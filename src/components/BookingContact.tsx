@@ -23,17 +23,24 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
   };
 
   return (
-    <section id="contacto" className={`py-24 relative transition-colors ${darkMode ? 'bg-slate-950' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+    <section id="contacto" className={`py-24 relative transition-colors ${
+      darkMode 
+        ? 'bg-slate-950' 
+        : 'bg-gradient-to-b from-purple-100/70 via-slate-50 to-white'
+    }`}>
+      
+      {/* Faded Background Grid Texture */}
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-50" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Human Messaging */}
           <div className="lg:col-span-5 space-y-6 text-left">
-            <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold border ${
+            <div className={`inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold border shadow-sm ${
               darkMode 
                 ? 'bg-orange-950/40 border-orange-800 text-orange-400' 
-                : 'bg-orange-50 border-orange-200 text-orange-600'
+                : 'bg-white border-orange-200 text-orange-600 shadow-orange-500/10'
             }`}>
               <Sparkles className="w-4 h-4 text-orange-500" />
               <span>Charlemos sobre tu Proyecto</span>
@@ -43,13 +50,13 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
               ¿Cómo Podemos <span className="text-gradient-brand">Ayudar a Tu Empresa</span>?
             </h2>
 
-            <p className={`text-base leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+            <p className={`text-base leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}`}>
               Escríbenos o agenda una breve reunión. Nos encantará conocer a tu equipo, entender tus ideas y proponerte una solución sin ningún compromiso.
             </p>
 
             <div className="space-y-4 pt-2">
-              <div className={`p-4 rounded-xl border flex items-center space-x-3.5 ${
-                darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200 shadow-sm'
+              <div className={`p-4 rounded-xl border flex items-center space-x-3.5 shadow-sm ${
+                darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
               }`}>
                 <div className="p-2.5 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20">
                   <Clock className="w-5 h-5" />
@@ -60,8 +67,8 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                 </div>
               </div>
 
-              <div className={`p-4 rounded-xl border flex items-center space-x-3.5 ${
-                darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200 shadow-sm'
+              <div className={`p-4 rounded-xl border flex items-center space-x-3.5 shadow-sm ${
+                darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
               }`}>
                 <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                   <MessageSquare className="w-5 h-5" />
@@ -82,9 +89,9 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
             </div>
           </div>
 
-          {/* Right Column: Clean Booking Form */}
+          {/* Right Column: Form */}
           <div className={`lg:col-span-7 p-8 rounded-2xl border ${
-            darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200 shadow-md'
+            darkMode ? 'bg-slate-900 border-slate-800 shadow-xl' : 'bg-white border-slate-200 shadow-xl shadow-purple-500/5'
           }`}>
             {submitted ? (
               <div className="py-12 text-center space-y-4 animate-fade-in">
@@ -106,7 +113,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
               <form onSubmit={handleSubmit} className="space-y-5 text-left">
                 <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Enviar una Consulta o Solicitar Cita</h3>
                 
-                {/* Service Selector Pills */}
+                {/* Service Pills */}
                 <div>
                   <label className={`text-xs font-bold block mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>¿En qué podemos ayudarte?</label>
                   <div className="flex flex-wrap gap-2">
@@ -121,10 +128,10 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                         key={tag}
                         type="button"
                         onClick={() => setSelectedService(tag)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                        className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
                           selectedService === tag
-                            ? 'gradient-brand text-white border-orange-500 shadow-md shadow-orange-500/20'
-                            : darkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-white text-slate-700 border-slate-300'
+                            ? 'gradient-brand text-white border-orange-500 shadow-md shadow-orange-500/25'
+                            : darkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
                         {tag}
@@ -143,7 +150,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                       onChange={e => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Ej. María Pérez"
                       className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                       }`}
                     />
                   </div>
@@ -157,7 +164,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
                       placeholder="mperez@empresa.com"
                       className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                       }`}
                     />
                   </div>
@@ -172,7 +179,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                       onChange={e => setFormData({ ...formData, company: e.target.value })}
                       placeholder="Nombre de tu empresa"
                       className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                       }`}
                     />
                   </div>
@@ -185,7 +192,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                       onChange={e => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="+54 9 11 ..."
                       className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                       }`}
                     />
                   </div>
@@ -199,14 +206,14 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                     onChange={e => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Cuéntanos brevemente qué te gustaría mejorar o qué sistema necesitas construir..."
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                      darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                      darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                     }`}
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35 transition-all flex items-center justify-center space-x-2"
+                  className="w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-xl shadow-orange-500/25 hover:shadow-orange-500/35 transition-all flex items-center justify-center space-x-2"
                 >
                   <Calendar className="w-4 h-4" />
                   <span>Enviar Mensaje</span>
@@ -216,7 +223,6 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
           </div>
 
         </div>
-
       </div>
     </section>
   );

@@ -9,32 +9,36 @@ interface SolutionsShowcaseProps {
 
 export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBooking, darkMode }) => {
   return (
-    <section id="soluciones" className={`py-24 relative overflow-hidden transition-colors ${darkMode ? 'bg-slate-950' : 'bg-white'}`}>
+    <section id="soluciones" className={`py-24 relative overflow-hidden transition-colors ${
+      darkMode 
+        ? 'bg-slate-950' 
+        : 'bg-gradient-to-br from-amber-50 via-orange-50/50 to-slate-100'
+    }`}>
       
-      {/* Subtle Faded Grid Background Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-30" />
+      {/* Faded Background Grid Texture */}
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-50" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Column: Floating 3D Low-Poly Artwork (100% Transparent, No Box Shadow, No Frame) */}
+          {/* Left Column: Floating Artwork */}
           <div className="lg:col-span-5 relative flex justify-center order-2 lg:order-1">
             <div className="relative w-full max-w-md">
               <img
                 src={solPerson}
                 alt="iAtomica Collaborative Team"
-                className="w-full h-auto object-contain artwork-cutout pointer-events-none"
+                className="w-full h-auto object-contain artwork-cutout pointer-events-none drop-shadow-xl"
               />
             </div>
           </div>
 
-          {/* Right Column: Clear Solutions Breakdown */}
+          {/* Right Column: Solutions Breakdown */}
           <div className="lg:col-span-7 space-y-6 text-left order-1 lg:order-2">
             
-            <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold border ${
+            <div className={`inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold border shadow-sm ${
               darkMode 
                 ? 'bg-purple-950/40 border-purple-800 text-purple-300' 
-                : 'bg-purple-50 border-purple-200 text-purple-700'
+                : 'bg-white border-purple-200 text-purple-700 shadow-purple-500/10'
             }`}>
               <Sparkles className="w-4 h-4 text-orange-500" />
               <span>Soluciones Orientadas a Resultados</span>
@@ -45,12 +49,12 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
               <span className="text-gradient-brand">Tu Equipo Necesita</span>.
             </h2>
 
-            <p className={`text-base leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+            <p className={`text-base sm:text-lg leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}`}>
               No vendemos fórmulas complejas. Estudiamos tus necesidades reales y desarrollamos soluciones digitales sencillas de usar que resuelven los problemas diarios de tu empresa.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <div className={`p-4 rounded-xl border shadow-sm ${darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
                 <h4 className="text-sm font-bold flex items-center gap-2 mb-1">
                   <Smile className="w-4 h-4 text-orange-500" />
                   <span>Fácil Adaptación</span>
@@ -60,9 +64,9 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
                 </p>
               </div>
 
-              <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <div className={`p-4 rounded-xl border shadow-sm ${darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
                 <h4 className="text-sm font-bold flex items-center gap-2 mb-1">
-                  <ShieldCheck className="w-4 h-4 text-purple-500" />
+                  <ShieldCheck className="w-4 h-4 text-purple-600" />
                   <span>Control de Calidad</span>
                 </h4>
                 <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -74,7 +78,7 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
             <div className="pt-4">
               <button
                 onClick={onOpenBooking}
-                className="px-8 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center space-x-2 group"
+                className="px-8 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-xl shadow-orange-500/25 hover:shadow-orange-500/35 transition-all flex items-center space-x-2 group"
               >
                 <span>Plantear una Consulta</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -86,12 +90,12 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
         </div>
       </div>
 
-      {/* SVG Wave Divider Transition to Next Section */}
+      {/* SVG Wave Divider Transition to Dark Section 4 (Methodology) */}
       <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none">
         <svg
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"
-          className={`relative block w-full h-12 ${darkMode ? 'text-slate-900/60 fill-current' : 'text-slate-50 fill-current'}`}
+          className="relative block w-full h-14 text-slate-950 fill-current"
         >
           <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,20 1200,60 L1200,120 L0,120 Z"></path>
         </svg>
