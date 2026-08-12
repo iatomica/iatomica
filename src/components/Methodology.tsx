@@ -44,27 +44,26 @@ interface MethodologyProps {
   darkMode: boolean;
 }
 
-export const Methodology: React.FC<MethodologyProps> = () => {
+export const Methodology: React.FC<MethodologyProps> = ({ darkMode }) => {
   return (
-    <section id="metodologia" className="py-24 relative overflow-hidden bg-gradient-to-br from-indigo-900 via-blue-900 to-purple-950 text-white">
+    <section id="metodologia" className={`py-24 relative overflow-hidden transition-colors ${
+      darkMode ? 'bg-slate-900/90 border-y border-slate-800 text-white' : 'bg-purple-50/40 border-y border-purple-100/80 text-slate-900'
+    }`}>
       
-      {/* Background Faded Grid Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-30" />
-
-      {/* Ambient Glows */}
-      <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-cyan-400/20 rounded-full filter blur-[110px] pointer-events-none" />
+      {/* Subtle Faded Grid Background Texture */}
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-40" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-300 bg-white/10 px-4 py-1.5 rounded-full border border-white/20 shadow-lg">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-purple-600 bg-purple-500/10 px-3.5 py-1.5 rounded-full border border-purple-500/20">
             Nuestra Forma de Trabajo
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white mt-4">
-            Un Proceso Simple, Claro y <span className="text-amber-300 drop-shadow-md">Sin Complicaciones</span>
+          <h2 className={`text-3xl sm:text-5xl font-black tracking-tight mt-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            Un Proceso Simple, Claro y <span className="text-gradient-brand">Sin Complicaciones</span>
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-blue-100 font-medium">
+          <p className={`mt-4 text-base sm:text-lg ${darkMode ? 'text-slate-300' : 'text-slate-600 font-medium'}`}>
             Te acompañamos paso a paso para que la transformación tecnológica de tu empresa sea ágil y segura.
           </p>
         </div>
@@ -76,11 +75,13 @@ export const Methodology: React.FC<MethodologyProps> = () => {
             return (
               <div
                 key={idx}
-                className="p-6 rounded-2xl bg-white/95 text-slate-900 backdrop-blur-md border border-white/40 shadow-2xl flex flex-col justify-between group transition-all duration-300 hover:-translate-y-2"
+                className={`p-6 rounded-2xl clean-card flex flex-col justify-between group ${
+                  darkMode ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200/90 shadow-sm hover:shadow-md'
+                }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <span className="font-mono text-3xl font-black text-orange-600">
+                    <span className="font-mono text-2xl font-black text-orange-500">
                       {st.number}
                     </span>
                     <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-600 border border-orange-500/20">
@@ -88,21 +89,21 @@ export const Methodology: React.FC<MethodologyProps> = () => {
                     </div>
                   </div>
 
-                  <span className="text-xs font-bold text-purple-700 block mb-1">
+                  <span className="text-xs font-bold text-purple-600 block mb-1">
                     {st.subtitle}
                   </span>
-                  <h3 className="text-lg font-black text-slate-900 mb-3">
+                  <h3 className={`text-lg font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                     {st.title}
                   </h3>
 
-                  <p className="text-xs leading-relaxed text-slate-600 font-medium">
+                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600 font-medium'}`}>
                     {st.description}
                   </p>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-slate-100 text-[11px] font-bold text-slate-400 flex items-center justify-between">
+                <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 flex items-center justify-between">
                   <span>PASO {st.number}</span>
-                  <ArrowRight className="w-4 h-4 text-orange-600 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 text-orange-500 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             );
@@ -110,10 +111,6 @@ export const Methodology: React.FC<MethodologyProps> = () => {
         </div>
 
       </div>
-
-      {/* Fusion Feathers Top & Bottom */}
-      <div className="fusion-feather-top" />
-      <div className="fusion-feather-bottom" />
     </section>
   );
 };
