@@ -44,27 +44,37 @@ interface MethodologyProps {
   darkMode: boolean;
 }
 
-export const Methodology: React.FC<MethodologyProps> = () => {
+export const Methodology: React.FC<MethodologyProps> = ({ darkMode }) => {
   return (
-    <section id="metodologia" className="py-24 relative bg-slate-950 text-white overflow-hidden">
+    <section id="metodologia" className={`py-24 relative overflow-hidden transition-colors ${
+      darkMode 
+        ? 'bg-slate-900 text-white' 
+        : 'bg-gradient-to-b from-purple-100/70 via-slate-100/50 to-orange-100/60 text-slate-900'
+    }`}>
       
       {/* Faded Background Grid Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-40" />
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-50" />
 
       {/* Ambient Glows */}
-      <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-purple-600/20 rounded-full filter blur-[100px] pointer-events-none" />
+      <div className={`absolute top-1/2 left-1/3 w-96 h-96 rounded-full filter blur-[110px] pointer-events-none ${
+        darkMode ? 'bg-purple-600/20' : 'bg-purple-300/40 opacity-70'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-4 py-1.5 rounded-full border border-purple-500/30 shadow-lg shadow-purple-500/10">
+          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-4 py-1.5 rounded-full border shadow-sm ${
+            darkMode 
+              ? 'bg-purple-500/10 border-purple-500/30 text-purple-400' 
+              : 'bg-white border-purple-300 text-purple-700 shadow-purple-500/10'
+          }`}>
             Nuestra Forma de Trabajo
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white mt-4">
+          <h2 className={`text-3xl sm:text-5xl font-black tracking-tight mt-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             Un Proceso Simple, Claro y <span className="text-gradient-brand">Sin Complicaciones</span>
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-300">
+          <p className={`mt-4 text-base sm:text-lg ${darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}`}>
             Te acompañamos paso a paso para que la transformación tecnológica de tu empresa sea ágil y segura.
           </p>
         </div>
@@ -76,33 +86,37 @@ export const Methodology: React.FC<MethodologyProps> = () => {
             return (
               <div
                 key={idx}
-                className="p-6 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-800 hover:border-orange-500/40 shadow-xl flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1"
+                className={`p-6 rounded-2xl clean-card flex flex-col justify-between group transition-all duration-300 ${
+                  darkMode 
+                    ? 'bg-slate-950/90 border-slate-800' 
+                    : 'bg-white/90 backdrop-blur-md border-slate-200/90 shadow-xl shadow-purple-500/5'
+                }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <span className="font-mono text-3xl font-black text-orange-500">
                       {st.number}
                     </span>
-                    <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                    <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-500 border border-orange-500/20">
                       <Icon className="w-5 h-5" />
                     </div>
                   </div>
 
-                  <span className="text-xs font-bold text-purple-400 block mb-1">
+                  <span className="text-xs font-bold text-purple-600 block mb-1">
                     {st.subtitle}
                   </span>
-                  <h3 className="text-lg font-bold text-white mb-3">
+                  <h3 className={`text-lg font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                     {st.title}
                   </h3>
 
-                  <p className="text-xs leading-relaxed text-slate-300">
+                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                     {st.description}
                   </p>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-slate-800 text-[11px] font-bold text-slate-400 flex items-center justify-between">
+                <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 flex items-center justify-between">
                   <span>PASO {st.number}</span>
-                  <ArrowRight className="w-4 h-4 text-orange-400 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 text-orange-500 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             );
@@ -111,16 +125,9 @@ export const Methodology: React.FC<MethodologyProps> = () => {
 
       </div>
 
-      {/* SVG Wave Divider Transition to Section 5 (BookingContact) */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none">
-        <svg
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-          className="relative block w-full h-14 text-purple-100/60 fill-current"
-        >
-          <path d="M0,0 C300,90 600,-40 900,40 C1050,80 1150,20 1200,30 L1200,120 L0,120 Z"></path>
-        </svg>
-      </div>
+      {/* Seamless Fusion Feathers Top & Bottom */}
+      <div className="fusion-feather-top" />
+      <div className="fusion-feather-bottom" />
     </section>
   );
 };

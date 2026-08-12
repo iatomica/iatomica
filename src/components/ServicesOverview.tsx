@@ -84,29 +84,41 @@ interface ServicesOverviewProps {
   darkMode: boolean;
 }
 
-export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBooking }) => {
+export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBooking, darkMode }) => {
   return (
-    <section id="servicios" className="py-24 relative bg-slate-900 text-white overflow-hidden">
+    <section id="servicios" className={`py-24 relative overflow-hidden transition-colors ${
+      darkMode 
+        ? 'bg-slate-900 text-white' 
+        : 'bg-gradient-to-b from-purple-100/70 via-orange-50/40 to-slate-100/80 text-slate-900'
+    }`}>
       
       {/* Faded Background Grid Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-40" />
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-50" />
 
-      {/* Glowing Ambient Glows */}
-      <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full filter blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-orange-600/20 rounded-full filter blur-[100px] pointer-events-none" />
+      {/* Ambient Glowing Aura Spotlights */}
+      <div className={`absolute top-1/3 left-1/4 w-96 h-96 rounded-full filter blur-[110px] pointer-events-none ${
+        darkMode ? 'bg-purple-600/20' : 'bg-purple-300/40 opacity-70'
+      }`} />
+      <div className={`absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full filter blur-[110px] pointer-events-none ${
+        darkMode ? 'bg-orange-600/20' : 'bg-orange-300/40 opacity-70'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/30 shadow-lg shadow-orange-500/10">
+          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-4 py-1.5 rounded-full border shadow-sm ${
+            darkMode 
+              ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' 
+              : 'bg-white border-orange-300 text-orange-600 shadow-orange-500/10'
+          }`}>
             Nuestros Servicios
           </span>
-          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white mt-4">
+          <h2 className={`text-3xl sm:text-5xl font-black tracking-tight mt-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             Todo lo que Necesitas para <br />
             <span className="text-gradient-brand">Impulsar Tu Empresa</span>
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-300">
+          <p className={`mt-4 text-base sm:text-lg ${darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}`}>
             Combinamos consultoría práctica, desarrollo de software, inteligencia artificial y comunicación para ayudarte a crecer.
           </p>
         </div>
@@ -116,7 +128,11 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
           {PILLARS.map((p, idx) => (
             <div
               key={idx}
-              className="w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:border-orange-500/40 shadow-xl shadow-black/40 flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1.5"
+              className={`w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl clean-card flex flex-col justify-between group transition-all duration-300 ${
+                darkMode 
+                  ? 'bg-slate-950/90 border-slate-800' 
+                  : 'bg-white/90 backdrop-blur-md border-slate-200/90 shadow-xl shadow-purple-500/5'
+              }`}
             >
               <div>
                 {/* 3D Low-Poly Icon Header */}
@@ -124,31 +140,35 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
                   <div className="w-14 h-14 flex items-center justify-center p-1 rounded-2xl bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 shadow-inner">
                     <img src={p.icon3d} alt={p.title} className="w-12 h-12 object-contain" />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
+                    darkMode 
+                      ? 'bg-slate-800 text-slate-300 border-slate-700' 
+                      : 'bg-slate-100 text-slate-700 border-slate-200'
+                  }`}>
                     {p.badge}
                   </span>
                 </div>
 
-                <span className="text-xs font-bold text-orange-400 block mb-1">{p.tagline}</span>
-                <h3 className="text-xl font-bold text-white mb-3">
+                <span className="text-xs font-bold text-orange-500 block mb-1">{p.tagline}</span>
+                <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                   {p.title}
                 </h3>
 
-                <p className="text-xs leading-relaxed text-slate-300 mb-6">
+                <p className={`text-xs leading-relaxed mb-6 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                   {p.description}
                 </p>
 
                 <div className="space-y-2 mb-6">
                   {p.points.map((pt, ptIdx) => (
-                    <div key={ptIdx} className="flex items-start space-x-2 text-xs text-slate-300">
-                      <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <span>{pt}</span>
+                    <div key={ptIdx} className="flex items-start space-x-2 text-xs">
+                      <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <span className={darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}>{pt}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-800">
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={onOpenBooking}
                   className="w-full py-3 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 flex items-center justify-center space-x-2 transition-all"
@@ -163,16 +183,9 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
 
       </div>
 
-      {/* SVG Wave Divider Transition to Section 3 (SolutionsShowcase) */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none">
-        <svg
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-          className="relative block w-full h-14 text-amber-50 fill-current"
-        >
-          <path d="M0,0 C300,90 600,-40 900,40 C1050,80 1150,20 1200,30 L1200,120 L0,120 Z"></path>
-        </svg>
-      </div>
+      {/* Seamless Fusion Feathers Top & Bottom */}
+      <div className="fusion-feather-top" />
+      <div className="fusion-feather-bottom" />
     </section>
   );
 };

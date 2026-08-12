@@ -10,18 +10,21 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMode }) => {
   return (
-    <section className={`relative min-h-[92vh] pt-32 pb-24 flex flex-col justify-center overflow-hidden transition-colors ${
+    <section className={`relative min-h-[92vh] pt-32 pb-28 flex flex-col justify-center overflow-hidden transition-colors ${
       darkMode 
         ? 'bg-slate-950' 
-        : 'bg-gradient-to-br from-orange-100/70 via-slate-50 to-purple-100/70'
+        : 'bg-gradient-to-b from-orange-100/90 via-purple-50/60 to-slate-50/90'
     }`}>
       
-      {/* Faded Grid Background Texture */}
+      {/* Soft Faded Grid Background Texture */}
       <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-80" />
 
-      {/* Vibrant Background Soft Glows */}
-      <div className={`absolute top-12 left-1/2 -translate-x-1/2 w-[650px] h-[650px] rounded-full filter blur-[100px] pointer-events-none ${
-        darkMode ? 'bg-purple-900/30 opacity-40' : 'bg-orange-300/40 opacity-60'
+      {/* Vibrant Glowing Spotlights */}
+      <div className={`absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full filter blur-[120px] pointer-events-none ${
+        darkMode ? 'bg-purple-900/30 opacity-40' : 'bg-orange-300/50 opacity-70'
+      }`} />
+      <div className={`absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full filter blur-[100px] pointer-events-none ${
+        darkMode ? 'bg-orange-900/20 opacity-30' : 'bg-purple-300/50 opacity-60'
       }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -30,11 +33,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
           {/* Left Column: Headline & Messaging */}
           <div className="lg:col-span-7 space-y-6 text-left">
             
-            {/* Badge */}
+            {/* Friendly Badge */}
             <div className={`inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold border shadow-sm ${
               darkMode 
                 ? 'bg-slate-900/90 border-slate-700 text-orange-400' 
-                : 'bg-white/90 border-orange-200 text-orange-600 shadow-orange-500/10'
+                : 'bg-white/90 border-orange-300 text-orange-600 shadow-orange-500/10'
             }`}>
               <HeartHandshake className="w-4 h-4 text-orange-500" />
               <span>Tu Socio Tecnológico de Confianza</span>
@@ -100,7 +103,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
               <img
                 src={heroPerson}
                 alt="iAtomica Team Illustration"
-                className="w-full h-auto object-contain artwork-cutout pointer-events-none drop-shadow-xl"
+                className="w-full h-auto object-contain artwork-cutout pointer-events-none"
               />
             </div>
           </div>
@@ -108,16 +111,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
         </div>
       </div>
 
-      {/* SVG Wave Divider Transition to Dark Section 2 (ServicesOverview) */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none">
-        <svg
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-          className="relative block w-full h-14 text-slate-900 fill-current"
-        >
-          <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,20 1200,60 L1200,120 L0,120 Z"></path>
-        </svg>
-      </div>
+      {/* Seamless Fusion Feather Bottom */}
+      <div className="fusion-feather-bottom" />
     </section>
   );
 };

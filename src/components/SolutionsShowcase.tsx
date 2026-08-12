@@ -12,11 +12,16 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
     <section id="soluciones" className={`py-24 relative overflow-hidden transition-colors ${
       darkMode 
         ? 'bg-slate-950' 
-        : 'bg-gradient-to-br from-amber-50 via-orange-50/50 to-slate-100'
+        : 'bg-gradient-to-b from-amber-100/60 via-orange-50/50 to-purple-100/60'
     }`}>
       
-      {/* Faded Background Grid Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-50" />
+      {/* Soft Faded Background Grid Texture */}
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-60" />
+
+      {/* Vibrant Ambient Glows */}
+      <div className={`absolute top-1/4 right-1/4 w-96 h-96 rounded-full filter blur-[110px] pointer-events-none ${
+        darkMode ? 'bg-orange-600/20' : 'bg-amber-300/50 opacity-70'
+      }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -27,7 +32,7 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
               <img
                 src={solPerson}
                 alt="iAtomica Collaborative Team"
-                className="w-full h-auto object-contain artwork-cutout pointer-events-none drop-shadow-xl"
+                className="w-full h-auto object-contain artwork-cutout pointer-events-none"
               />
             </div>
           </div>
@@ -90,16 +95,9 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
         </div>
       </div>
 
-      {/* SVG Wave Divider Transition to Dark Section 4 (Methodology) */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none">
-        <svg
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-          className="relative block w-full h-14 text-slate-950 fill-current"
-        >
-          <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,20 1200,60 L1200,120 L0,120 Z"></path>
-        </svg>
-      </div>
+      {/* Seamless Fusion Feathers Top & Bottom */}
+      <div className="fusion-feather-top" />
+      <div className="fusion-feather-bottom" />
     </section>
   );
 };
