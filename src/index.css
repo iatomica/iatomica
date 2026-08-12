@@ -1,22 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --bg-deep: #070a12;
-  --bg-surface: #0e1322;
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --border-color: #e2e8f0;
   --orange-primary: #ff6b00;
-  --orange-glow: #f97316;
   --violet-primary: #7c3aed;
-  --violet-glow: #9333ea;
+}
+
+.dark {
+  --bg-main: #090d16;
+  --bg-surface: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #1e293b;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-deep);
-  color: #f8fafc;
+  background-color: var(--bg-main);
+  color: var(--text-main);
   font-family: 'Plus Jakarta Sans', sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
   selection-background-color: #ff6b00;
   selection-color: #ffffff;
 }
@@ -25,93 +35,52 @@ h1, h2, h3, h4, .font-heading {
   font-family: 'Outfit', sans-serif;
 }
 
-.font-mono {
-  font-family: 'Fira Code', monospace;
-}
-
 /* --- Brand Signature Gradients --- */
 .gradient-brand {
-  background: linear-gradient(135deg, #ff6b00 0%, #d946ef 50%, #7c3aed 100%);
+  background: linear-gradient(135deg, #ff6b00 0%, #a855f7 50%, #7c3aed 100%);
 }
 
 .text-gradient-brand {
-  background: linear-gradient(135deg, #ff8c38 0%, #f97316 35%, #c084fc 70%, #9333ea 100%);
+  background: linear-gradient(135deg, #ff6b00 0%, #d946ef 50%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-orange {
-  background: linear-gradient(135deg, #ffffff 0%, #ff8c38 50%, #f97316 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-violet {
-  background: linear-gradient(135deg, #ffffff 0%, #c084fc 50%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* --- Linear Style Minimalist Cards --- */
-.linear-card {
-  background: rgba(14, 19, 34, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+/* --- Fresh Clean Panels --- */
+.clean-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
 }
 
-.linear-card:hover {
-  border-color: rgba(249, 115, 22, 0.4);
-  box-shadow: 0 20px 40px -15px rgba(249, 115, 22, 0.15), 0 0 25px rgba(124, 58, 237, 0.12);
+.clean-card:hover {
+  border-color: rgba(255, 107, 0, 0.4);
+  box-shadow: 0 12px 30px -10px rgba(255, 107, 0, 0.12);
   transform: translateY(-2px);
 }
 
-.linear-nav {
-  background: rgba(7, 10, 18, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+/* Floating Artwork Cutout Effect */
+.artwork-cutout {
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.12));
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* --- Ambient Auras --- */
-.aura-orange {
-  position: absolute;
-  width: 550px;
-  height: 550px;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.14) 0%, rgba(7, 10, 18, 0) 70%);
-  filter: blur(70px);
-  pointer-events: none;
-}
-
-.aura-violet {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.14) 0%, rgba(7, 10, 18, 0) 70%);
-  filter: blur(80px);
-  pointer-events: none;
-}
-
-/* --- Grid Pattern Background --- */
-.bg-grid-line {
-  background-size: 50px 50px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+.artwork-cutout:hover {
+  transform: scale(1.03) rotate(-1deg);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #070a12;
+  background: var(--bg-main);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: #cbd5e1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #f97316;
+  background: #ff6b00;
 }

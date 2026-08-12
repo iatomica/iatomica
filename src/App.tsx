@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { SolutionsSpectrum } from './components/SolutionsSpectrum';
-import { TradeShowcase } from './components/TradeShowcase';
+import { ServicesOverview } from './components/ServicesOverview';
+import { SolutionsShowcase } from './components/SolutionsShowcase';
 import { Methodology } from './components/Methodology';
-import { ArchitectureDiagram } from './components/ArchitectureDiagram';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AiChatModal } from './components/AiChatModal';
 
 export function App() {
+  const [darkMode, setDarkMode] = useState(false); // Native Light Mode Default
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const scrollToBooking = () => {
     const el = document.getElementById('contacto');
@@ -20,38 +28,47 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-orange-500 selection:text-slate-950">
+    <div className="min-h-screen transition-colors duration-300">
       
-      {/* Navigation Header */}
+      {/* Header & Sticky Navigation */}
       <Navbar
         onOpenBooking={scrollToBooking}
         onOpenAiChat={() => setIsAiChatOpen(true)}
+        darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
 
-      {/* Main Sections */}
+      {/* Main Content */}
       <main>
         <Hero
           onOpenBooking={scrollToBooking}
           onOpenAiChat={() => setIsAiChatOpen(true)}
+          darkMode={darkMode}
         />
 
-        <SolutionsSpectrum
+        <ServicesOverview
           onOpenBooking={scrollToBooking}
+          darkMode={darkMode}
         />
 
-        <TradeShowcase
+        <SolutionsShowcase
           onOpenBooking={scrollToBooking}
+          darkMode={darkMode}
         />
 
-        <Methodology />
+        <Methodology
+          darkMode={darkMode}
+        />
 
-        <ArchitectureDiagram />
-
-        <BookingContact />
+        <BookingContact
+          darkMode={darkMode}
+        />
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer
+        darkMode={darkMode}
+      />
 
       {/* Floating AI Chat Assistant Modal */}
       <AiChatModal

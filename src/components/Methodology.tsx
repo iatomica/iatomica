@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Cpu, Code2, Rocket, ArrowRight, Sparkles } from 'lucide-react';
+import { MessageCircle, Compass, Code2, HeartHandshake, ArrowRight } from 'lucide-react';
 
 interface Step {
   number: string;
@@ -7,60 +7,58 @@ interface Step {
   subtitle: string;
   description: string;
   icon: any;
-  color: string;
 }
 
 const STEPS: Step[] = [
   {
     number: '01',
-    title: 'Auditoría & Discovery',
-    subtitle: 'Análisis de Procesos',
-    description: 'Auditamos los flujos de trabajo actuales de su empresa, identificamos cuellos de botella manuales y evaluamos el potencial de integración de IA.',
-    icon: Compass,
-    color: 'text-orange-400 border-orange-500/30 bg-orange-500/10'
+    title: 'Conversación & Diagnóstico',
+    subtitle: 'Escuchamos tus necesidades',
+    description: 'Nos reunimos para entender la rutina de tu empresa, los problemas a resolver y las áreas donde la tecnología te dará mejores resultados.',
+    icon: MessageCircle,
   },
   {
     number: '02',
-    title: 'Arquitectura de Solución',
-    subtitle: 'Diseño de Ingeniería',
-    description: 'Diseñamos la hoja de ruta técnica: selección de modelos de IA (RAG/LLMs), estructura de bases de datos, seguridad E2E e integraciones de API.',
-    icon: Cpu,
-    color: 'text-purple-400 border-purple-500/30 bg-purple-500/10'
+    title: 'Diseño de la Solución',
+    subtitle: 'Plan transparente',
+    description: 'Diseñamos la estrategia y el prototipo de la herramienta o contenido. Te explicamos de forma sencilla qué haremos y cuánto tiempo tomará.',
+    icon: Compass,
   },
   {
     number: '03',
-    title: 'Desarrollo & Integración',
-    subtitle: 'Construcción Ágil',
-    description: 'Desarrollamos el software a medida, configuramos agentes autónomos y los interconectamos con sus sistemas ERP/CRM existentes (Odoo, SAP, etc.).',
+    title: 'Desarrollo & Pruebas de Calidad',
+    subtitle: 'Construcción profesional',
+    description: 'Creamos el software, configuramos las herramientas de IA y realizamos controles de calidad (QA) estrictos para garantizar que funcione perfecto.',
     icon: Code2,
-    color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10'
   },
   {
     number: '04',
-    title: 'Despliegue & Escalado',
-    subtitle: 'Operación Continua',
-    description: 'Puesta en marcha supervisada, capacitación del equipo interno y monitoreo de performance para garantizar escalabilidad operativa.',
-    icon: Rocket,
-    color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
+    title: 'Puesta en Marcha & Soporte',
+    subtitle: 'Acompañamiento continuo',
+    description: 'Implementamos la solución con tu equipo, los capacitamos en su uso y nos quedamos a tu lado ofreciendo mantenimiento y mejoras constantes.',
+    icon: HeartHandshake,
   }
 ];
 
-export const Methodology: React.FC = () => {
+interface MethodologyProps {
+  darkMode: boolean;
+}
+
+export const Methodology: React.FC<MethodologyProps> = ({ darkMode }) => {
   return (
-    <section id="metodologia" className="py-24 relative bg-slate-950">
+    <section id="metodologia" className={`py-24 transition-colors ${darkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-mono mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-            <span>Proceso de Trabajo de Alto Nivel</span>
-          </div>
-          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            Metodología de <span className="text-gradient-brand">Consultoría &amp; Desarrollo</span>
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-purple-600 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+            Nuestra Forma de Trabajo
+          </span>
+          <h2 className={`text-3xl sm:text-5xl font-black tracking-tight mt-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            Un Proceso Simple, Claro y <span className="text-gradient-brand">Sin Complicaciones</span>
           </h2>
-          <p className="mt-4 text-slate-400 text-base sm:text-lg">
-            Un marco estructurado y riguroso desde el diagnóstico inicial hasta el despliegue de soluciones en producción.
+          <p className={`mt-4 text-base sm:text-lg ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            Te acompañamos paso a paso para que la transformación tecnológica de tu empresa sea ágil y segura.
           </p>
         </div>
 
@@ -71,33 +69,35 @@ export const Methodology: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="p-6 rounded-2xl linear-card border border-slate-800 hover:border-orange-500/30 flex flex-col justify-between group"
+                className={`p-6 rounded-2xl clean-card flex flex-col justify-between group ${
+                  darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <span className="font-mono text-2xl font-black text-slate-500 group-hover:text-orange-400 transition-colors">
+                    <span className="font-mono text-2xl font-black text-orange-500">
                       {st.number}
                     </span>
-                    <div className={`p-2.5 rounded-xl border ${st.color}`}>
+                    <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-600 border border-orange-500/20">
                       <Icon className="w-5 h-5" />
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <span className="text-xs font-bold text-purple-600 block mb-1">
                     {st.subtitle}
                   </span>
-                  <h3 className="text-lg font-bold text-white mb-3 group-hover:text-orange-300 transition-colors">
+                  <h3 className={`text-lg font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                     {st.title}
                   </h3>
 
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                     {st.description}
                   </p>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-slate-800/80 text-[10px] font-mono text-slate-500 flex items-center justify-between">
-                  <span>ETAPA {st.number}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
+                <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 flex items-center justify-between">
+                  <span>PASO {st.number}</span>
+                  <ArrowRight className="w-4 h-4 text-orange-500 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             );
