@@ -119,11 +119,13 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
               className="w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-orange-500/40 shadow-xl flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1.5"
             >
               <div>
-                {/* 3D Low-Poly Icon Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-14 h-14 flex items-center justify-center p-1 rounded-2xl bg-slate-900 border border-slate-800 shadow-inner">
-                    <img src={p.icon3d} alt={p.title} className="w-12 h-12 object-contain" />
-                  </div>
+                {/* 3D Low-Poly Icon Header (Double Size, No Frame) */}
+                <div className="flex items-start justify-between mb-4">
+                  <img
+                    src={p.icon3d}
+                    alt={p.title}
+                    className="w-24 h-24 object-contain pointer-events-none -ml-2 -mt-2 filter drop-shadow-md"
+                  />
                   <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
                     {p.badge}
                   </span>
