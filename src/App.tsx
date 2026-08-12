@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { AiAgentSimulator } from './components/AiAgentSimulator';
-import { RoiCalculator } from './components/RoiCalculator';
-import { ServicesSuite } from './components/ServicesSuite';
+import { SolutionsSpectrum } from './components/SolutionsSpectrum';
+import { TradeShowcase } from './components/TradeShowcase';
+import { Methodology } from './components/Methodology';
 import { ArchitectureDiagram } from './components/ArchitectureDiagram';
-import { CaseStudies } from './components/CaseStudies';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AiChatModal } from './components/AiChatModal';
@@ -21,7 +20,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-orange-500 selection:text-slate-950">
       
       {/* Navigation Header */}
       <Navbar
@@ -36,19 +35,17 @@ export function App() {
           onOpenAiChat={() => setIsAiChatOpen(true)}
         />
 
-        <AiAgentSimulator />
-
-        <RoiCalculator
+        <SolutionsSpectrum
           onOpenBooking={scrollToBooking}
         />
 
-        <ServicesSuite
+        <TradeShowcase
           onOpenBooking={scrollToBooking}
         />
+
+        <Methodology />
 
         <ArchitectureDiagram />
-
-        <CaseStudies />
 
         <BookingContact />
       </main>
