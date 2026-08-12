@@ -84,27 +84,29 @@ interface ServicesOverviewProps {
   darkMode: boolean;
 }
 
-export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBooking, darkMode }) => {
+export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBooking }) => {
   return (
-    <section id="servicios" className={`py-24 relative transition-colors ${
-      darkMode ? 'bg-slate-900/90 border-y border-slate-800 text-white' : 'bg-slate-50 border-y border-slate-200/80 text-slate-900'
-    }`}>
+    <section id="servicios" className="py-24 relative bg-[#0B0F19] text-white border-y border-slate-800/80 overflow-hidden">
       
-      {/* Subtle Faded Grid Background Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-40" />
+      {/* Subtle Dot Matrix Texture */}
+      <div className="absolute inset-0 bg-dot-subtle pointer-events-none opacity-40" />
+
+      {/* Glowing Ambient Spotlights */}
+      <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] bg-purple-600/15 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-[450px] h-[450px] bg-orange-500/15 rounded-full filter blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600 bg-orange-500/10 px-3.5 py-1.5 rounded-full border border-orange-500/20">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 shadow-sm">
             Nuestros Servicios
           </span>
-          <h2 className={`text-3xl sm:text-5xl font-black tracking-tight mt-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white mt-4">
             Todo lo que Necesitas para <br />
             <span className="text-gradient-brand">Impulsar Tu Empresa</span>
           </h2>
-          <p className={`mt-4 text-base sm:text-lg ${darkMode ? 'text-slate-300' : 'text-slate-600 font-medium'}`}>
+          <p className="mt-4 text-base sm:text-lg text-slate-300">
             Combinamos consultoría práctica, desarrollo de software, inteligencia artificial y comunicación para ayudarte a crecer.
           </p>
         </div>
@@ -114,46 +116,42 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
           {PILLARS.map((p, idx) => (
             <div
               key={idx}
-              className={`w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl clean-card flex flex-col justify-between group ${
-                darkMode ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200 shadow-sm hover:shadow-md'
-              }`}
+              className="w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-orange-500/40 shadow-xl flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1.5"
             >
               <div>
                 {/* 3D Low-Poly Icon Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-14 h-14 flex items-center justify-center p-1 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-xs">
+                  <div className="w-14 h-14 flex items-center justify-center p-1 rounded-2xl bg-slate-900 border border-slate-800 shadow-inner">
                     <img src={p.icon3d} alt={p.title} className="w-12 h-12 object-contain" />
                   </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
-                    darkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-600 border-slate-200'
-                  }`}>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
                     {p.badge}
                   </span>
                 </div>
 
-                <span className="text-xs font-bold text-orange-600 block mb-1">{p.tagline}</span>
-                <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <span className="text-xs font-bold text-orange-400 block mb-1">{p.tagline}</span>
+                <h3 className="text-xl font-bold text-white mb-3">
                   {p.title}
                 </h3>
 
-                <p className={`text-xs leading-relaxed mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-600 font-medium'}`}>
+                <p className="text-xs leading-relaxed text-slate-300 mb-6">
                   {p.description}
                 </p>
 
                 <div className="space-y-2 mb-6">
                   {p.points.map((pt, ptIdx) => (
-                    <div key={ptIdx} className="flex items-start space-x-2 text-xs">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span className={darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}>{pt}</span>
+                    <div key={ptIdx} className="flex items-start space-x-2 text-xs text-slate-300">
+                      <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>{pt}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+              <div className="pt-6 border-t border-slate-800">
                 <button
                   onClick={onOpenBooking}
-                  className="w-full py-3 rounded-xl gradient-brand text-white font-bold text-xs shadow-md shadow-orange-500/15 hover:shadow-orange-500/25 flex items-center justify-center space-x-2 transition-all"
+                  className="w-full py-3 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 flex items-center justify-center space-x-2 transition-all"
                 >
                   <span>Consultar por este servicio</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

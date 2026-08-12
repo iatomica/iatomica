@@ -10,16 +10,16 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMode }) => {
   return (
-    <section className={`relative min-h-[88vh] pt-32 pb-20 flex flex-col justify-center overflow-hidden transition-colors ${
+    <section className={`relative min-h-[90vh] pt-32 pb-20 flex flex-col justify-center overflow-hidden transition-colors ${
       darkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'
     }`}>
       
-      {/* Subtle Faded Grid Background Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-40" />
+      {/* Subtle Architectural Grid Texture */}
+      <div className="absolute inset-0 bg-grid-subtle pointer-events-none opacity-60" />
 
-      {/* Subtle Warm Backdrop Spotlights */}
-      <div className={`absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full filter blur-[120px] pointer-events-none ${
-        darkMode ? 'bg-purple-900/20 opacity-30' : 'bg-orange-100/60 opacity-60'
+      {/* Subtle Ambient Glow */}
+      <div className={`absolute top-12 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full filter blur-[120px] pointer-events-none ${
+        darkMode ? 'bg-purple-900/20 opacity-30' : 'bg-orange-100/50 opacity-60'
       }`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -28,7 +28,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
           {/* Left Column: Headline & Messaging */}
           <div className="lg:col-span-7 space-y-6 text-left">
             
-            {/* Friendly Badge */}
+            {/* Badge */}
             <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold border ${
               darkMode 
                 ? 'bg-slate-900 border-slate-800 text-orange-400' 
@@ -52,15 +52,15 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
 
             {/* Benefit Pills */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div className={`p-3 rounded-xl border flex items-center space-x-2.5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/80 shadow-xs'}`}>
+              <div className={`p-3 rounded-xl border flex items-center space-x-2.5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/80'}`}>
                 <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
                 <span className="text-xs font-bold">Ahorro de Tiempo</span>
               </div>
-              <div className={`p-3 rounded-xl border flex items-center space-x-2.5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/80 shadow-xs'}`}>
+              <div className={`p-3 rounded-xl border flex items-center space-x-2.5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/80'}`}>
                 <ShieldCheck className="w-4 h-4 text-purple-600 shrink-0" />
                 <span className="text-xs font-bold">Control &amp; Calidad</span>
               </div>
-              <div className={`p-3 rounded-xl border flex items-center space-x-2.5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/80 shadow-xs'}`}>
+              <div className={`p-3 rounded-xl border flex items-center space-x-2.5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/80'}`}>
                 <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span className="text-xs font-bold">Fácil de Usar</span>
               </div>
@@ -92,7 +92,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
 
           </div>
 
-          {/* Right Column: Floating Artwork on Crisp White Background */}
+          {/* Right Column: Floating Artwork on Pure White Background */}
           <div className="lg:col-span-5 relative flex justify-center items-center">
             <div className="relative w-full max-w-md">
               <img

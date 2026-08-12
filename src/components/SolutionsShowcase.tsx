@@ -13,13 +13,13 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
       darkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'
     }`}>
       
-      {/* Subtle Faded Grid Background Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-30" />
+      {/* Subtle Dot Matrix Texture */}
+      <div className="absolute inset-0 bg-dot-subtle pointer-events-none opacity-50" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Column: Floating Artwork on Crisp White Background */}
+          {/* Left Column: Floating Artwork on Pure White Background */}
           <div className="lg:col-span-5 relative flex justify-center order-2 lg:order-1">
             <div className="relative w-full max-w-md">
               <img
@@ -76,7 +76,7 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
             <div className="pt-4">
               <button
                 onClick={onOpenBooking}
-                className="px-8 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center space-x-2 group"
+                className="px-8 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center justify-center space-x-2 group"
               >
                 <span>Plantear una Consulta</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

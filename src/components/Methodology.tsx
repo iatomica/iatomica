@@ -47,11 +47,11 @@ interface MethodologyProps {
 export const Methodology: React.FC<MethodologyProps> = ({ darkMode }) => {
   return (
     <section id="metodologia" className={`py-24 relative overflow-hidden transition-colors ${
-      darkMode ? 'bg-slate-900/90 border-y border-slate-800 text-white' : 'bg-purple-50/40 border-y border-purple-100/80 text-slate-900'
+      darkMode ? 'bg-slate-900/90 border-y border-slate-800 text-white' : 'bg-purple-50/50 border-y border-purple-100/80 text-slate-900'
     }`}>
       
-      {/* Subtle Faded Grid Background Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-40" />
+      {/* Subtle Architectural Grid Texture */}
+      <div className="absolute inset-0 bg-grid-subtle pointer-events-none opacity-40" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         

@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 :root {
-  --bg-main: #f8fafc;
+  --bg-main: #ffffff;
   --bg-surface: #ffffff;
   --text-main: #0f172a;
   --text-muted: #475569;
@@ -26,7 +26,7 @@ body {
   color: var(--text-main);
   font-family: 'Plus Jakarta Sans', sans-serif;
   overflow-x: hidden;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
   selection-background-color: #ff6b00;
   selection-color: #ffffff;
 }
@@ -46,23 +46,23 @@ h1, h2, h3, h4, .font-heading {
   -webkit-text-fill-color: transparent;
 }
 
-/* --- Seamless Card Aesthetics --- */
+/* --- Modern Linear Cards --- */
 .clean-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 25px -5px rgba(124, 58, 237, 0.06);
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.03);
 }
 
 .clean-card:hover {
-  border-color: rgba(255, 107, 0, 0.5);
-  box-shadow: 0 16px 35px -10px rgba(255, 107, 0, 0.18), 0 0 20px rgba(124, 58, 237, 0.1);
-  transform: translateY(-4px);
+  border-color: rgba(255, 107, 0, 0.4);
+  box-shadow: 0 16px 35px -10px rgba(255, 107, 0, 0.12);
+  transform: translateY(-3px);
 }
 
-/* Floating Cutout Artwork (Zero Frame, Zero Box Shadow) */
+/* Floating Artwork Cutout (Zero Frame, Zero Box Shadow) */
 .artwork-cutout {
-  filter: drop-shadow(0 15px 25px rgba(255, 107, 0, 0.08));
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.05));
   box-shadow: none !important;
   border: none !important;
   transition: transform 0.4s ease;
@@ -72,37 +72,22 @@ h1, h2, h3, h4, .font-heading {
   transform: scale(1.02);
 }
 
-/* --- Faded Grid Texture with Soft Edge Dissolve --- */
-.bg-grid-faded {
-  background-size: 40px 40px;
+/* --- Subtle Architectural Grid Texture --- */
+.bg-grid-subtle {
+  background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(124, 58, 237, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 107, 0, 0.07) 1px, transparent 1px);
-  mask-image: radial-gradient(circle at center, black 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 75%);
+    linear-gradient(to right, rgba(148, 163, 184, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
 }
 
-/* --- Seamless Section Fusion Feathers --- */
-.fusion-feather-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  background: linear-gradient(to bottom, transparent 0%, var(--bg-main) 100%);
-  pointer-events: none;
-  z-index: 5;
-}
-
-.fusion-feather-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  background: linear-gradient(to top, transparent 0%, var(--bg-main) 100%);
-  pointer-events: none;
-  z-index: 5;
+/* --- Subtle Dot Matrix Texture --- */
+.bg-dot-subtle {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.2) 1.5px, transparent 1.5px);
+  mask-image: radial-gradient(circle at center, black 45%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at center, black 45%, transparent 85%);
 }
 
 /* Custom Scrollbar */
