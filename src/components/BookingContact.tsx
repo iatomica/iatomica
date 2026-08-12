@@ -5,7 +5,7 @@ interface BookingContactProps {
   darkMode: boolean;
 }
 
-export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
+export const BookingContact: React.FC<BookingContactProps> = () => {
   const [submitted, setSubmitted] = useState(false);
   const [selectedService, setSelectedService] = useState('Consultoría & Asesoramiento');
   const [formData, setFormData] = useState({
@@ -23,63 +23,51 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
   };
 
   return (
-    <section id="contacto" className={`py-24 relative transition-colors ${
-      darkMode 
-        ? 'bg-slate-950' 
-        : 'bg-gradient-to-b from-purple-100/70 via-slate-50 to-white'
-    }`}>
+    <section id="contacto" className="py-24 relative overflow-hidden bg-gradient-to-br from-purple-700 via-fuchsia-700 to-orange-600 text-white">
       
-      {/* Faded Background Grid Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-50" />
+      {/* Background Faded Grid Texture */}
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-30" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Human Messaging */}
           <div className="lg:col-span-5 space-y-6 text-left">
-            <div className={`inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold border shadow-sm ${
-              darkMode 
-                ? 'bg-orange-950/40 border-orange-800 text-orange-400' 
-                : 'bg-white border-orange-200 text-orange-600 shadow-orange-500/10'
-            }`}>
-              <Sparkles className="w-4 h-4 text-orange-500" />
+            <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/15 border border-white/30 text-amber-200 backdrop-blur-md shadow-lg">
+              <Sparkles className="w-4 h-4 text-amber-300" />
               <span>Charlemos sobre tu Proyecto</span>
             </div>
 
-            <h2 className={`text-3xl sm:text-5xl font-black tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              ¿Cómo Podemos <span className="text-gradient-brand">Ayudar a Tu Empresa</span>?
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">
+              ¿Cómo Podemos <span className="text-amber-300 drop-shadow-md">Ayudar a Tu Empresa</span>?
             </h2>
 
-            <p className={`text-base leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}`}>
+            <p className="text-base sm:text-lg leading-relaxed text-purple-100 font-medium">
               Escríbenos o agenda una breve reunión. Nos encantará conocer a tu equipo, entender tus ideas y proponerte una solución sin ningún compromiso.
             </p>
 
             <div className="space-y-4 pt-2">
-              <div className={`p-4 rounded-xl border flex items-center space-x-3.5 shadow-sm ${
-                darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
-              }`}>
-                <div className="p-2.5 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20">
+              <div className="p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg flex items-center space-x-3.5">
+                <div className="p-2.5 rounded-lg bg-amber-400 text-slate-950 font-bold">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold">Respuesta Rápida</h4>
-                  <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Te respondemos en menos de 2 horas en horario laboral.</p>
+                  <h4 className="text-sm font-bold text-white">Respuesta Rápida</h4>
+                  <p className="text-xs text-purple-100 font-medium">Te respondemos en menos de 2 horas en horario laboral.</p>
                 </div>
               </div>
 
-              <div className={`p-4 rounded-xl border flex items-center space-x-3.5 shadow-sm ${
-                darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
-              }`}>
-                <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+              <div className="p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg flex items-center space-x-3.5">
+                <div className="p-2.5 rounded-lg bg-emerald-400 text-slate-950 font-bold">
                   <MessageSquare className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold">WhatsApp Directo</h4>
+                  <h4 className="text-sm font-bold text-white">WhatsApp Directo</h4>
                   <a
                     href="https://wa.me/5491100000000?text=Hola%20iAtomica,%20quiero%20consultar%20por%20sus%20servicios"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs text-orange-600 font-bold hover:underline flex items-center gap-1 mt-0.5"
+                    className="text-xs text-amber-300 font-extrabold hover:underline flex items-center gap-1 mt-0.5"
                   >
                     <span>Escribirnos por WhatsApp</span>
                     <ArrowRight className="w-3 h-3" />
@@ -90,16 +78,14 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
           </div>
 
           {/* Right Column: Form */}
-          <div className={`lg:col-span-7 p-8 rounded-2xl border ${
-            darkMode ? 'bg-slate-900 border-slate-800 shadow-xl' : 'bg-white border-slate-200 shadow-xl shadow-purple-500/5'
-          }`}>
+          <div className="lg:col-span-7 p-8 rounded-2xl bg-white/95 text-slate-900 backdrop-blur-md border border-white/40 shadow-2xl">
             {submitted ? (
               <div className="py-12 text-center space-y-4 animate-fade-in">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 flex items-center justify-center mx-auto">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-600 border border-emerald-500/30 flex items-center justify-center mx-auto">
                   <CheckCircle2 size={36} />
                 </div>
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>¡Mensaje Recibido!</h3>
-                <p className={`text-sm max-w-md mx-auto ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                <h3 className="text-2xl font-bold text-slate-900">¡Mensaje Recibido!</h3>
+                <p className="text-sm max-w-md mx-auto text-slate-600 font-medium">
                   Muchas gracias por contactarnos. Un consultor de **iAtomica** se comunicará contigo muy pronto.
                 </p>
                 <button
@@ -111,11 +97,11 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5 text-left">
-                <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Enviar una Consulta o Solicitar Cita</h3>
+                <h3 className="text-xl font-black text-slate-900 mb-2">Enviar una Consulta o Solicitar Cita</h3>
                 
                 {/* Service Pills */}
                 <div>
-                  <label className={`text-xs font-bold block mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>¿En qué podemos ayudarte?</label>
+                  <label className="text-xs font-bold block mb-2 text-slate-700">¿En qué podemos ayudarte?</label>
                   <div className="flex flex-wrap gap-2">
                     {[
                       'Consultoría & Asesoramiento',
@@ -128,10 +114,10 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                         key={tag}
                         type="button"
                         onClick={() => setSelectedService(tag)}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
                           selectedService === tag
-                            ? 'gradient-brand text-white border-orange-500 shadow-md shadow-orange-500/25'
-                            : darkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                         }`}
                       >
                         {tag}
@@ -142,78 +128,68 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={`text-xs font-bold block mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Nombre Completo *</label>
+                    <label className="text-xs font-bold block mb-1 text-slate-700">Nombre Completo *</label>
                     <input
                       type="text"
                       required
                       value={formData.name}
                       onChange={e => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Ej. María Pérez"
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                      }`}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-orange-500 bg-white text-slate-900 placeholder-slate-400 font-medium"
                     />
                   </div>
 
                   <div>
-                    <label className={`text-xs font-bold block mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Email *</label>
+                    <label className="text-xs font-bold block mb-1 text-slate-700">Email *</label>
                     <input
                       type="email"
                       required
                       value={formData.email}
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
                       placeholder="mperez@empresa.com"
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                      }`}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-orange-500 bg-white text-slate-900 placeholder-slate-400 font-medium"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className={`text-xs font-bold block mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Empresa u Organización</label>
+                    <label className="text-xs font-bold block mb-1 text-slate-700">Empresa u Organización</label>
                     <input
                       type="text"
                       value={formData.company}
                       onChange={e => setFormData({ ...formData, company: e.target.value })}
                       placeholder="Nombre de tu empresa"
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                      }`}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-orange-500 bg-white text-slate-900 placeholder-slate-400 font-medium"
                     />
                   </div>
 
                   <div>
-                    <label className={`text-xs font-bold block mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Teléfono / WhatsApp</label>
+                    <label className="text-xs font-bold block mb-1 text-slate-700">Teléfono / WhatsApp</label>
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={e => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="+54 9 11 ..."
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                      }`}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-orange-500 bg-white text-slate-900 placeholder-slate-400 font-medium"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className={`text-xs font-bold block mb-1 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>¿En qué consiste tu idea o necesidad?</label>
+                  <label className="text-xs font-bold block mb-1 text-slate-700">¿En qué consiste tu idea o necesidad?</label>
                   <textarea
                     rows={3}
                     value={formData.message}
                     onChange={e => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Cuéntanos brevemente qué te gustaría mejorar o qué sistema necesitas construir..."
-                    className={`w-full px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
-                      darkMode ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                    }`}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-orange-500 bg-white text-slate-900 placeholder-slate-400 font-medium"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-xl shadow-orange-500/25 hover:shadow-orange-500/35 transition-all flex items-center justify-center space-x-2"
+                  className="w-full py-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-xl shadow-amber-400/30 transition-all flex items-center justify-center space-x-2"
                 >
                   <Calendar className="w-4 h-4" />
                   <span>Enviar Mensaje</span>
@@ -224,6 +200,9 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
 
         </div>
       </div>
+
+      {/* Fusion Feather Top */}
+      <div className="fusion-feather-top" />
     </section>
   );
 };

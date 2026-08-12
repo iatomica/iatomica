@@ -84,41 +84,29 @@ interface ServicesOverviewProps {
   darkMode: boolean;
 }
 
-export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBooking, darkMode }) => {
+export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBooking }) => {
   return (
-    <section id="servicios" className={`py-24 relative overflow-hidden transition-colors ${
-      darkMode 
-        ? 'bg-slate-900 text-white' 
-        : 'bg-gradient-to-b from-purple-100/70 via-orange-50/40 to-slate-100/80 text-slate-900'
-    }`}>
+    <section id="servicios" className="py-24 relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-fuchsia-950 text-white">
       
-      {/* Faded Background Grid Texture */}
-      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-50" />
+      {/* Background Faded Grid Texture */}
+      <div className="absolute inset-0 bg-grid-faded pointer-events-none opacity-30" />
 
-      {/* Ambient Glowing Aura Spotlights */}
-      <div className={`absolute top-1/3 left-1/4 w-96 h-96 rounded-full filter blur-[110px] pointer-events-none ${
-        darkMode ? 'bg-purple-600/20' : 'bg-purple-300/40 opacity-70'
-      }`} />
-      <div className={`absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full filter blur-[110px] pointer-events-none ${
-        darkMode ? 'bg-orange-600/20' : 'bg-orange-300/40 opacity-70'
-      }`} />
+      {/* Ambient Glowing Spotlights */}
+      <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-amber-400/20 rounded-full filter blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-fuchsia-500/20 rounded-full filter blur-[110px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-4 py-1.5 rounded-full border shadow-sm ${
-            darkMode 
-              ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' 
-              : 'bg-white border-orange-300 text-orange-600 shadow-orange-500/10'
-          }`}>
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-300 bg-white/10 px-4 py-1.5 rounded-full border border-white/20 shadow-lg">
             Nuestros Servicios
           </span>
-          <h2 className={`text-3xl sm:text-5xl font-black tracking-tight mt-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white mt-4">
             Todo lo que Necesitas para <br />
-            <span className="text-gradient-brand">Impulsar Tu Empresa</span>
+            <span className="text-amber-300 drop-shadow-md">Impulsar Tu Empresa</span>
           </h2>
-          <p className={`mt-4 text-base sm:text-lg ${darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}`}>
+          <p className="mt-4 text-base sm:text-lg text-purple-100 font-medium">
             Combinamos consultoría práctica, desarrollo de software, inteligencia artificial y comunicación para ayudarte a crecer.
           </p>
         </div>
@@ -128,11 +116,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
           {PILLARS.map((p, idx) => (
             <div
               key={idx}
-              className={`w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl clean-card flex flex-col justify-between group transition-all duration-300 ${
-                darkMode 
-                  ? 'bg-slate-950/90 border-slate-800' 
-                  : 'bg-white/90 backdrop-blur-md border-slate-200/90 shadow-xl shadow-purple-500/5'
-              }`}
+              className="w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl bg-white/95 text-slate-900 backdrop-blur-md border border-white/40 shadow-2xl flex flex-col justify-between group transition-all duration-300 hover:-translate-y-2"
             >
               <div>
                 {/* 3D Low-Poly Icon Header */}
@@ -140,38 +124,34 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
                   <div className="w-14 h-14 flex items-center justify-center p-1 rounded-2xl bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 shadow-inner">
                     <img src={p.icon3d} alt={p.title} className="w-12 h-12 object-contain" />
                   </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
-                    darkMode 
-                      ? 'bg-slate-800 text-slate-300 border-slate-700' 
-                      : 'bg-slate-100 text-slate-700 border-slate-200'
-                  }`}>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
                     {p.badge}
                   </span>
                 </div>
 
-                <span className="text-xs font-bold text-orange-500 block mb-1">{p.tagline}</span>
-                <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <span className="text-xs font-bold text-orange-600 block mb-1">{p.tagline}</span>
+                <h3 className="text-xl font-black text-slate-900 mb-3">
                   {p.title}
                 </h3>
 
-                <p className={`text-xs leading-relaxed mb-6 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                <p className="text-xs leading-relaxed text-slate-600 font-medium mb-6">
                   {p.description}
                 </p>
 
                 <div className="space-y-2 mb-6">
                   {p.points.map((pt, ptIdx) => (
                     <div key={ptIdx} className="flex items-start space-x-2 text-xs">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span className={darkMode ? 'text-slate-300' : 'text-slate-700 font-medium'}>{pt}</span>
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span className="text-slate-700 font-semibold">{pt}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+              <div className="pt-6 border-t border-slate-100">
                 <button
                   onClick={onOpenBooking}
-                  className="w-full py-3 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/35 flex items-center justify-center space-x-2 transition-all"
+                  className="w-full py-3 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 flex items-center justify-center space-x-2 transition-all"
                 >
                   <span>Consultar por este servicio</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -183,7 +163,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
 
       </div>
 
-      {/* Seamless Fusion Feathers Top & Bottom */}
+      {/* Fusion Feathers Top & Bottom */}
       <div className="fusion-feather-top" />
       <div className="fusion-feather-bottom" />
     </section>
