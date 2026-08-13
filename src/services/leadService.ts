@@ -23,8 +23,9 @@ export interface Lead {
   notes?: LeadNote[];
 }
 
-const STORAGE_KEY = 'iatomica_crm_leads_v4';
+const STORAGE_KEY = 'iatomica_crm_leads_v5';
 const SYNC_CHANNEL_NAME = 'iatomica_crm_live_sync';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 // BroadcastChannel for instant live synchronization across browser windows & tabs
 let syncChannel: BroadcastChannel | null = null;
@@ -42,18 +43,33 @@ const notifyLiveSync = () => {
   }
 };
 
-const SEED_LEADS: Lead[] = [];
+let cachedLeads: Lead[] = [];
+
+export const fetchLeadsFromDb = async (): Promise<Lead[]> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/leads`);
+    if (res.ok) {
+      const data = await res.json();
+      cachedLeads = data;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      return data;
+    }
+  } catch (err) {
+    console.warn('SQLite API server offline, using local cache');
+  }
+
+  return getLeads();
+};
 
 export const getLeads = (): Lead[] => {
+  if (cachedLeads.length > 0) return cachedLeads;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_LEADS));
-      return SEED_LEADS;
-    }
-    return JSON.parse(raw);
+    if (!raw) return [];
+    cachedLeads = JSON.parse(raw);
+    return cachedLeads;
   } catch (e) {
-    return SEED_LEADS;
+    return [];
   }
 };
 
@@ -61,56 +77,107 @@ export const subscribeToLeadChanges = (callback: () => void) => {
   if (syncChannel) {
     const handler = (event: MessageEvent) => {
       if (event.data && event.data.type === 'LEADS_UPDATED') {
-        callback();
+        fetchLeadsFromDb().then(() => callback());
       }
     };
     syncChannel.addEventListener('message', handler);
     return () => syncChannel?.removeEventListener('message', handler);
   }
 
-  // Fallback to window storage event for cross-tab sync
   const storageHandler = (e: StorageEvent) => {
     if (e.key === STORAGE_KEY) {
-      callback();
+      fetchLeadsFromDb().then(() => callback());
     }
   };
   window.addEventListener('storage', storageHandler);
   return () => window.removeEventListener('storage', storageHandler);
 };
 
-export const createLead = (newLeadData: Omit<Lead, 'id' | 'status' | 'assignedTo' | 'createdAt' | 'notes'>): Lead => {
-  const leads = getLeads();
-  const lead: Lead = {
+export const createLead = async (newLeadData: Omit<Lead, 'id' | 'status' | 'assignedTo' | 'createdAt' | 'notes'>): Promise<Lead> => {
+  const tempId = 'lead-' + Date.now();
+  const tempLead: Lead = {
     ...newLeadData,
-    id: 'lead-' + Date.now(),
+    id: tempId,
     status: 'nuevo',
     assignedTo: 'Atención Público',
     createdAt: new Date().toISOString(),
     notes: []
   };
-  const updated = [lead, ...leads];
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/leads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newLeadData)
+    });
+    if (res.ok) {
+      const created = await res.json();
+      await fetchLeadsFromDb();
+      notifyLiveSync();
+      return created;
+    }
+  } catch (err) {
+    console.warn('SQLite API offline, saving to local cache');
+  }
+
+  const leads = getLeads();
+  const updated = [tempLead, ...leads];
+  cachedLeads = updated;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   notifyLiveSync();
-  return lead;
+  return tempLead;
 };
 
-export const updateLeadStatus = (id: string, status: LeadStatus): Lead[] => {
+export const updateLeadStatus = async (id: string, status: LeadStatus): Promise<Lead[]> => {
+  try {
+    await fetch(`${API_BASE_URL}/leads/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+  } catch (err) {
+    console.warn('SQLite API offline');
+  }
+
   const leads = getLeads();
   const updated = leads.map(l => l.id === id ? { ...l, status } : l);
+  cachedLeads = updated;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   notifyLiveSync();
   return updated;
 };
 
-export const assignLeadRole = (id: string, assignedTo: LeadRole): Lead[] => {
+export const assignLeadRole = async (id: string, assignedTo: LeadRole): Promise<Lead[]> => {
+  try {
+    await fetch(`${API_BASE_URL}/leads/${id}/assign`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ assignedTo })
+    });
+  } catch (err) {
+    console.warn('SQLite API offline');
+  }
+
   const leads = getLeads();
   const updated = leads.map(l => l.id === id ? { ...l, assignedTo } : l);
+  cachedLeads = updated;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   notifyLiveSync();
   return updated;
 };
 
-export const addLeadNote = (id: string, text: string, author: string): Lead[] => {
+export const addLeadNote = async (id: string, text: string, author: string): Promise<Lead[]> => {
+  try {
+    await fetch(`${API_BASE_URL}/leads/${id}/notes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, author })
+    });
+    return await fetchLeadsFromDb();
+  } catch (err) {
+    console.warn('SQLite API offline');
+  }
+
   const leads = getLeads();
   const note: LeadNote = {
     id: 'note-' + Date.now(),
@@ -125,14 +192,23 @@ export const addLeadNote = (id: string, text: string, author: string): Lead[] =>
     }
     return l;
   });
+  cachedLeads = updated;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   notifyLiveSync();
   return updated;
 };
 
-export const deleteLead = (id: string): Lead[] => {
+export const deleteLead = async (id: string): Promise<Lead[]> => {
+  try {
+    await fetch(`${API_BASE_URL}/leads/${id}`);
+    await fetch(`${API_BASE_URL}/leads/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    console.warn('SQLite API offline');
+  }
+
   const leads = getLeads();
   const updated = leads.filter(l => l.id !== id);
+  cachedLeads = updated;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   notifyLiveSync();
   return updated;

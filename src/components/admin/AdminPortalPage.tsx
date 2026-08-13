@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentUser, logoutUser } from '../../services/authService';
 import type { User } from '../../services/authService';
-import { getLeads, updateLeadStatus, assignLeadRole, addLeadNote, deleteLead, subscribeToLeadChanges } from '../../services/leadService';
+import { fetchLeadsFromDb, updateLeadStatus, assignLeadRole, addLeadNote, deleteLead, subscribeToLeadChanges } from '../../services/leadService';
 import type { Lead, LeadStatus, LeadRole } from '../../services/leadService';
 import { AdminLoginPage } from './AdminLoginPage';
 import { KanbanBoard } from './KanbanBoard';
@@ -20,8 +20,8 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>('todos');
 
-  const fetchLatestLeads = () => {
-    const data = getLeads();
+  const fetchLatestLeads = async () => {
+    const data = await fetchLeadsFromDb();
     setLeads(data);
     if (selectedLead) {
       const refreshed = data.find(l => l.id === selectedLead.id) || null;
@@ -54,34 +54,34 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
     setCurrentUser(null);
   };
 
-  const handleStatusChange = (id: string, newStatus: LeadStatus) => {
-    const updated = updateLeadStatus(id, newStatus);
+  const handleStatusChange = async (id: string, newStatus: LeadStatus) => {
+    const updated = await updateLeadStatus(id, newStatus);
     setLeads(updated);
     if (selectedLead && selectedLead.id === id) {
       setSelectedLead(updated.find(l => l.id === id) || null);
     }
   };
 
-  const handleAssignRole = (id: string, role: LeadRole) => {
-    const updated = assignLeadRole(id, role);
+  const handleAssignRole = async (id: string, role: LeadRole) => {
+    const updated = await assignLeadRole(id, role);
     setLeads(updated);
     if (selectedLead && selectedLead.id === id) {
       setSelectedLead(updated.find(l => l.id === id) || null);
     }
   };
 
-  const handleAddNote = (id: string, text: string) => {
+  const handleAddNote = async (id: string, text: string) => {
     if (!currentUser) return;
     const authorName = `${currentUser.name} (${currentUser.role})`;
-    const updated = addLeadNote(id, text, authorName);
+    const updated = await addLeadNote(id, text, authorName);
     setLeads(updated);
     if (selectedLead && selectedLead.id === id) {
       setSelectedLead(updated.find(l => l.id === id) || null);
     }
   };
 
-  const handleDeleteLead = (id: string) => {
-    const updated = deleteLead(id);
+  const handleDeleteLead = async (id: string) => {
+    const updated = await deleteLead(id);
     setLeads(updated);
     if (selectedLead?.id === id) {
       setSelectedLead(null);

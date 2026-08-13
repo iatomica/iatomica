@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getLeads, updateLeadStatus, assignLeadRole, deleteLead } from '../../services/leadService';
+import { fetchLeadsFromDb, updateLeadStatus, assignLeadRole, deleteLead } from '../../services/leadService';
 import type { Lead, LeadStatus, LeadRole } from '../../services/leadService';
 import { KanbanBoard } from './KanbanBoard';
 import { LayoutGrid, Table, X, ShieldAlert, Database } from 'lucide-react';
@@ -17,24 +17,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   useEffect(() => {
     if (isOpen) {
-      setLeads(getLeads());
+      fetchLeadsFromDb().then(setLeads);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleStatusChange = (id: string, newStatus: LeadStatus) => {
-    const updated = updateLeadStatus(id, newStatus);
+  const handleStatusChange = async (id: string, newStatus: LeadStatus) => {
+    const updated = await updateLeadStatus(id, newStatus);
     setLeads(updated);
   };
 
-  const handleAssignRole = (id: string, role: LeadRole) => {
-    const updated = assignLeadRole(id, role);
+  const handleAssignRole = async (id: string, role: LeadRole) => {
+    const updated = await assignLeadRole(id, role);
     setLeads(updated);
   };
 
-  const handleDeleteLead = (id: string) => {
-    const updated = deleteLead(id);
+  const handleDeleteLead = async (id: string) => {
+    const updated = await deleteLead(id);
     setLeads(updated);
   };
 
