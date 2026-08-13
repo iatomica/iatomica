@@ -40,9 +40,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
 
             {/* Main Headline */}
             <h1 className={`text-4xl sm:text-6xl font-black tracking-tight leading-[1.1] ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              Consultoría &amp; Desarrollo de <br />
-              <span className="text-gradient-brand">Soluciones Digitales e IA</span> <br />
-              para Tu Empresa.
+              Consultoría &amp; Desarrollo <br />
+              <span className="text-gradient-brand">Soluciones Digitales e IA</span>
             </h1>
 
             {/* Subtitle */}
