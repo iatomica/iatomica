@@ -23,7 +23,7 @@ export interface Lead {
   notes?: LeadNote[];
 }
 
-const STORAGE_KEY = 'iatomica_crm_leads_v3';
+const STORAGE_KEY = 'iatomica_crm_leads_v4';
 const SYNC_CHANNEL_NAME = 'iatomica_crm_live_sync';
 
 // BroadcastChannel for instant live synchronization across browser windows & tabs
@@ -42,74 +42,7 @@ const notifyLiveSync = () => {
   }
 };
 
-const SEED_LEADS: Lead[] = [
-  {
-    id: 'lead-101',
-    name: 'Carlos Benítez',
-    email: 'cbenitez@logistica-sur.com',
-    company: 'Logística Sur S.A.',
-    phone: '+54 9 11 4455 6677',
-    service: 'Desarrollo de Herramientas IA',
-    message: 'Necesitamos un asistente inteligente para procesar pedidos de clientes y responder por WhatsApp.',
-    status: 'nuevo',
-    assignedTo: 'Atención Público',
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-    notes: [
-      {
-        id: 'n-1',
-        author: 'Sofía Martínez (Atención Público)',
-        text: 'Consulta recibida por formulario web. Se envió mensaje inicial de saludo por WhatsApp.',
-        timestamp: new Date(Date.now() - 3600000 * 3).toISOString()
-      }
-    ]
-  },
-  {
-    id: 'lead-102',
-    name: 'Mariana Rossi',
-    email: 'mrossi@distribuidoraglobal.com',
-    company: 'Distribuidora Global',
-    phone: '+54 9 11 5566 7788',
-    service: 'Consultoría & Asesoramiento',
-    message: 'Queremos realizar una auditoría técnica de nuestros sistemas actuales para digitalizar la facturación.',
-    status: 'en_contacto',
-    assignedTo: 'Consultoría Técnica',
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-    notes: [
-      {
-        id: 'n-2',
-        author: 'Ing. Lucas Varela',
-        text: 'Se revisó la infraestructura actual. Tienen servidor local y quieren migrar a Docker en nube.',
-        timestamp: new Date(Date.now() - 3600000 * 18).toISOString()
-      }
-    ]
-  },
-  {
-    id: 'lead-103',
-    name: 'Federico Gómez',
-    email: 'fgomez@retail-norte.com',
-    company: 'Retail Norte',
-    phone: '+54 9 11 6677 8899',
-    service: 'Software a Medida & Apps',
-    message: 'Buscamos desarrollar un portal de clientes custom conectado con nuestra base de datos.',
-    status: 'cita_agendada',
-    assignedTo: 'Atención Público',
-    createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
-    notes: []
-  },
-  {
-    id: 'lead-104',
-    name: 'Lucía Fernández',
-    email: 'lfernandez@innovatech.ar',
-    company: 'InnovaTech',
-    phone: '+54 9 11 7788 9900',
-    service: 'Mantenimiento & Control de Calidad (QA)',
-    message: 'Requerimos servicios de testing QA y soporte preventivo para nuestra plataforma web.',
-    status: 'propuesta',
-    assignedTo: 'Consultoría Técnica',
-    createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
-    notes: []
-  }
-];
+const SEED_LEADS: Lead[] = [];
 
 export const getLeads = (): Lead[] => {
   try {
