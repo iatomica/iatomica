@@ -78,7 +78,7 @@ export const SolutionsShowcase: React.FC<SolutionsShowcaseProps> = ({ onOpenBook
                 onClick={onOpenBooking}
                 className="px-8 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center justify-center space-x-2 group"
               >
-                <span>Plantear una Consulta</span>
+                <span>Agendar Demo</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>

@@ -6,12 +6,10 @@ import { SolutionsShowcase } from './components/SolutionsShowcase';
 import { Methodology } from './components/Methodology';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
-import { AiChatModal } from './components/AiChatModal';
 import { AdminPortalPage } from './components/admin/AdminPortalPage';
 
 export function App() {
   const [currentView, setCurrentView] = useState<'site' | 'admin'>('site');
-  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -44,7 +42,6 @@ export function App() {
       {/* Sticky Navbar */}
       <Navbar
         onOpenBooking={scrollToContact}
-        onOpenAiChat={() => setIsAiChatOpen(true)}
         onOpenAdmin={() => setCurrentView('admin')}
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
@@ -54,7 +51,6 @@ export function App() {
         {/* Section 1: Hero */}
         <Hero
           onOpenBooking={scrollToContact}
-          onOpenAiChat={() => setIsAiChatOpen(true)}
           darkMode={darkMode}
         />
 
@@ -84,13 +80,6 @@ export function App() {
       {/* Footer */}
       <Footer
         onOpenAdmin={() => setCurrentView('admin')}
-        darkMode={darkMode}
-      />
-
-      {/* AI Assistant Chat Modal */}
-      <AiChatModal
-        isOpen={isAiChatOpen}
-        onClose={() => setIsAiChatOpen(false)}
         darkMode={darkMode}
       />
 

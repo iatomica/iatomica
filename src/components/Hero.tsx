@@ -1,16 +1,13 @@
 import React from 'react';
-import { Sparkles, ArrowRight, Bot, Calendar, CheckCircle2, HeartHandshake, ShieldCheck } from 'lucide-react';
+import { Sparkles, ArrowRight, Calendar, CheckCircle2, HeartHandshake, ShieldCheck } from 'lucide-react';
 import heroPerson from '../assets/hero_person_transparent.webp';
 
 interface HeroProps {
-  onOpenBooking?: () => void;
-  onOpenAiChat: () => void;
+  onOpenBooking: () => void;
   darkMode: boolean;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenAiChat, darkMode }) => {
-  const calendlyUrl = "https://calendly.com/contacto-iatomica/30min";
-
+export const Hero: React.FC<HeroProps> = ({ onOpenBooking, darkMode }) => {
   return (
     <section className={`relative min-h-[90vh] pt-32 pb-20 flex flex-col justify-center overflow-hidden transition-colors ${
       darkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'
@@ -69,27 +66,13 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiChat, darkMode }) => {
 
             {/* Action Buttons */}
             <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-              <a
-                href={calendlyUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full sm:w-auto px-8 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:scale-[1.01] transition-all flex items-center justify-center space-x-2 group"
+              <button
+                onClick={onOpenBooking}
+                className="w-full sm:w-auto px-9 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:scale-[1.01] transition-all flex items-center justify-center space-x-2 group"
               >
                 <Calendar className="w-4 h-4" />
-                <span>Agendar Cita de Consultoría (Calendly)</span>
+                <span>Agendar Demo</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
-
-              <button
-                onClick={onOpenAiChat}
-                className={`w-full sm:w-auto px-7 py-4 rounded-xl border font-bold text-xs transition-all flex items-center justify-center space-x-2 ${
-                  darkMode 
-                    ? 'bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-800' 
-                    : 'bg-slate-50 border-slate-200 text-slate-800 hover:bg-slate-100'
-                }`}
-              >
-                <Bot className="w-4 h-4 text-purple-600" />
-                <span>Hablar con Asistente IA</span>
               </button>
             </div>
 

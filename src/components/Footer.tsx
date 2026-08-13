@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, MessageSquare, Calendar, ShieldAlert } from 'lucide-react';
+import { Cpu, MessageSquare, ShieldAlert } from 'lucide-react';
 
 interface FooterProps {
   onOpenAdmin: () => void;
@@ -8,7 +8,6 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, darkMode }) => {
   const whatsappUrl = "https://wa.me/5491170142641?text=Hola%20iAtomica,%20quiero%20consultar%20por%20servicios%20de%20consultor%C3%ADa%20y%20desarrollo%20de%20IA%20para%20mi%20empresa.";
-  const calendlyUrl = "https://calendly.com/contacto-iatomica/30min";
 
   return (
     <footer className={`py-12 border-t transition-colors ${
@@ -38,12 +37,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, darkMode }) => {
                   <span>WhatsApp: +54 9 11 7014-2641</span>
                 </a>
               </li>
-              <li>
-                <a href={calendlyUrl} target="_blank" rel="noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5 font-mono">
-                  <Calendar size={13} className="text-orange-400" />
-                  <span>Calendly: 30 min Demo</span>
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -54,7 +47,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, darkMode }) => {
               className="px-3.5 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-mono font-bold flex items-center space-x-2 transition-colors"
             >
               <ShieldAlert size={14} />
-              <span>Acceso Panel Admin CRM</span>
+              <span>Acceso Plataforma Admin CRM</span>
             </button>
           </div>
 

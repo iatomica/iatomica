@@ -34,8 +34,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
     setSubmitted(true);
   };
 
-  const whatsappUrl = "https://wa.me/5491170142641?text=Hola%20iAtomica,%20quiero%20consultar%20por%20servicios%20de%20consultor%C3%ADa%20y%20desarrollo%20de%20IA%20para%20mi%20empresa.";
-  const calendlyUrl = "https://calendly.com/contacto-iatomica/30min";
+  const whatsappUrl = "https://wa.me/5491170142641?text=Hola%20iAtomica,%20quiero%20solicitar%20una%20demo%20de%20sus%20servicios%20de%20consultor%C3%ADa%20y%20desarrollo%20de%20IA.";
 
   return (
     <section id="contacto" className={`py-24 relative overflow-hidden transition-colors ${
@@ -64,7 +63,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
             </h2>
 
             <p className={`text-base leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600 font-medium'}`}>
-              Escríbenos o agenda una breve reunión de 30 minutos por Calendly. Nos encantará conocer a tu equipo y proponerte una solución a medida.
+              Escríbenos o agenda una demo personalizada. Nos encantará conocer a tu equipo y proponerte una solución a medida.
             </p>
 
             <div className="space-y-4 pt-2">
@@ -103,7 +102,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
             </div>
           </div>
 
-          {/* Right Column: Form & Direct Calendly Button */}
+          {/* Right Column: Form */}
           <div className={`lg:col-span-7 p-8 rounded-2xl border ${
             darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/90 shadow-sm'
           }`}>
@@ -112,44 +111,23 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-600 border border-emerald-500/30 flex items-center justify-center mx-auto">
                   <CheckCircle2 size={36} />
                 </div>
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>¡Mensaje Registrado en el CRM!</h3>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>¡Solicitud de Demo Registrada!</h3>
                 <p className={`text-sm max-w-md mx-auto ${darkMode ? 'text-slate-300' : 'text-slate-600 font-medium'}`}>
-                  Muchas gracias por contactarnos. Tu consulta ya fue registrada. Puedes agendar la llamada directamente por Calendly si lo deseas.
+                  Muchas gracias por contactarnos. Un especialista de **iAtomica** se comunicará contigo muy pronto para coordinar la presentación.
                 </p>
                 
-                <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
-                  <a
-                    href={calendlyUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-6 py-3 rounded-xl gradient-brand text-white font-bold text-xs shadow-md flex items-center justify-center space-x-2"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    <span>Abrir Calendly 30 min</span>
-                  </a>
-
+                <div className="pt-2 flex justify-center">
                   <button
                     onClick={() => setSubmitted(false)}
                     className="px-6 py-3 rounded-xl border font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-800"
                   >
-                    Enviar otra consulta
+                    Enviar otra solicitud
                   </button>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5 text-left">
-                <div className="flex items-center justify-between">
-                  <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>Enviar una Consulta o Solicitar Cita</h3>
-                  <a
-                    href={calendlyUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs font-bold text-orange-600 hover:underline flex items-center gap-1 font-mono"
-                  >
-                    <span>Abrir Calendly</span>
-                    <ArrowRight size={12} />
-                  </a>
-                </div>
+                <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Agendar Demo / Solicitar Información</h3>
                 
                 {/* Service Pills */}
                 <div>
@@ -254,7 +232,7 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
                   className="w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center justify-center space-x-2"
                 >
                   <Calendar className="w-4 h-4" />
-                  <span>Enviar Mensaje &amp; Registrar Lead</span>
+                  <span>Agendar Demo</span>
                 </button>
               </form>
             )}
