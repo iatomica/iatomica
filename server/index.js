@@ -220,6 +220,18 @@ app.delete('/api/leads/:id', (req, res) => {
   });
 });
 
+// Serve Static Production Assets in Container
+const distDir = path.join(__dirname, '../dist');
+if (fs.existsSync(distDir)) {
+  console.log('Serving production static frontend from:', distDir);
+  app.use(express.static(distDir));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(distDir, 'index.html'));
+    }
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`iAtomica Database API server running at http://localhost:${PORT}`);
 });

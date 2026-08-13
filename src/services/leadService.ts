@@ -25,7 +25,7 @@ export interface Lead {
 
 const STORAGE_KEY = 'iatomica_crm_leads_v5';
 const SYNC_CHANNEL_NAME = 'iatomica_crm_live_sync';
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // BroadcastChannel for instant live synchronization across browser windows & tabs
 let syncChannel: BroadcastChannel | null = null;
