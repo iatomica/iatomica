@@ -1,12 +1,13 @@
 import React from 'react';
 import type { Lead, LeadStatus, LeadRole } from '../../services/leadService';
-import { UserCheck, Phone, Mail, Building, ArrowRight, ArrowLeft, Trash2 } from 'lucide-react';
+import { UserCheck, Phone, Mail, Building, ArrowRight, ArrowLeft, Trash2, MessageSquareText } from 'lucide-react';
 
 interface KanbanBoardProps {
   leads: Lead[];
   onStatusChange: (id: string, newStatus: LeadStatus) => void;
   onAssignRole: (id: string, role: LeadRole) => void;
   onDeleteLead: (id: string) => void;
+  onSelectLead?: (lead: Lead) => void;
   darkMode: boolean;
 }
 
@@ -31,6 +32,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onStatusChange,
   onAssignRole,
   onDeleteLead,
+  onSelectLead,
   darkMode
 }) => {
   const getPrevStatus = (current: LeadStatus): LeadStatus | null => {
@@ -78,8 +80,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   return (
                     <div
                       key={lead.id}
-                      className={`p-4 rounded-xl border transition-all text-left shadow-sm ${
-                        darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+                      onClick={() => onSelectLead && onSelectLead(lead)}
+                      className={`p-4 rounded-xl border transition-all text-left shadow-sm hover:shadow-md cursor-pointer group ${
+                        darkMode ? 'bg-slate-950 border-slate-800 text-white hover:border-purple-500/50' : 'bg-white border-slate-200 text-slate-900 hover:border-orange-400/50'
                       }`}
                     >
                       {/* Service Tag */}
@@ -88,7 +91,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           {lead.service}
                         </span>
                         <button
-                          onClick={() => onDeleteLead(lead.id)}
+                          onClick={(e) => { e.stopPropagation(); onDeleteLead(lead.id); }}
                           className="text-slate-400 hover:text-rose-500 transition-colors p-1"
                           title="Eliminar Lead"
                         >
@@ -97,7 +100,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       </div>
 
                       {/* Client Name & Company */}
-                      <h4 className="font-bold text-sm leading-snug">{lead.name}</h4>
+                      <h4 className="font-bold text-sm leading-snug group-hover:text-orange-500 transition-colors">
+                        {lead.name}
+                      </h4>
                       <p className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-0.5">
                         <Building size={12} className="shrink-0 text-slate-400" />
                         <span className="truncate">{lead.company || 'Empresa Privada'}</span>
@@ -124,8 +129,16 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         </p>
                       )}
 
+                      {/* Notes Counter */}
+                      {lead.notes && lead.notes.length > 0 && (
+                        <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-purple-600">
+                          <MessageSquareText size={12} />
+                          <span>{lead.notes.length} nota(s) interna(s)</span>
+                        </div>
+                      )}
+
                       {/* Role Assignment Selector */}
-                      <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                      <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center space-x-1.5">
                           <UserCheck size={12} className="text-purple-600" />
                           <select
@@ -142,7 +155,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       </div>
 
                       {/* Transition Action Buttons */}
-                      <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                      <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800" onClick={e => e.stopPropagation()}>
                         {prev ? (
                           <button
                             onClick={() => onStatusChange(lead.id, prev)}

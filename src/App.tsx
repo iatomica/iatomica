@@ -7,11 +7,11 @@ import { Methodology } from './components/Methodology';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AiChatModal } from './components/AiChatModal';
-import { AdminDashboard } from './components/admin/AdminDashboard';
+import { AdminPortalPage } from './components/admin/AdminPortalPage';
 
 export function App() {
+  const [currentView, setCurrentView] = useState<'site' | 'admin'>('site');
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -29,6 +29,15 @@ export function App() {
     }
   };
 
+  if (currentView === 'admin') {
+    return (
+      <AdminPortalPage
+        onReturnToSite={() => setCurrentView('site')}
+        darkMode={darkMode}
+      />
+    );
+  }
+
   return (
     <div className={`min-h-screen font-sans antialiased transition-colors ${darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-white text-slate-900'}`}>
       
@@ -36,7 +45,7 @@ export function App() {
       <Navbar
         onOpenBooking={scrollToContact}
         onOpenAiChat={() => setIsAiChatOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={() => setCurrentView('admin')}
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
@@ -74,7 +83,7 @@ export function App() {
 
       {/* Footer */}
       <Footer
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={() => setCurrentView('admin')}
         darkMode={darkMode}
       />
 
@@ -82,13 +91,6 @@ export function App() {
       <AiChatModal
         isOpen={isAiChatOpen}
         onClose={() => setIsAiChatOpen(false)}
-        darkMode={darkMode}
-      />
-
-      {/* Admin CRM Dashboard Modal */}
-      <AdminDashboard
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
         darkMode={darkMode}
       />
 
