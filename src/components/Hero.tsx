@@ -3,12 +3,14 @@ import { Sparkles, ArrowRight, Bot, Calendar, CheckCircle2, HeartHandshake, Shie
 import heroPerson from '../assets/hero_person_transparent.webp';
 
 interface HeroProps {
-  onOpenBooking: () => void;
+  onOpenBooking?: () => void;
   onOpenAiChat: () => void;
   darkMode: boolean;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMode }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenAiChat, darkMode }) => {
+  const calendlyUrl = "https://calendly.com/contacto-iatomica/30min";
+
   return (
     <section className={`relative min-h-[90vh] pt-32 pb-20 flex flex-col justify-center overflow-hidden transition-colors ${
       darkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'
@@ -67,14 +69,16 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
 
             {/* Action Buttons */}
             <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-              <button
-                onClick={onOpenBooking}
+              <a
+                href={calendlyUrl}
+                target="_blank"
+                rel="noreferrer"
                 className="w-full sm:w-auto px-8 py-4 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:scale-[1.01] transition-all flex items-center justify-center space-x-2 group"
               >
                 <Calendar className="w-4 h-4" />
-                <span>Agendar Cita de Consultoría</span>
+                <span>Agendar Cita de Consultoría (Calendly)</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </a>
 
               <button
                 onClick={onOpenAiChat}
@@ -91,7 +95,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenBooking, onOpenAiChat, darkMod
 
           </div>
 
-          {/* Right Column: Floating Artwork on Pure White Background */}
+          {/* Right Column: Floating Artwork */}
           <div className="lg:col-span-5 relative flex justify-center items-center">
             <div className="relative w-full max-w-md">
               <img

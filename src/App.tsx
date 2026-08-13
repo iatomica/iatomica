@@ -7,10 +7,12 @@ import { Methodology } from './components/Methodology';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AiChatModal } from './components/AiChatModal';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 
 export function App() {
-  const [darkMode, setDarkMode] = useState(false); // Native Light Mode Default
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     if (darkMode) {
@@ -20,7 +22,7 @@ export function App() {
     }
   }, [darkMode]);
 
-  const scrollToBooking = () => {
+  const scrollToContact = () => {
     const el = document.getElementById('contacto');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -28,38 +30,43 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen transition-colors duration-300">
+    <div className={`min-h-screen font-sans antialiased transition-colors ${darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-white text-slate-900'}`}>
       
-      {/* Header & Sticky Navigation */}
+      {/* Sticky Navbar */}
       <Navbar
-        onOpenBooking={scrollToBooking}
+        onOpenBooking={scrollToContact}
         onOpenAiChat={() => setIsAiChatOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
 
-      {/* Main Content */}
       <main>
+        {/* Section 1: Hero */}
         <Hero
-          onOpenBooking={scrollToBooking}
+          onOpenBooking={scrollToContact}
           onOpenAiChat={() => setIsAiChatOpen(true)}
           darkMode={darkMode}
         />
 
+        {/* Section 2: Services Overview */}
         <ServicesOverview
-          onOpenBooking={scrollToBooking}
+          onOpenBooking={scrollToContact}
           darkMode={darkMode}
         />
 
+        {/* Section 3: Solutions Showcase */}
         <SolutionsShowcase
-          onOpenBooking={scrollToBooking}
+          onOpenBooking={scrollToContact}
           darkMode={darkMode}
         />
 
+        {/* Section 4: Methodology */}
         <Methodology
           darkMode={darkMode}
         />
 
+        {/* Section 5: Booking & Contact Form */}
         <BookingContact
           darkMode={darkMode}
         />
@@ -67,15 +74,24 @@ export function App() {
 
       {/* Footer */}
       <Footer
+        onOpenAdmin={() => setIsAdminOpen(true)}
         darkMode={darkMode}
       />
 
-      {/* Floating AI Chat Assistant Modal */}
+      {/* AI Assistant Chat Modal */}
       <AiChatModal
         isOpen={isAiChatOpen}
         onClose={() => setIsAiChatOpen(false)}
-        onOpenBooking={scrollToBooking}
+        darkMode={darkMode}
       />
+
+      {/* Admin CRM Dashboard Modal */}
+      <AdminDashboard
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        darkMode={darkMode}
+      />
+
     </div>
   );
 }

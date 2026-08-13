@@ -4,7 +4,7 @@ import { Bot, Send, X, User, Calendar } from 'lucide-react';
 interface AiChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenBooking: () => void;
+  darkMode?: boolean;
 }
 
 interface Message {
@@ -14,7 +14,7 @@ interface Message {
   showCta?: boolean;
 }
 
-export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose, onOpenBooking }) => {
+export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -122,13 +122,16 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose, onOpe
                 <p className="whitespace-pre-line leading-relaxed">{m.text}</p>
 
                 {m.showCta && (
-                  <button
-                    onClick={() => { onClose(); onOpenBooking(); }}
-                    className="mt-3 px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-[11px] flex items-center space-x-1.5 transition-colors"
+                  <a
+                    href="https://calendly.com/contacto-iatomica/30min"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={onClose}
+                    className="mt-3 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-400 text-white font-bold text-[11px] flex items-center space-x-1.5 transition-colors inline-flex"
                   >
                     <Calendar size={12} />
-                    <span>Agendar Cita Demo Ahora</span>
-                  </button>
+                    <span>Agendar Cita en Calendly</span>
+                  </a>
                 )}
 
                 <span className="text-[9px] text-slate-500 block text-right mt-1 font-mono">{m.timestamp}</span>
