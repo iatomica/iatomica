@@ -13,7 +13,7 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=3000
 
 COPY package*.json ./
 RUN npm ci --only=production
@@ -24,6 +24,6 @@ COPY server ./server
 # Persistent SQLite Volume Mount Path
 VOLUME /app/server/data
 
-EXPOSE 3001
+EXPOSE 3000
 
 CMD ["node", "server/index.js"]
