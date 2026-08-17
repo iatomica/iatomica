@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Menu, X, ArrowRight, Sun, Moon, Cpu, ShieldAlert } from 'lucide-react';
+import { Calendar, Menu, X, ArrowRight, Sun, Moon, Cpu, ShieldAlert, LayoutDashboard } from 'lucide-react';
 
 interface NavbarProps {
   onOpenBooking: () => void;
   onOpenAdmin: () => void;
+  isLoggedIn: boolean;
   darkMode: boolean;
   onToggleDarkMode: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, darkMode, onToggleDarkMode }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, isLoggedIn, darkMode, onToggleDarkMode }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -54,20 +55,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, dark
         {/* Action Buttons */}
         <div className="hidden lg:flex items-center space-x-3">
           
-          {/* Admin CRM Entry Point */}
+          {/* Acceso / Panel Entry Point */}
           <button
             onClick={onOpenAdmin}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 border border-orange-500/20 text-xs font-bold font-mono transition-colors"
-            title="Abrir Plataforma de Gestión CRM"
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-colors cursor-pointer ${
+              isLoggedIn
+                ? 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 border border-purple-500/20'
+                : 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 border border-orange-500/20'
+            }`}
+            title={isLoggedIn ? "Ir al Panel de Gestión" : "Acceso a la Plataforma"}
           >
-            <ShieldAlert size={14} />
-            <span>Admin CRM</span>
+            {isLoggedIn ? <LayoutDashboard size={14} /> : <ShieldAlert size={14} />}
+            <span>{isLoggedIn ? 'Panel' : 'Acceso'}</span>
           </button>
 
           {/* Light/Dark Toggle */}
           <button
             onClick={onToggleDarkMode}
-            className={`p-2 rounded-xl border transition-colors ${
+            className={`p-2 rounded-xl border transition-colors cursor-pointer ${
               darkMode ? 'bg-slate-800 border-slate-700 text-amber-400' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
             }`}
             title="Cambiar Modo Claro / Oscuro"
@@ -78,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, dark
           {/* Agendar Demo Direct Action */}
           <button
             onClick={onOpenBooking}
-            className="relative group overflow-hidden px-5 py-2.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-md shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center space-x-2"
+            className="relative group overflow-hidden px-5 py-2.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-md shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center space-x-2 cursor-pointer"
           >
             <Calendar className="w-3.5 h-3.5" />
             <span>Agendar Demo</span>
@@ -90,10 +95,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, dark
         <div className="md:hidden flex items-center space-x-2">
           <button
             onClick={onOpenAdmin}
-            className="p-2 rounded-xl bg-orange-500/10 text-orange-600 border border-orange-500/20"
-            title="Admin CRM"
+            className="p-2 rounded-xl bg-orange-500/10 text-orange-600 border border-orange-500/20 text-xs font-mono font-bold flex items-center gap-1"
+            title={isLoggedIn ? "Panel" : "Acceso"}
           >
-            <ShieldAlert size={18} />
+            {isLoggedIn ? <LayoutDashboard size={16} /> : <ShieldAlert size={16} />}
+            <span>{isLoggedIn ? 'Panel' : 'Acceso'}</span>
           </button>
           <button
             onClick={onToggleDarkMode}
@@ -120,14 +126,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, dark
           <div className="pt-3 border-t flex flex-col space-y-2">
             <button
               onClick={() => { setMobileMenuOpen(false); onOpenAdmin(); }}
-              className="w-full py-2.5 rounded-xl bg-orange-500/10 text-orange-600 font-bold text-xs flex items-center justify-center space-x-2 border border-orange-500/20"
+              className="w-full py-2.5 rounded-xl bg-orange-500/10 text-orange-600 font-bold text-xs flex items-center justify-center space-x-2 border border-orange-500/20 cursor-pointer"
             >
-              <ShieldAlert size={14} />
-              <span>Abrir Plataforma Admin CRM</span>
+              {isLoggedIn ? <LayoutDashboard size={14} /> : <ShieldAlert size={14} />}
+              <span>{isLoggedIn ? 'Panel de Gestión' : 'Acceso'}</span>
             </button>
             <button
               onClick={() => { setMobileMenuOpen(false); onOpenBooking(); }}
-              className="w-full py-2.5 rounded-xl gradient-brand text-white text-xs font-bold flex items-center justify-center space-x-2"
+              className="w-full py-2.5 rounded-xl gradient-brand text-white text-xs font-bold flex items-center justify-center space-x-2 cursor-pointer"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>Agendar Demo</span>

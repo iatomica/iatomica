@@ -1,12 +1,13 @@
 import React from 'react';
-import { Cpu, MessageSquare, ShieldAlert } from 'lucide-react';
+import { Cpu, MessageSquare, ShieldAlert, LayoutDashboard } from 'lucide-react';
 
 interface FooterProps {
   onOpenAdmin: () => void;
+  isLoggedIn: boolean;
   darkMode: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, darkMode }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, isLoggedIn, darkMode }) => {
   const whatsappUrl = "https://wa.me/5491170142641?text=Hola%20iAtomica,%20quiero%20consultar%20por%20servicios%20de%20consultor%C3%ADa%20y%20desarrollo%20de%20IA%20para%20mi%20empresa.";
 
   return (
@@ -41,13 +42,17 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, darkMode }) => {
           </div>
 
           <div>
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-white mb-3">Administración</h4>
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-white mb-3">Plataforma</h4>
             <button
               onClick={onOpenAdmin}
-              className="px-3.5 py-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-mono font-bold flex items-center space-x-2 transition-colors"
+              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold flex items-center space-x-2 transition-colors cursor-pointer ${
+                isLoggedIn
+                  ? 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20'
+                  : 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20'
+              }`}
             >
-              <ShieldAlert size={14} />
-              <span>Acceso Plataforma Admin CRM</span>
+              {isLoggedIn ? <LayoutDashboard size={14} /> : <ShieldAlert size={14} />}
+              <span>{isLoggedIn ? 'Panel' : 'Acceso'}</span>
             </button>
           </div>
 

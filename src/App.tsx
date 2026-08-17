@@ -7,10 +7,12 @@ import { Methodology } from './components/Methodology';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AdminPortalPage } from './components/admin/AdminPortalPage';
+import { getCurrentUser } from './services/authService';
 
 export function App() {
   const [currentView, setCurrentView] = useState<'site' | 'admin'>('site');
   const [darkMode, setDarkMode] = useState(false);
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
 
   useEffect(() => {
     if (darkMode) {
@@ -19,6 +21,10 @@ export function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  const refreshUser = () => {
+    setCurrentUser(getCurrentUser());
+  };
 
   const scrollToContact = () => {
     const el = document.getElementById('contacto');
@@ -30,7 +36,10 @@ export function App() {
   if (currentView === 'admin') {
     return (
       <AdminPortalPage
-        onReturnToSite={() => setCurrentView('site')}
+        onReturnToSite={() => {
+          refreshUser();
+          setCurrentView('site');
+        }}
         darkMode={darkMode}
       />
     );
@@ -43,6 +52,7 @@ export function App() {
       <Navbar
         onOpenBooking={scrollToContact}
         onOpenAdmin={() => setCurrentView('admin')}
+        isLoggedIn={!!currentUser}
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
@@ -80,6 +90,7 @@ export function App() {
       {/* Footer */}
       <Footer
         onOpenAdmin={() => setCurrentView('admin')}
+        isLoggedIn={!!currentUser}
         darkMode={darkMode}
       />
 

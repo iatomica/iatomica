@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { loginUser, loginAsPreset, DEMO_USERS } from '../../services/authService';
+import { loginUser, DEMO_USERS } from '../../services/authService';
 import type { User } from '../../services/authService';
-import { Cpu, Lock, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Cpu, Lock, Mail, ArrowRight, ArrowLeft, Users } from 'lucide-react';
 
 interface AdminLoginPageProps {
   onLoginSuccess: (user: User) => void;
@@ -25,9 +25,8 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
     }
   };
 
-  const handlePresetSelect = (userId: string) => {
-    const user = loginAsPreset(userId);
-    onLoginSuccess(user);
+  const handleSelectEmail = (selectedEmail: string) => {
+    setEmail(selectedEmail);
   };
 
   return (
@@ -99,37 +98,44 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35 transition-all flex items-center justify-center space-x-2"
+              className="w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35 transition-all flex items-center justify-center space-x-2 cursor-pointer"
             >
               <span>Ingresar al Sistema</span>
               <ArrowRight size={14} />
             </button>
           </form>
 
-          {/* Quick Demo Credentials Presets */}
-          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-3 text-center">
-              Ingreso Rápido por Rol (Demostración)
-            </span>
+          {/* Directory of Authorized Users */}
+          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-left">
+            <div className="flex items-center space-x-1.5 mb-3 justify-center">
+              <Users size={12} className="text-slate-400" />
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                Directorio de Usuarios Autorizados
+              </span>
+            </div>
 
             <div className="space-y-2">
               {DEMO_USERS.map(u => (
-                <button
+                <div
                   key={u.id}
-                  onClick={() => handlePresetSelect(u.id)}
-                  className={`w-full p-2.5 rounded-xl border text-left flex items-center space-x-3 transition-all ${
-                    darkMode ? 'bg-slate-950 border-slate-800 hover:border-purple-500/40' : 'bg-slate-50 border-slate-200 hover:border-orange-400/50'
+                  onClick={() => handleSelectEmail(u.email)}
+                  className={`p-2.5 rounded-xl border flex items-center space-x-3 transition-all cursor-pointer ${
+                    email === u.email
+                      ? 'border-orange-500/60 bg-orange-500/5'
+                      : darkMode ? 'bg-slate-950 border-slate-800/80 hover:border-slate-700' : 'bg-slate-50/70 border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <img src={u.avatar} alt={u.name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                  <img src={u.avatar} alt={u.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <h5 className="text-xs font-bold truncate">{u.name}</h5>
-                    <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold block">
-                      Rol: {u.role}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-xs font-bold truncate">{u.name}</h5>
+                      <span className="text-[9px] text-purple-600 dark:text-purple-400 font-mono font-bold">
+                        {u.role}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-mono block truncate">{u.email}</span>
                   </div>
-                  <ArrowRight size={12} className="text-slate-400 shrink-0" />
-                </button>
+                </div>
               ))}
             </div>
           </div>
@@ -138,7 +144,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
         {/* Back to public site */}
         <button
           onClick={onReturnToSite}
-          className="text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center space-x-1.5 mx-auto transition-colors"
+          className="text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center space-x-1.5 mx-auto transition-colors cursor-pointer"
         >
           <ArrowLeft size={14} />
           <span>Volver al Sitio Web Público</span>
