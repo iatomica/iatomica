@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CinematicHeroVideo } from './CinematicHeroVideo';
+import { CinematicHeroCanvas } from './CinematicHeroCanvas';
 import { CinematicHeroOverlay } from './CinematicHeroOverlay';
 import { HERO_CONFIG } from './heroConfig';
 
@@ -47,6 +47,7 @@ export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking, dar
       setReducedMotion(e.matches);
     };
 
+    checkViewport();
     window.addEventListener('resize', checkViewport);
     mediaQuery.addEventListener('change', handleMotionChange);
 
@@ -95,7 +96,7 @@ export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking, dar
   if (reducedMotion) {
     return (
       <section className="relative w-full min-h-screen min-h-[90svh] flex items-center justify-center overflow-hidden bg-white">
-        <CinematicHeroVideo progress={0} isMobile={isMobile} />
+        <CinematicHeroCanvas progress={0} isMobile={isMobile} />
         <CinematicHeroOverlay
           progress={0}
           scenes={HERO_CONFIG.scenes}
@@ -112,8 +113,8 @@ export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking, dar
       className="relative w-full h-screen h-[100svh] overflow-hidden bg-white select-none"
       aria-label="Cinematic Hero Introduction"
     >
-      {/* Scrubbed Cinematic MP4 Video Layer */}
-      <CinematicHeroVideo
+      {/* Pixel-Perfect HTML5 Canvas WebP Image Sequence Layer */}
+      <CinematicHeroCanvas
         progress={scrollProgress}
         isMobile={isMobile}
       />
