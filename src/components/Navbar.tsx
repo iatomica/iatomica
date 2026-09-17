@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Calendar, Menu, X, ArrowRight, Sun, Moon, Cpu, ShieldAlert, LayoutDashboard } from 'lucide-react';
 
 interface NavbarProps {
@@ -10,25 +10,13 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, isLoggedIn, darkMode, onToggleDarkMode }) => {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3.5 ${
-      scrolled
-        ? darkMode 
-          ? 'bg-slate-900/85 backdrop-blur-xl border-b border-slate-800/80 shadow-sm shadow-black/20' 
-          : 'bg-white/88 backdrop-blur-xl border-b border-slate-200/80 shadow-sm shadow-slate-900/5'
-        : 'bg-transparent border-b border-transparent shadow-none'
+    <header className={`fixed top-0 left-0 right-0 z-50 py-3.5 border-b shadow-sm ${
+      darkMode 
+        ? 'bg-slate-900/85 backdrop-blur-xl border-slate-800/80 shadow-black/20' 
+        : 'bg-white/88 backdrop-blur-xl border-slate-200/80 shadow-slate-900/5'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         

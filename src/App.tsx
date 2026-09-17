@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { CinematicHero } from './components/hero/CinematicHero';
 import { Hero } from './components/Hero';
+import { ExperimentalHero } from './components/experimental/ExperimentalHero';
 import { ServicesOverview } from './components/ServicesOverview';
 import { SolutionsShowcase } from './components/SolutionsShowcase';
 import { Methodology } from './components/Methodology';
@@ -18,8 +19,20 @@ export function App() {
     }
     return 'site';
   });
+  const [isDesktop, setIsDesktop] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
   const [darkMode, setDarkMode] = useState(false);
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (darkMode) {
@@ -101,17 +114,25 @@ export function App() {
       />
 
       <main>
-        {/* Cinematic Scroll-Driven Hero */}
-        <CinematicHero
-          onOpenBooking={scrollToContact}
-          darkMode={darkMode}
-        />
-
-        {/* Section 1: Hero */}
-        <Hero
-          onOpenBooking={scrollToContact}
-          darkMode={darkMode}
-        />
+        {isDesktop ? (
+          /* Desktop Split-Layout Scroll-Driven Hero with Synchronized Beats & LED Ambilight Canvas */
+          <ExperimentalHero
+            onOpenBooking={scrollToContact}
+            darkMode={darkMode}
+          />
+        ) : (
+          /* Mobile: Classic Fullscreen Cinematic Hero & Intro */
+          <>
+            <CinematicHero
+              onOpenBooking={scrollToContact}
+              darkMode={darkMode}
+            />
+            <Hero
+              onOpenBooking={scrollToContact}
+              darkMode={darkMode}
+            />
+          </>
+        )}
 
         {/* Section 2: Services Overview */}
         <ServicesOverview
