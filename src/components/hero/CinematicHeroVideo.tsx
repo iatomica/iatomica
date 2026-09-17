@@ -17,6 +17,7 @@ export const CinematicHeroVideo: React.FC<CinematicHeroVideoProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const targetTimeRef = useRef<number>(0);
   const isSeekingRef = useRef<boolean>(false);
+  const isPrimedRef = useRef<boolean>(false);
   const rafIdRef = useRef<number | null>(null);
 
   const [isVideoLoaded, setIsVideoLoaded] = useState<boolean>(false);
@@ -25,6 +26,30 @@ export const CinematicHeroVideo: React.FC<CinematicHeroVideoProps> = ({
   const videoSrc = isMobile ? HERO_CONFIG.mobileVideoSrc : HERO_CONFIG.desktopVideoSrc;
   const posterSrc = isMobile ? HERO_CONFIG.mobilePosterSrc : HERO_CONFIG.desktopPosterSrc;
   const objectPosition = isMobile ? HERO_CONFIG.objectPositionMobile : HERO_CONFIG.objectPositionDesktop;
+
+  // Prime mobile video decoder (iOS Safari & Android require play/pause once to enable smooth programmatic seeking)
+  const primeVideo = useCallback(() => {
+    if (isPrimedRef.current) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    isPrimedRef.current = true;
+    video.muted = true;
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          video.pause();
+          // Apply latest target time immediately
+          if (video.duration && targetTimeRef.current > 0) {
+            video.currentTime = Math.min(video.duration - 0.01, targetTimeRef.current);
+          }
+        })
+        .catch(() => {
+          // Autoplay policy handled gracefully
+        });
+    }
+  }, []);
 
   // Execute seek to the latest requested target time with coalescing
   const attemptSeek = useCallback(() => {
@@ -39,13 +64,36 @@ export const CinematicHeroVideo: React.FC<CinematicHeroVideoProps> = ({
     // Responsive seek threshold (~1/2 frame at 24fps = 0.02s)
     if (diff > 0.02) {
       isSeekingRef.current = true;
+      const safeTime = Math.max(0, Math.min(video.duration - 0.01, targetTime));
       try {
-        video.currentTime = Math.max(0, Math.min(video.duration - 0.01, targetTime));
+        // Use fastSeek if supported (Safari iOS hardware acceleration)
+        if (typeof (video as any).fastSeek === 'function') {
+          (video as any).fastSeek(safeTime);
+        } else {
+          video.currentTime = safeTime;
+        }
       } catch (err) {
         isSeekingRef.current = false;
       }
     }
   }, []);
+
+  // Listen for initial user gesture to prime video on mobile devices
+  useEffect(() => {
+    const handleGesture = () => {
+      primeVideo();
+    };
+
+    window.addEventListener('touchstart', handleGesture, { passive: true });
+    window.addEventListener('pointerdown', handleGesture, { passive: true });
+    window.addEventListener('scroll', handleGesture, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', handleGesture);
+      window.removeEventListener('pointerdown', handleGesture);
+      window.removeEventListener('scroll', handleGesture);
+    };
+  }, [primeVideo]);
 
   // Update target time whenever progress prop changes
   useEffect(() => {
@@ -68,9 +116,14 @@ export const CinematicHeroVideo: React.FC<CinematicHeroVideoProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
+    // Ensure muted is set directly on the DOM node for mobile browsers
+    video.muted = true;
+    (video as any).defaultMuted = true;
+
     const handleLoadedData = () => {
       setIsVideoLoaded(true);
       onVideoReady?.();
+      primeVideo();
       if (video.duration) {
         video.currentTime = targetTimeRef.current || 0;
       }
@@ -95,7 +148,7 @@ export const CinematicHeroVideo: React.FC<CinematicHeroVideoProps> = ({
       video.removeEventListener('seeked', handleSeeked);
       video.removeEventListener('error', handleError);
     };
-  }, [attemptSeek, onVideoReady, onError]);
+  }, [attemptSeek, onVideoReady, onError, primeVideo]);
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none bg-white">
@@ -111,7 +164,7 @@ export const CinematicHeroVideo: React.FC<CinematicHeroVideoProps> = ({
         fetchPriority="high"
       />
 
-      {/* Scrubbed Cinematic Video (Native 2560x1440 QHD on desktop, 1080p on mobile) */}
+      {/* Scrubbed Cinematic Video with full mobile iOS/Android attributes */}
       {!hasError && (
         <video
           ref={videoRef}
@@ -119,7 +172,9 @@ export const CinematicHeroVideo: React.FC<CinematicHeroVideoProps> = ({
           poster={posterSrc}
           muted
           playsInline
+          autoPlay={false}
           preload="auto"
+          {...({ 'webkit-playsinline': 'true', 'x5-playsinline': 'true' } as any)}
           style={{ objectPosition, transform: 'translateZ(0)' }}
           className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-300 ${
             isVideoLoaded ? 'opacity-100' : 'opacity-0'

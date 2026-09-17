@@ -73,13 +73,14 @@ export const CinematicHeroOverlay: React.FC<CinematicHeroOverlayProps> = ({
           return (
             <div
               key={scene.id}
-              style={style}
+              style={{ ...style, touchAction: 'pan-y' }}
               className={`absolute inset-x-0 transition-all duration-150 ease-out flex flex-col ${
                 isCenter ? 'items-center text-center' : isLeft ? 'items-start text-left max-w-xl' : 'items-end text-right ml-auto max-w-xl'
               }`}
             >
               {/* Glassmorphic backdrop pill to guarantee perfect legibility over video frames */}
               <div
+                style={{ touchAction: 'pan-y' }}
                 className={`p-6 sm:p-8 rounded-3xl backdrop-blur-xl border shadow-2xl transition-colors ${
                   darkMode
                     ? 'bg-slate-950/85 border-slate-800/90 shadow-black/60 text-white'
