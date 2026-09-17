@@ -25,10 +25,6 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
     }
   };
 
-  const handleSelectEmail = (selectedEmail: string) => {
-    setEmail(selectedEmail);
-  };
-
   return (
     <div className={`min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 transition-colors ${
       darkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
@@ -110,33 +106,63 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
             <div className="flex items-center space-x-1.5 mb-3 justify-center">
               <Users size={12} className="text-slate-400" />
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                Directorio de Usuarios Autorizados
+                Acceso Rápido por Perfil (1 Clic)
               </span>
             </div>
 
-            <div className="space-y-2">
-              {DEMO_USERS.map(u => (
-                <div
-                  key={u.id}
-                  onClick={() => handleSelectEmail(u.email)}
-                  className={`p-2.5 rounded-xl border flex items-center space-x-3 transition-all cursor-pointer ${
-                    email === u.email
-                      ? 'border-orange-500/60 bg-orange-500/5'
-                      : darkMode ? 'bg-slate-950 border-slate-800/80 hover:border-slate-700' : 'bg-slate-50/70 border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  <img src={u.avatar} alt={u.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h5 className="text-xs font-bold truncate">{u.name}</h5>
-                      <span className="text-[9px] text-purple-600 dark:text-purple-400 font-mono font-bold">
-                        {u.role}
-                      </span>
+            <div className="space-y-2.5">
+              {DEMO_USERS.map(u => {
+                const isCurrentAdmin = u.role === 'admin';
+                const isBariloche = u.projectId === 'bariloche';
+                const colorClasses = isCurrentAdmin
+                  ? 'bg-orange-500/10 text-orange-600 border-orange-500/30'
+                  : isBariloche
+                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30'
+                  : 'bg-indigo-500/10 text-indigo-600 border-indigo-500/30';
+
+                return (
+                  <div
+                    key={u.id}
+                    onClick={() => {
+                      const res = loginUser(u.email, 'pass123');
+                      if (res.success && res.user) {
+                        onLoginSuccess(res.user);
+                      }
+                    }}
+                    className={`p-3 rounded-2xl border flex items-center space-x-3 transition-all cursor-pointer group ${
+                      email === u.email
+                        ? 'border-orange-500 bg-orange-500/5 shadow-xs'
+                        : darkMode
+                        ? 'bg-slate-950 border-slate-800/80 hover:border-slate-700'
+                        : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    {/* Typographic Monogram Badge */}
+                    <div
+                      className={`w-9 h-9 rounded-xl border flex items-center justify-center font-mono font-black text-xs shrink-0 ${colorClasses}`}
+                    >
+                      {u.initials}
                     </div>
-                    <span className="text-[10px] text-slate-400 font-mono block truncate">{u.email}</span>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <h5 className="text-xs font-bold truncate group-hover:text-orange-500 transition-colors">
+                          {u.name}
+                        </h5>
+                        <span
+                          className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border ${colorClasses}`}
+                        >
+                          {isCurrentAdmin ? 'Super Admin' : u.projectLabel.replace('Proyecto ', '')}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-0.5">
+                        <span className="truncate">{u.email}</span>
+                        <span className="text-[9px] text-slate-400">pass123</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

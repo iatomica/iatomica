@@ -1,40 +1,53 @@
-import type { LeadRole } from './leadService';
+export type UserRole = 'admin' | 'project_user';
+export type ProjectScope = 'all' | 'bariloche' | 'espana';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: LeadRole | 'Administrador';
+  username: string;
+  role: UserRole;
+  projectId: ProjectScope;
   title: string;
-  avatar: string;
+  initials: string;
+  projectLabel: string;
 }
 
-const AUTH_STORAGE_KEY = 'iatomica_auth_user_v2';
+const AUTH_STORAGE_KEY = 'iatomica_auth_user_v3';
 
 export const DEMO_USERS: User[] = [
   {
-    id: 'usr-1',
-    name: import.meta.env.VITE_USER1_NAME || 'Sofía Martínez',
-    email: import.meta.env.VITE_USER1_EMAIL || 'atencion@iatomica.com',
-    role: (import.meta.env.VITE_USER1_ROLE as LeadRole) || 'Atención Público',
-    title: 'Coordinadora de Atención & Leads',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
+    id: 'usr-admin',
+    name: 'Lic. Mateo Rossi',
+    email: 'admin@iatomica.com',
+    username: 'admin',
+    role: 'admin',
+    projectId: 'all',
+    title: 'Director de Operaciones & Sistemas',
+    initials: 'MR',
+    projectLabel: 'Super Admin (Todos los Proyectos)'
   },
   {
-    id: 'usr-2',
-    name: import.meta.env.VITE_USER2_NAME || 'Ing. Lucas Varela',
-    email: import.meta.env.VITE_USER2_EMAIL || 'tecnico@iatomica.com',
-    role: (import.meta.env.VITE_USER2_ROLE as LeadRole) || 'Consultoría Técnica',
-    title: 'Lead Architect & IA Tech Consultant',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
+    id: 'usr-jose',
+    name: 'José Anaya',
+    email: 'jose.anaya@iatomica.com',
+    username: 'jose.anaya',
+    role: 'project_user',
+    projectId: 'bariloche',
+    title: 'Project Lead · Bariloche',
+    initials: 'JA',
+    projectLabel: 'Proyecto Bariloche'
   },
   {
-    id: 'usr-3',
-    name: import.meta.env.VITE_USER3_NAME || 'Lic. Mateo Rossi',
-    email: import.meta.env.VITE_USER3_EMAIL || 'admin@iatomica.com',
-    role: 'Administrador',
-    title: 'Director de Operaciones',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+    id: 'usr-stefi',
+    name: 'Stefi Del Papa',
+    email: 'stefi.delpapa@iatomica.com',
+    username: 'stefi.delpapa',
+    role: 'project_user',
+    projectId: 'espana',
+    title: 'Project Lead · España',
+    initials: 'SD',
+    projectLabel: 'Proyecto España'
   }
 ];
 
@@ -48,20 +61,24 @@ export const getCurrentUser = (): User | null => {
   }
 };
 
-export const loginUser = (email: string, pass: string): { success: boolean; user?: User; error?: string } => {
-  const allowedPass1 = import.meta.env.VITE_USER1_PASS || 'pass123';
-  const allowedPass2 = import.meta.env.VITE_USER2_PASS || 'pass123';
-  const allowedPass3 = import.meta.env.VITE_USER3_PASS || 'pass123';
+export const loginUser = (identifier: string, pass: string): { success: boolean; user?: User; error?: string } => {
+  const cleanId = identifier.trim().toLowerCase();
+  const cleanPass = pass.trim();
 
-  const validPasswords = [allowedPass1, allowedPass2, allowedPass3, 'pass123'];
-
-  if (!validPasswords.includes(pass)) {
-    return { success: false, error: 'Contraseña incorrecta' };
+  // Accept pass123 or standard credentials
+  if (cleanPass !== 'pass123' && cleanPass !== 'admin') {
+    return { success: false, error: 'Contraseña incorrecta (usa "pass123")' };
   }
 
-  const found = DEMO_USERS.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+  const found = DEMO_USERS.find(
+    u => u.email.toLowerCase() === cleanId || u.username.toLowerCase() === cleanId
+  );
+
   if (!found) {
-    return { success: false, error: 'Usuario no encontrado en el sistema' };
+    return {
+      success: false,
+      error: `Usuario no reconocido. Opciones: admin, jose.anaya, stefi.delpapa`
+    };
   }
 
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(found));

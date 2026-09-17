@@ -1,12 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getCurrentUser, logoutUser } from '../../services/authService';
-import type { User } from '../../services/authService';
-import { fetchLeadsFromDb, updateLeadStatus, assignLeadRole, addLeadNote, deleteLead, subscribeToLeadChanges } from '../../services/leadService';
-import type { Lead, LeadStatus, LeadRole } from '../../services/leadService';
+import type { User, ProjectScope } from '../../services/authService';
+import {
+  getTickets,
+  getSprints,
+  updateTicketStatus,
+  updateTicketSprint,
+  addTicketComment,
+  deleteTicket,
+  subscribeToWorkChanges,
+  PROJECTS
+} from '../../services/workService';
+import type { WorkTicket, Sprint, TicketStatus, ProjectId } from '../../services/workService';
 import { AdminLoginPage } from './AdminLoginPage';
 import { KanbanBoard } from './KanbanBoard';
-import { LeadDetailDrawer } from './LeadDetailDrawer';
-import { Cpu, LayoutGrid, Table, LogOut, Database, ArrowLeft } from 'lucide-react';
+import { BacklogView } from './BacklogView';
+import { TicketDetailDrawer } from './TicketDetailDrawer';
+import { CreateTicketModal } from './CreateTicketModal';
+import {
+  Cpu,
+  LayoutGrid,
+  Layers,
+  Table,
+  LogOut,
+  ArrowLeft,
+  Plus,
+  Building,
+  MessageSquare,
+  ShieldCheck,
+  Briefcase
+} from 'lucide-react';
 
 interface AdminPortalPageProps {
   onReturnToSite: () => void;
@@ -15,38 +38,49 @@ interface AdminPortalPageProps {
 
 export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser());
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [roleFilter, setRoleFilter] = useState<string>('todos');
 
-  const fetchLatestLeads = async () => {
-    const data = await fetchLeadsFromDb();
-    setLeads(data);
-    if (selectedLead) {
-      const refreshed = data.find(l => l.id === selectedLead.id) || null;
-      setSelectedLead(refreshed);
-    }
+  // Determine initial project scope based on user role
+  const getInitialProjectScope = (user: User | null): ProjectScope => {
+    if (!user) return 'all';
+    if (user.role === 'admin') return 'all';
+    return user.projectId;
   };
 
+  const [activeProjectFilter, setActiveProjectFilter] = useState<ProjectScope>(() =>
+    getInitialProjectScope(currentUser)
+  );
+  const [viewMode, setViewMode] = useState<'kanban' | 'backlog' | 'crm_table'>('kanban');
+  const [activeSprintFilter, setActiveSprintFilter] = useState<string>('all');
+  const [tickets, setTickets] = useState<WorkTicket[]>([]);
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<WorkTicket | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const loadData = useCallback(() => {
+    if (!currentUser) return;
+    const currentTickets = getTickets(currentUser, activeProjectFilter);
+    const currentSprints = getSprints(currentUser, activeProjectFilter);
+    setTickets(currentTickets);
+    setSprints(currentSprints);
+
+    if (selectedTicket) {
+      const refreshed = currentTickets.find(t => t.id === selectedTicket.id) || null;
+      setSelectedTicket(refreshed);
+    }
+  }, [currentUser, activeProjectFilter, selectedTicket]);
+
   useEffect(() => {
-    fetchLatestLeads();
-    // Subscribe to BroadcastChannel real-time live updates
-    const unsubscribe = subscribeToLeadChanges(() => {
-      fetchLatestLeads();
+    loadData();
+    const unsubscribe = subscribeToWorkChanges(() => {
+      loadData();
     });
     return () => unsubscribe();
-  }, []);
+  }, [loadData]);
 
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
-    // If logging in as specific role, set filter accordingly
-    if (user.role === 'Atención Público' || user.role === 'Consultoría Técnica') {
-      setRoleFilter(user.role);
-    } else {
-      setRoleFilter('todos');
-    }
-    fetchLatestLeads();
+    setActiveProjectFilter(user.role === 'admin' ? 'all' : user.projectId);
+    loadData();
   };
 
   const handleLogout = () => {
@@ -54,38 +88,31 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
     setCurrentUser(null);
   };
 
-  const handleStatusChange = async (id: string, newStatus: LeadStatus) => {
-    const updated = await updateLeadStatus(id, newStatus);
-    setLeads(updated);
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead(updated.find(l => l.id === id) || null);
-    }
-  };
-
-  const handleAssignRole = async (id: string, role: LeadRole) => {
-    const updated = await assignLeadRole(id, role);
-    setLeads(updated);
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead(updated.find(l => l.id === id) || null);
-    }
-  };
-
-  const handleAddNote = async (id: string, text: string) => {
+  const handleStatusChange = (id: string, newStatus: TicketStatus) => {
     if (!currentUser) return;
-    const authorName = `${currentUser.name} (${currentUser.role})`;
-    const updated = await addLeadNote(id, text, authorName);
-    setLeads(updated);
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead(updated.find(l => l.id === id) || null);
-    }
+    updateTicketStatus(currentUser, id, newStatus);
+    loadData();
   };
 
-  const handleDeleteLead = async (id: string) => {
-    const updated = await deleteLead(id);
-    setLeads(updated);
-    if (selectedLead?.id === id) {
-      setSelectedLead(null);
+  const handleSprintChange = (id: string, sprintId: string | null) => {
+    if (!currentUser) return;
+    updateTicketSprint(currentUser, id, sprintId);
+    loadData();
+  };
+
+  const handleAddComment = (id: string, text: string) => {
+    if (!currentUser) return;
+    addTicketComment(currentUser, id, text);
+    loadData();
+  };
+
+  const handleDeleteTicket = (id: string) => {
+    if (!currentUser) return;
+    deleteTicket(currentUser, id);
+    if (selectedTicket?.id === id) {
+      setSelectedTicket(null);
     }
+    loadData();
   };
 
   if (!currentUser) {
@@ -98,32 +125,33 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
     );
   }
 
-  const filteredLeads = leads.filter(l => {
-    if (roleFilter === 'todos') return true;
-    return l.assignedTo === roleFilter;
-  });
+  const isAdmin = currentUser.role === 'admin';
 
-  const totalCount = leads.length;
-  const newCount = leads.filter(l => l.status === 'nuevo').length;
-  const contactCount = leads.filter(l => l.status === 'en_contacto').length;
-  const bookedCount = leads.filter(l => l.status === 'cita_agendada').length;
-  const clientCount = leads.filter(l => l.status === 'cliente').length;
+  // Metrics
+  const totalTickets = tickets.length;
+  const todoCount = tickets.filter(t => t.status === 'todo').length;
+  const inProgressCount = tickets.filter(t => t.status === 'in_progress').length;
+  const reviewCount = tickets.filter(t => t.status === 'review').length;
+  const doneCount = tickets.filter(t => t.status === 'done').length;
+  const crmCount = tickets.filter(t => t.crm).length;
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors ${
-      darkMode ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'
-    }`}>
-      
-      {/* Top Work Management Header */}
-      <header className={`px-6 py-4 border-b flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-md ${
-        darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-xs'
-      }`}>
-        
-        {/* Brand & Workspace Title */}
-        <div className="flex items-center space-x-4">
+    <div
+      className={`min-h-screen flex flex-col transition-colors ${
+        darkMode ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'
+      }`}
+    >
+      {/* Top Header */}
+      <header
+        className={`px-6 py-4 border-b flex flex-col lg:flex-row items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-md ${
+          darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-xs'
+        }`}
+      >
+        {/* Brand, Return, and Project Scope */}
+        <div className="flex items-center space-x-4 w-full lg:w-auto justify-between lg:justify-start">
           <button
             onClick={onReturnToSite}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
             title="Volver al Sitio Web Público"
           >
             <ArrowLeft size={18} />
@@ -134,258 +162,384 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               <Cpu size={20} />
             </div>
             <div>
-              <h1 className="font-heading font-black text-lg leading-none flex items-center gap-2">
-                <span>Herramienta de Gestión de Trabajo</span>
+              <h1 className="font-heading font-black text-base leading-none flex items-center gap-2">
+                <span>Gestión de Trabajo & CRM</span>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                  🟢 Sincronizado en Vivo
+                  🟢 En Vivo
                 </span>
               </h1>
-              <span className="text-xs text-slate-400 font-medium">iAtomica 2.0 Work Platform</span>
+              <span className="text-[11px] text-slate-400 font-medium">iAtomica 2.0 Work Platform</span>
             </div>
+          </div>
+
+          {/* Project Switcher for Admin OR Fixed Badge for Project Users */}
+          <div className="pl-3 border-l border-slate-200 dark:border-slate-800 hidden sm:block">
+            {isAdmin ? (
+              <div className="flex items-center space-x-2">
+                <Briefcase size={14} className="text-orange-500" />
+                <select
+                  value={activeProjectFilter}
+                  onChange={e => setActiveProjectFilter(e.target.value as ProjectScope)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 border-none focus:outline-none cursor-pointer"
+                >
+                  <option value="all">🌐 Todos los Proyectos (Vista Global)</option>
+                  <option value="bariloche">🌲 Proyecto Bariloche (José Anaya)</option>
+                  <option value="espana">🇪🇸 Proyecto España (Stefi Del Papa)</option>
+                </select>
+              </div>
+            ) : (
+              <div
+                className={`px-3 py-1.5 rounded-xl border flex items-center space-x-2 text-xs font-bold ${
+                  PROJECTS[currentUser.projectId as ProjectId].badgeBg
+                } ${PROJECTS[currentUser.projectId as ProjectId].badgeText} ${
+                  PROJECTS[currentUser.projectId as ProjectId].border
+                }`}
+              >
+                <ShieldCheck size={14} />
+                <span>{PROJECTS[currentUser.projectId as ProjectId].name}</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* User Identity & Actions */}
-        <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
-          
-          {/* View Switcher */}
+        {/* View Switchers, New Ticket, and User Profile */}
+        <div className="flex items-center space-x-3 w-full lg:w-auto justify-between lg:justify-end flex-wrap gap-2">
+          {/* New Ticket Button: Accessible to ALL users */}
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="px-3.5 py-2 rounded-xl gradient-brand text-white font-bold text-xs shadow-md hover:opacity-90 transition-all flex items-center space-x-1.5 cursor-pointer"
+          >
+            <Plus size={15} />
+            <span>+ Nueva Tarjeta</span>
+          </button>
+
+          {/* View Mode Switcher */}
           <div className="flex items-center p-1 rounded-xl bg-slate-200 dark:bg-slate-800">
             <button
               onClick={() => setViewMode('kanban')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
                 viewMode === 'kanban'
-                  ? 'gradient-brand text-white shadow-sm'
+                  ? 'gradient-brand text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
               }`}
             >
               <LayoutGrid size={14} />
-              <span>Tablero Kanban</span>
+              <span>Tablero</span>
             </button>
 
             <button
-              onClick={() => setViewMode('table')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                viewMode === 'table'
-                  ? 'gradient-brand text-white shadow-sm'
+              onClick={() => setViewMode('backlog')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
+                viewMode === 'backlog'
+                  ? 'gradient-brand text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+              }`}
+            >
+              <Layers size={14} />
+              <span>Backlog & Sprints</span>
+            </button>
+
+            <button
+              onClick={() => setViewMode('crm_table')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
+                viewMode === 'crm_table'
+                  ? 'gradient-brand text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
               }`}
             >
               <Table size={14} />
-              <span>Tabla CRM</span>
+              <span>Directorio CRM</span>
             </button>
           </div>
 
-          {/* User Badge Profile */}
-          <div className="flex items-center space-x-3 pl-3 border-l border-slate-200 dark:border-slate-800">
-            <img src={currentUser.avatar} alt={currentUser.name} className="w-9 h-9 rounded-full object-cover border border-purple-500" />
+          {/* User Profile Badge (NO AVATAR PHOTO - Clean Typographic Monogram) */}
+          <div className="flex items-center space-x-2.5 pl-3 border-l border-slate-200 dark:border-slate-800">
+            <div
+              className={`w-8 h-8 rounded-xl border flex items-center justify-center font-mono font-black text-xs shrink-0 ${
+                isAdmin
+                  ? 'bg-orange-500/10 text-orange-600 border-orange-500/30'
+                  : currentUser.projectId === 'bariloche'
+                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30'
+                  : 'bg-indigo-500/10 text-indigo-600 border-indigo-500/30'
+              }`}
+            >
+              {currentUser.initials}
+            </div>
+
             <div className="hidden sm:block text-left">
               <h4 className="text-xs font-bold leading-tight">{currentUser.name}</h4>
-              <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold block">
-                {currentUser.role}
+              <span className="text-[10px] text-slate-400 font-mono block">
+                {isAdmin ? 'Super Admin' : currentUser.projectLabel}
               </span>
             </div>
 
             <button
               onClick={handleLogout}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-rose-600 transition-colors"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
               title="Cerrar Sesión"
             >
               <LogOut size={16} />
             </button>
           </div>
-
         </div>
       </header>
 
-      {/* Main Workspace Body */}
+      {/* Main Container */}
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
-        
-        {/* KPI Header Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-600 font-bold">
-              {totalCount}
+        {/* KPI Metrics Summary */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+          <div
+            className={`p-3.5 rounded-2xl border flex items-center space-x-3 ${
+              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}
+          >
+            <div className="p-2 rounded-xl bg-orange-500/10 text-orange-600 font-black text-sm">
+              {totalTickets}
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Trabajo</span>
-              <h4 className="text-sm font-black">{totalCount} Tarjetas</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Total</span>
+              <h4 className="text-xs font-black">{totalTickets} Tarjetas</h4>
             </div>
           </div>
 
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 font-bold">
-              {newCount}
+          <div
+            className={`p-3.5 rounded-2xl border flex items-center space-x-3 ${
+              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}
+          >
+            <div className="p-2 rounded-xl bg-slate-500/10 text-slate-400 font-black text-sm">
+              {todoCount}
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nuevos Leads</span>
-              <h4 className="text-sm font-black text-purple-600">{newCount} Nuevos</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Por Iniciar</span>
+              <h4 className="text-xs font-black text-slate-400">{todoCount} Pendientes</h4>
             </div>
           </div>
 
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 font-bold">
-              {contactCount}
+          <div
+            className={`p-3.5 rounded-2xl border flex items-center space-x-3 ${
+              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}
+          >
+            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 font-black text-sm">
+              {inProgressCount}
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">En Contacto</span>
-              <h4 className="text-sm font-black text-indigo-600">{contactCount} Activos</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">En Curso</span>
+              <h4 className="text-xs font-black text-purple-600">{inProgressCount} Activas</h4>
             </div>
           </div>
 
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 font-bold">
-              {bookedCount}
+          <div
+            className={`p-3.5 rounded-2xl border flex items-center space-x-3 ${
+              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}
+          >
+            <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-600 font-black text-sm">
+              {reviewCount}
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Citas Agendadas</span>
-              <h4 className="text-sm font-black text-blue-600">{bookedCount} Citas</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Revisión QA</span>
+              <h4 className="text-xs font-black text-cyan-600">{reviewCount} en QA</h4>
             </div>
           </div>
 
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 font-bold">
-              {clientCount}
+          <div
+            className={`p-3.5 rounded-2xl border flex items-center space-x-3 ${
+              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}
+          >
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 font-black text-sm">
+              {doneCount}
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Clientes Ganados</span>
-              <h4 className="text-sm font-black text-emerald-600">{clientCount} Ganados</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Completado</span>
+              <h4 className="text-xs font-black text-emerald-600">{doneCount} Hechas</h4>
+            </div>
+          </div>
+
+          <div
+            className={`p-3.5 rounded-2xl border flex items-center space-x-3 ${
+              darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}
+          >
+            <div className="p-2 rounded-xl bg-orange-500/10 text-orange-600 font-black text-sm">
+              {crmCount}
+            </div>
+            <div>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Clientes CRM</span>
+              <h4 className="text-xs font-black text-orange-600">{crmCount} Leads</h4>
             </div>
           </div>
         </div>
 
-        {/* Toolbar Filters */}
-        <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 ${
-          darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-        }`}>
-          <div className="flex items-center space-x-3 w-full sm:w-auto">
-            <span className="text-xs font-bold text-slate-500 font-mono">Filtro por Rol:</span>
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 border-none focus:outline-none cursor-pointer"
-            >
-              <option value="todos">Todos los Equipos</option>
-              <option value="Atención Público">Atención Público</option>
-              <option value="Consultoría Técnica">Consultoría Técnica</option>
-              <option value="Ventas">Ventas</option>
-            </select>
-          </div>
-
-          <div className="flex items-center space-x-2 text-xs font-mono text-slate-500">
-            <Database size={14} className="text-emerald-500" />
-            <span>Sincronización en vivo activa vía BroadcastChannel</span>
-          </div>
-        </div>
-
-        {/* Active View: Kanban vs Table */}
-        {viewMode === 'kanban' ? (
+        {/* View Routing */}
+        {viewMode === 'kanban' && (
           <KanbanBoard
-            leads={filteredLeads}
+            tickets={tickets}
+            sprints={sprints}
+            currentUser={currentUser}
+            activeSprintFilter={activeSprintFilter}
+            onSprintFilterChange={setActiveSprintFilter}
             onStatusChange={handleStatusChange}
-            onAssignRole={handleAssignRole}
-            onDeleteLead={handleDeleteLead}
-            onSelectLead={setSelectedLead}
+            onDeleteTicket={handleDeleteTicket}
+            onSelectTicket={setSelectedTicket}
             darkMode={darkMode}
           />
-        ) : (
-          <div className={`rounded-2xl border overflow-hidden ${
-            darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
+        )}
+
+        {viewMode === 'backlog' && (
+          <BacklogView
+            currentUser={currentUser}
+            activeProjectFilter={activeProjectFilter}
+            tickets={tickets}
+            sprints={sprints}
+            onSelectTicket={setSelectedTicket}
+            onRefresh={loadData}
+            darkMode={darkMode}
+          />
+        )}
+
+        {viewMode === 'crm_table' && (
+          <div
+            className={`rounded-2xl border overflow-hidden text-left ${
+              darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+            }`}
+          >
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-sm">Directorio de Clientes & Requerimientos CRM</h3>
+                <p className="text-xs text-slate-400 font-mono">
+                  Todos los contactos comerciales vinculados a tarjetas de trabajo.
+                </p>
+              </div>
+              <span className="text-xs font-mono font-bold text-orange-500">
+                {tickets.filter(t => t.crm).length} clientes registrados
+              </span>
+            </div>
+
             <table className="w-full text-left text-xs">
-              <thead className={`border-b uppercase font-mono text-[10px] tracking-wider ${
-                darkMode ? 'bg-slate-950 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
-              }`}>
+              <thead
+                className={`border-b uppercase font-mono text-[10px] tracking-wider ${
+                  darkMode
+                    ? 'bg-slate-950 border-slate-800 text-slate-400'
+                    : 'bg-slate-100 border-slate-200 text-slate-600'
+                }`}
+              >
                 <tr>
-                  <th className="p-3.5">Cliente / Empresa</th>
+                  <th className="p-3.5">Código / Proyecto</th>
+                  <th className="p-3.5">Cliente & Empresa</th>
                   <th className="p-3.5">Contacto</th>
-                  <th className="p-3.5">Servicio Requerido</th>
-                  <th className="p-3.5">Estado CRM</th>
-                  <th className="p-3.5">Rol Asignado</th>
-                  <th className="p-3.5">Acciones</th>
+                  <th className="p-3.5">Servicio & Presupuesto</th>
+                  <th className="p-3.5">Fase de Trabajo</th>
+                  <th className="p-3.5">WhatsApp</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-sans">
-                {filteredLeads.map(l => (
-                  <tr
-                    key={l.id}
-                    onClick={() => setSelectedLead(l)}
-                    className="hover:bg-purple-500/5 transition-colors cursor-pointer"
-                  >
-                    <td className="p-3.5 font-bold">
-                      <div>{l.name}</div>
-                      <div className="text-[11px] text-slate-400 font-normal">{l.company || 'Particular'}</div>
-                    </td>
-                    <td className="p-3.5 font-mono text-[11px]">
-                      <div>{l.email}</div>
-                      <div className="text-slate-400">{l.phone}</div>
-                    </td>
-                    <td className="p-3.5">
-                      <span className="px-2.5 py-1 rounded-full bg-orange-500/10 text-orange-600 border border-orange-500/20 font-bold text-[10px]">
-                        {l.service}
-                      </span>
-                    </td>
-                    <td className="p-3.5 font-bold" onClick={e => e.stopPropagation()}>
-                      <select
-                        value={l.status}
-                        onChange={(e) => handleStatusChange(l.id, e.target.value as LeadStatus)}
-                        className="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-none text-[11px] font-bold focus:outline-none cursor-pointer"
+                {tickets
+                  .filter(t => t.crm)
+                  .map(t => {
+                    const project = PROJECTS[t.projectId];
+                    const whatsappNumber = t.crm?.phone ? t.crm.phone.replace(/[^0-9]/g, '') : null;
+                    const whatsappUrl = whatsappNumber
+                      ? `https://wa.me/${whatsappNumber}?text=Hola%20${encodeURIComponent(
+                          t.crm?.clientName || ''
+                        )},%20te%20escribo%20desde%20iAtomica.`
+                      : null;
+
+                    return (
+                      <tr
+                        key={t.id}
+                        onClick={() => setSelectedTicket(t)}
+                        className="hover:bg-orange-500/5 transition-colors cursor-pointer"
                       >
-                        <option value="nuevo">1. Nuevo Lead</option>
-                        <option value="en_contacto">2. En Contacto</option>
-                        <option value="cita_agendada">3. Cita Agendada</option>
-                        <option value="propuesta">4. Propuesta Enviada</option>
-                        <option value="cliente">5. Cliente Ganado</option>
-                      </select>
-                    </td>
-                    <td className="p-3.5" onClick={e => e.stopPropagation()}>
-                      <select
-                        value={l.assignedTo}
-                        onChange={(e) => handleAssignRole(l.id, e.target.value as LeadRole)}
-                        className="px-2 py-1 rounded bg-purple-500/10 text-purple-600 border border-purple-500/20 text-[11px] font-bold focus:outline-none cursor-pointer"
-                      >
-                        <option value="Atención Público">Atención Público</option>
-                        <option value="Consultoría Técnica">Consultoría Técnica</option>
-                        <option value="Ventas">Ventas</option>
-                        <option value="Sin Asignar">Sin Asignar</option>
-                      </select>
-                    </td>
-                    <td className="p-3.5" onClick={e => e.stopPropagation()}>
-                      <button
-                        onClick={() => handleDeleteLead(l.id)}
-                        className="text-slate-400 hover:text-rose-600 text-xs font-semibold"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <td className="p-3.5 font-mono">
+                          <div className="font-bold">{t.code}</div>
+                          <span
+                            className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full border inline-block mt-0.5 ${project.badgeBg} ${project.badgeText} ${project.border}`}
+                          >
+                            {project.code}
+                          </span>
+                        </td>
+                        <td className="p-3.5 font-bold">
+                          <div>{t.crm?.clientName}</div>
+                          <div className="text-[11px] text-slate-400 font-normal flex items-center gap-1">
+                            <Building size={11} className="text-slate-400" />
+                            <span>{t.crm?.company}</span>
+                          </div>
+                        </td>
+                        <td className="p-3.5 font-mono text-[11px]">
+                          <div>{t.crm?.email || '—'}</div>
+                          <div className="text-slate-400">{t.crm?.phone || '—'}</div>
+                        </td>
+                        <td className="p-3.5">
+                          <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-bold text-[10px] inline-block">
+                            {t.crm?.service}
+                          </span>
+                          {t.crm?.budget && (
+                            <div className="text-[10px] font-mono font-bold text-emerald-600 mt-0.5">
+                              {t.crm.budget}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-3.5" onClick={e => e.stopPropagation()}>
+                          <select
+                            value={t.status}
+                            onChange={e => handleStatusChange(t.id, e.target.value as TicketStatus)}
+                            className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold border-none focus:outline-none cursor-pointer"
+                          >
+                            <option value="todo">1. Por Iniciar</option>
+                            <option value="in_progress">2. En Progreso</option>
+                            <option value="review">3. En Revisión / QA</option>
+                            <option value="done">4. Completado / Ganado</option>
+                          </select>
+                        </td>
+                        <td className="p-3.5" onClick={e => e.stopPropagation()}>
+                          {whatsappUrl ? (
+                            <a
+                              href={whatsappUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 border border-emerald-500/30 text-xs font-bold inline-flex items-center space-x-1 transition-colors"
+                            >
+                              <MessageSquare size={12} />
+                              <span>WhatsApp</span>
+                            </a>
+                          ) : (
+                            <span className="text-slate-400 text-[10px] font-mono">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
         )}
-
       </main>
 
-      {/* Side Drawer for Lead Inspection & Internal Notes */}
-      <LeadDetailDrawer
-        lead={selectedLead}
-        onClose={() => setSelectedLead(null)}
+      {/* Ticket / CRM Detail Drawer */}
+      <TicketDetailDrawer
+        ticket={selectedTicket}
+        currentUser={currentUser}
+        onClose={() => setSelectedTicket(null)}
         onStatusChange={handleStatusChange}
-        onAssignRole={handleAssignRole}
-        onAddNote={handleAddNote}
+        onSprintChange={handleSprintChange}
+        onAddComment={handleAddComment}
+        onDeleteTicket={handleDeleteTicket}
         darkMode={darkMode}
       />
 
+      {/* Create Ticket Modal */}
+      {isCreateModalOpen && (
+        <CreateTicketModal
+          currentUser={currentUser}
+          onClose={() => setIsCreateModalOpen(false)}
+          onTicketCreated={loadData}
+          darkMode={darkMode}
+          defaultProjectId={activeProjectFilter !== 'all' ? (activeProjectFilter as ProjectId) : undefined}
+        />
+      )}
     </div>
   );
 };
