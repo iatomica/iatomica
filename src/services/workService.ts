@@ -86,6 +86,7 @@ export interface Sprint {
 const STORAGE_TICKETS_KEY = 'iatomica_work_tickets_v2';
 const STORAGE_SPRINTS_KEY = 'iatomica_work_sprints_v2';
 const WORK_SYNC_CHANNEL = 'iatomica_work_live_sync_v2';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 let syncChannel: BroadcastChannel | null = null;
 if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -383,6 +384,56 @@ const INITIAL_TICKETS: WorkTicket[] = [
 let cachedTickets: WorkTicket[] | null = null;
 let cachedSprints: Sprint[] | null = null;
 
+// Fetch Sprints from SQLite DB
+export const fetchSprintsFromDb = async (): Promise<Sprint[]> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/work/sprints`);
+    if (res.ok) {
+      const data: Sprint[] = await res.json();
+      const prevJson = JSON.stringify(cachedSprints);
+      const newJson = JSON.stringify(data);
+      if (prevJson !== newJson) {
+        cachedSprints = data;
+        localStorage.setItem(STORAGE_SPRINTS_KEY, newJson);
+        notifySync();
+      }
+      return data;
+    }
+  } catch (err) {
+    // Offline or server unavailable: silent fallback
+  }
+  return cachedSprints || INITIAL_SPRINTS;
+};
+
+// Fetch Tickets from SQLite DB
+export const fetchTicketsFromDb = async (): Promise<WorkTicket[]> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/work/tickets`);
+    if (res.ok) {
+      const data: WorkTicket[] = await res.json();
+      const prevJson = JSON.stringify(cachedTickets);
+      const newJson = JSON.stringify(data);
+      if (prevJson !== newJson) {
+        cachedTickets = data;
+        localStorage.setItem(STORAGE_TICKETS_KEY, newJson);
+        notifySync();
+      }
+      return data;
+    }
+  } catch (err) {
+    // Offline or server unavailable: silent fallback
+  }
+  return cachedTickets || INITIAL_TICKETS;
+};
+
+// Auto-trigger background hydration on startup
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    fetchSprintsFromDb();
+    fetchTicketsFromDb();
+  }, 50);
+}
+
 // Read Sprints
 export const getSprints = (user: User, filterProject?: ProjectScope): Sprint[] => {
   if (!cachedSprints) {
@@ -420,6 +471,14 @@ export const createSprint = (user: User, sprintData: Omit<Sprint, 'id'>): Sprint
   cachedSprints = updated;
   localStorage.setItem(STORAGE_SPRINTS_KEY, JSON.stringify(updated));
   notifySync();
+
+  // Async server persistence
+  fetch(`${API_BASE_URL}/work/sprints`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newSprint)
+  }).catch(e => console.warn('Offline sprint sync fallback:', e));
+
   return newSprint;
 };
 
@@ -485,6 +544,7 @@ export const createTicket = (
   const count = allTickets.filter(t => t.projectId === effectiveProject).length + 101;
   const code = `${projectCode}-${count}`;
 
+  const now = new Date().toISOString();
   const newTicket: WorkTicket = {
     id: `t-${effectiveProject}-${Date.now()}`,
     code,
@@ -497,14 +557,22 @@ export const createTicket = (
     crm: data.crm,
     comments: [],
     createdBy: user.name,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: now,
+    updatedAt: now
   };
 
   const updated = [newTicket, ...allTickets];
   cachedTickets = updated;
   localStorage.setItem(STORAGE_TICKETS_KEY, JSON.stringify(updated));
   notifySync();
+
+  // Async server persistence
+  fetch(`${API_BASE_URL}/work/tickets`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newTicket)
+  }).catch(e => console.warn('Offline ticket create sync fallback:', e));
+
   return newTicket;
 };
 
@@ -515,6 +583,7 @@ export const updateTicketStatus = (
   newStatus: TicketStatus
 ): WorkTicket[] => {
   const allTickets = cachedTickets || INITIAL_TICKETS;
+  const now = new Date().toISOString();
   const updated = allTickets.map(t => {
     if (t.id === ticketId) {
       // Verify isolation permission
@@ -524,7 +593,7 @@ export const updateTicketStatus = (
       return {
         ...t,
         status: newStatus,
-        updatedAt: new Date().toISOString()
+        updatedAt: now
       };
     }
     return t;
@@ -533,6 +602,14 @@ export const updateTicketStatus = (
   cachedTickets = updated;
   localStorage.setItem(STORAGE_TICKETS_KEY, JSON.stringify(updated));
   notifySync();
+
+  // Async server persistence
+  fetch(`${API_BASE_URL}/work/tickets/${ticketId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: newStatus })
+  }).catch(e => console.warn('Offline status sync fallback:', e));
+
   return getTickets(user);
 };
 
@@ -543,6 +620,7 @@ export const updateTicketSprint = (
   sprintId: string | null
 ): WorkTicket[] => {
   const allTickets = cachedTickets || INITIAL_TICKETS;
+  const now = new Date().toISOString();
   const updated = allTickets.map(t => {
     if (t.id === ticketId) {
       if (user.role !== 'admin' && t.projectId !== user.projectId) {
@@ -551,7 +629,7 @@ export const updateTicketSprint = (
       return {
         ...t,
         sprintId,
-        updatedAt: new Date().toISOString()
+        updatedAt: now
       };
     }
     return t;
@@ -560,6 +638,14 @@ export const updateTicketSprint = (
   cachedTickets = updated;
   localStorage.setItem(STORAGE_TICKETS_KEY, JSON.stringify(updated));
   notifySync();
+
+  // Async server persistence
+  fetch(`${API_BASE_URL}/work/tickets/${ticketId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sprintId })
+  }).catch(e => console.warn('Offline sprint sync fallback:', e));
+
   return getTickets(user);
 };
 
@@ -573,13 +659,14 @@ export const addTicketComment = (
   const allTickets = cachedTickets || INITIAL_TICKETS;
 
   let modifiedTicket: WorkTicket | null = null;
+  const now = new Date().toISOString();
   const comment: TicketComment = {
     id: `c-${Date.now()}`,
     authorName: user.name,
     authorRole: user.role === 'admin' ? 'Administrador' : 'Project Lead',
     authorInitials: user.initials,
     text: text.trim(),
-    timestamp: new Date().toISOString()
+    timestamp: now
   };
 
   const updated = allTickets.map(t => {
@@ -590,7 +677,7 @@ export const addTicketComment = (
       modifiedTicket = {
         ...t,
         comments: [...t.comments, comment],
-        updatedAt: new Date().toISOString()
+        updatedAt: now
       };
       return modifiedTicket;
     }
@@ -600,6 +687,14 @@ export const addTicketComment = (
   cachedTickets = updated;
   localStorage.setItem(STORAGE_TICKETS_KEY, JSON.stringify(updated));
   notifySync();
+
+  // Async server persistence
+  fetch(`${API_BASE_URL}/work/tickets/${ticketId}/comments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(comment)
+  }).catch(e => console.warn('Offline comment sync fallback:', e));
+
   return modifiedTicket;
 };
 
@@ -611,6 +706,8 @@ export const updateTicketCRM = (
 ): WorkTicket | null => {
   const allTickets = cachedTickets || INITIAL_TICKETS;
   let modifiedTicket: WorkTicket | null = null;
+  const now = new Date().toISOString();
+  let mergedCrm: TicketCRM | undefined = undefined;
 
   const updated = allTickets.map(t => {
     if (t.id === ticketId) {
@@ -624,10 +721,11 @@ export const updateTicketCRM = (
         phone: '',
         service: ''
       };
+      mergedCrm = { ...existingCRM, ...crmData };
       modifiedTicket = {
         ...t,
-        crm: { ...existingCRM, ...crmData },
-        updatedAt: new Date().toISOString()
+        crm: mergedCrm,
+        updatedAt: now
       };
       return modifiedTicket;
     }
@@ -637,6 +735,16 @@ export const updateTicketCRM = (
   cachedTickets = updated;
   localStorage.setItem(STORAGE_TICKETS_KEY, JSON.stringify(updated));
   notifySync();
+
+  // Async server persistence
+  if (mergedCrm) {
+    fetch(`${API_BASE_URL}/work/tickets/${ticketId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ crm: mergedCrm })
+    }).catch(e => console.warn('Offline crm sync fallback:', e));
+  }
+
   return modifiedTicket;
 };
 
@@ -652,30 +760,59 @@ export const deleteTicket = (user: User, ticketId: string): boolean => {
   cachedTickets = updated;
   localStorage.setItem(STORAGE_TICKETS_KEY, JSON.stringify(updated));
   notifySync();
+
+  // Async server persistence
+  fetch(`${API_BASE_URL}/work/tickets/${ticketId}`, {
+    method: 'DELETE'
+  }).catch(e => console.warn('Offline delete sync fallback:', e));
+
   return true;
 };
 
-// Subscribe to real-time live sync
+// Subscribe to real-time live sync (Cross-tab + Multi-user DB polling + Window focus)
 export const subscribeToWorkChanges = (callback: () => void) => {
+  let channelHandler: ((event: MessageEvent) => void) | null = null;
   if (syncChannel) {
-    const handler = (event: MessageEvent) => {
+    channelHandler = (event: MessageEvent) => {
       if (event.data && event.data.type === 'WORK_UPDATED') {
-        cachedTickets = null;
-        cachedSprints = null;
         callback();
       }
     };
-    syncChannel.addEventListener('message', handler);
-    return () => syncChannel?.removeEventListener('message', handler);
+    syncChannel.addEventListener('message', channelHandler);
   }
 
   const storageHandler = (e: StorageEvent) => {
     if (e.key === STORAGE_TICKETS_KEY || e.key === STORAGE_SPRINTS_KEY) {
-      cachedTickets = null;
-      cachedSprints = null;
       callback();
     }
   };
   window.addEventListener('storage', storageHandler);
-  return () => window.removeEventListener('storage', storageHandler);
+
+  // Background multi-user polling: sync with SQLite server every 4 seconds
+  const pollInterval = setInterval(() => {
+    fetchTicketsFromDb().then(() => {
+      fetchSprintsFromDb().then(() => {
+        callback();
+      });
+    });
+  }, 4000);
+
+  // Instant re-sync on tab/window focus
+  const focusHandler = () => {
+    fetchTicketsFromDb().then(() => {
+      fetchSprintsFromDb().then(() => {
+        callback();
+      });
+    });
+  };
+  window.addEventListener('focus', focusHandler);
+
+  return () => {
+    if (syncChannel && channelHandler) {
+      syncChannel.removeEventListener('message', channelHandler);
+    }
+    window.removeEventListener('storage', storageHandler);
+    clearInterval(pollInterval);
+    window.removeEventListener('focus', focusHandler);
+  };
 };
