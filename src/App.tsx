@@ -8,10 +8,16 @@ import { Methodology } from './components/Methodology';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AdminPortalPage } from './components/admin/AdminPortalPage';
+import { PruebaPage } from './components/experimental/PruebaPage';
 import { getCurrentUser } from './services/authService';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'site' | 'admin'>('site');
+  const [currentView, setCurrentView] = useState<'site' | 'admin' | 'prueba'>(() => {
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/prueba')) {
+      return 'prueba';
+    }
+    return 'site';
+  });
   const [darkMode, setDarkMode] = useState(false);
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
 
@@ -23,8 +29,31 @@ export function App() {
     }
   }, [darkMode]);
 
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      if (window.location.pathname.startsWith('/prueba')) {
+        setCurrentView('prueba');
+      } else {
+        setCurrentView('site');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const refreshUser = () => {
     setCurrentUser(getCurrentUser());
+  };
+
+  const navigateTo = (view: 'site' | 'admin' | 'prueba') => {
+    setCurrentView(view);
+    if (view === 'prueba') {
+      window.history.pushState({}, '', '/prueba');
+    } else if (view === 'site') {
+      window.history.pushState({}, '', '/');
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const scrollToContact = () => {
@@ -39,8 +68,20 @@ export function App() {
       <AdminPortalPage
         onReturnToSite={() => {
           refreshUser();
-          setCurrentView('site');
+          navigateTo('site');
         }}
+        darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
+      />
+    );
+  }
+
+  if (currentView === 'prueba') {
+    return (
+      <PruebaPage
+        onOpenAdmin={() => setCurrentView('admin')}
+        onReturnToSite={() => navigateTo('site')}
+        isLoggedIn={!!currentUser}
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
