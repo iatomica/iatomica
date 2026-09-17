@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Calendar, Menu, X, ArrowRight, Sun, Moon, Cpu, ShieldAlert, LayoutDashboard } from 'lucide-react';
 
 interface NavbarProps {
@@ -10,16 +10,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, isLoggedIn, darkMode, onToggleDarkMode }) => {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3.5 border-b shadow-sm ${
