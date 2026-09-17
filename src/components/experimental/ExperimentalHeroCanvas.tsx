@@ -6,6 +6,7 @@ interface ExperimentalHeroCanvasProps {
   onLoaded?: () => void;
 }
 
+const START_FRAME = 2;
 const TOTAL_FRAMES = 181;
 const BASE_PATH = '/media/frames/desktop';
 
@@ -16,7 +17,7 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<(HTMLImageElement | null)[]>(new Array(TOTAL_FRAMES).fill(null));
-  const latestTargetFrameRef = useRef<number>(0);
+  const latestTargetFrameRef = useRef<number>(START_FRAME);
   const currentFrameDrawnRef = useRef<number>(-1);
   const [initialFrameLoaded, setInitialFrameLoaded] = useState<boolean>(false);
 
@@ -25,7 +26,7 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
     return `${BASE_PATH}/frame_${padded}.webp`;
   }, []);
 
-  // Draw frame with cover/contain fitting
+  // Draw frame with cover fitting
   const drawImageToCanvas = useCallback((img: HTMLImageElement, frameIdx: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -63,7 +64,7 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
     // Find nearest already loaded frame
     let closestIdx = -1;
     let minDiff = Infinity;
-    for (let i = 0; i < TOTAL_FRAMES; i++) {
+    for (let i = START_FRAME; i < TOTAL_FRAMES; i++) {
       const img = imagesRef.current[i];
       if (img && img.complete && img.naturalWidth > 0) {
         const diff = Math.abs(i - targetIdx);
@@ -103,7 +104,7 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const rect = canvas.getBoundingClientRect();
     const w = rect.width || 480;
-    const h = rect.height || 480;
+    const h = rect.height || 270;
 
     const targetW = Math.round(w * dpr);
     const targetH = Math.round(h * dpr);
@@ -116,34 +117,34 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
     }
   }, [renderCurrent]);
 
-  // Initial load
+  // Initial load starting from START_FRAME (frame 2)
   useEffect(() => {
     syncCanvasSize();
     window.addEventListener('resize', syncCanvasSize);
 
     const firstImg = new Image();
-    firstImg.src = getFrameUrl(0);
+    firstImg.src = getFrameUrl(START_FRAME);
     firstImg.onload = () => {
-      imagesRef.current[0] = firstImg;
+      imagesRef.current[START_FRAME] = firstImg;
       setInitialFrameLoaded(true);
-      drawImageToCanvas(firstImg, 0);
+      drawImageToCanvas(firstImg, START_FRAME);
       onLoaded?.();
     };
-    imagesRef.current[0] = firstImg;
+    imagesRef.current[START_FRAME] = firstImg;
 
     return () => {
       window.removeEventListener('resize', syncCanvasSize);
     };
   }, [getFrameUrl, syncCanvasSize, drawImageToCanvas, onLoaded]);
 
-  // Progressive background preloader
+  // Progressive background preloader starting from START_FRAME
   useEffect(() => {
     if (!initialFrameLoaded) return;
 
     let isCancelled = false;
 
-    // Load first 30 frames
-    for (let i = 1; i < Math.min(30, TOTAL_FRAMES); i++) {
+    // Load first 35 frames starting from START_FRAME
+    for (let i = START_FRAME; i < Math.min(35, TOTAL_FRAMES); i++) {
       if (!imagesRef.current[i]) {
         const img = new Image();
         img.src = getFrameUrl(i);
@@ -171,7 +172,7 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
       setTimeout(() => loadBatch(end), 100);
     };
 
-    const timer = setTimeout(() => loadBatch(30), 150);
+    const timer = setTimeout(() => loadBatch(35), 150);
 
     return () => {
       isCancelled = true;
@@ -179,39 +180,90 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
     };
   }, [initialFrameLoaded, getFrameUrl]);
 
-  // Seek on progress change
+  // Seek on progress change mapped from START_FRAME to TOTAL_FRAMES - 1
   useEffect(() => {
-    const targetIdx = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(progress * (TOTAL_FRAMES - 1))));
+    const clampedProgress = Math.max(0, Math.min(1, progress));
+    const targetIdx = Math.round(START_FRAME + clampedProgress * (TOTAL_FRAMES - 1 - START_FRAME));
     latestTargetFrameRef.current = targetIdx;
     renderCurrent();
   }, [progress, renderCurrent]);
 
-  return (
-    <div className={`relative w-full aspect-[16/9] max-w-[560px] mx-auto rounded-3xl overflow-hidden select-none pointer-events-none transition-all duration-300 ${
-      darkMode
-        ? 'bg-slate-950 border border-slate-800 shadow-2xl shadow-black/50'
-        : 'bg-white border border-slate-200/80 shadow-2xl shadow-slate-900/10'
-    }`}>
-      {/* Fallback image */}
-      <img
-        src={`${BASE_PATH}/frame_000.webp`}
-        alt="iAtomica 3D Animation Model"
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-0 ${
-          initialFrameLoaded ? 'opacity-0' : 'opacity-100'
-        }`}
-        loading="eager"
-      />
+  // Dynamic LED Backlight color gradients based on scroll progress (Ambilight TV Effect)
+  const getLedConic = (p: number) => {
+    if (p < 0.25) {
+      // Stage 0: Brand Orange, Amber & Fuchsia (Crystal & Strategy)
+      return 'conic-gradient(from 45deg at 50% 50%, #ff6b00, #f59e0b, #ec4899, #d946ef, #ff6b00)';
+    } else if (p < 0.50) {
+      // Stage 1: AI Cyan, Electric Blue & Violet (AI Tools & Automation)
+      return 'conic-gradient(from 45deg at 50% 50%, #06b6d4, #3b82f6, #6366f1, #0ea5e9, #06b6d4)';
+    } else if (p < 0.75) {
+      // Stage 2: QA Indigo, Violet & Emerald (Quality & Stability)
+      return 'conic-gradient(from 45deg at 50% 50%, #6366f1, #8b5cf6, #3b82f6, #10b981, #6366f1)';
+    } else {
+      // Stage 3: Scale Fuchsia, Brand Orange & Rose (Scale & Content)
+      return 'conic-gradient(from 45deg at 50% 50%, #d946ef, #ff6b00, #f43f5e, #a855f7, #d946ef)';
+    }
+  };
 
-      {/* Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full z-10"
+  const getLedRadial = (p: number) => {
+    if (p < 0.25) {
+      return 'radial-gradient(ellipse at center, rgba(255, 107, 0, 0.85) 0%, rgba(245, 158, 11, 0.6) 45%, rgba(217, 70, 239, 0.35) 75%, transparent 100%)';
+    } else if (p < 0.50) {
+      return 'radial-gradient(ellipse at center, rgba(6, 182, 212, 0.85) 0%, rgba(59, 130, 246, 0.6) 45%, rgba(124, 58, 237, 0.35) 75%, transparent 100%)';
+    } else if (p < 0.75) {
+      return 'radial-gradient(ellipse at center, rgba(99, 102, 241, 0.85) 0%, rgba(139, 92, 246, 0.6) 45%, rgba(56, 189, 248, 0.35) 75%, transparent 100%)';
+    } else {
+      return 'radial-gradient(ellipse at center, rgba(217, 70, 239, 0.85) 0%, rgba(255, 107, 0, 0.6) 45%, rgba(244, 63, 94, 0.35) 75%, transparent 100%)';
+    }
+  };
+
+  return (
+    <div className="relative w-full max-w-[560px] mx-auto select-none pointer-events-none">
+      {/* TV Ambilight LED Glow Behind Screen - Layer 1: Wide Rotating Ambient Halo */}
+      <div
+        className="absolute -inset-5 sm:-inset-7 rounded-[40px] filter blur-2xl sm:blur-3xl animate-led-drift transition-all duration-700 pointer-events-none -z-10"
         style={{
-          width: '100%',
-          height: '100%',
-          transform: 'translateZ(0)',
+          background: getLedConic(progress),
+          opacity: darkMode ? 0.75 : 0.5,
         }}
       />
+
+      {/* TV Ambilight LED Glow Behind Screen - Layer 2: Breathing Radial Core */}
+      <div
+        className="absolute -inset-2.5 sm:-inset-3.5 rounded-[32px] filter blur-xl sm:blur-2xl animate-led-breathe transition-all duration-500 pointer-events-none -z-10"
+        style={{
+          background: getLedRadial(progress),
+          opacity: darkMode ? 0.85 : 0.6,
+        }}
+      />
+
+      {/* The 16:9 Screen / TV Display Itself */}
+      <div className={`relative w-full aspect-[16/9] rounded-3xl overflow-hidden select-none pointer-events-none transition-all duration-300 z-10 ${
+        darkMode
+          ? 'bg-slate-950 border border-slate-700/70 shadow-2xl shadow-black/80'
+          : 'bg-white border border-slate-200/90 shadow-2xl shadow-slate-900/15'
+      }`}>
+        {/* Fallback image starting at frame 002 */}
+        <img
+          src={`${BASE_PATH}/frame_002.webp`}
+          alt="iAtomica 3D Animation Model"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-0 ${
+            initialFrameLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+          loading="eager"
+        />
+
+        {/* Hardware-Accelerated Canvas */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full z-10"
+          style={{
+            width: '100%',
+            height: '100%',
+            transform: 'translateZ(0)',
+          }}
+        />
+      </div>
     </div>
   );
 };
