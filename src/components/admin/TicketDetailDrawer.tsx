@@ -121,7 +121,7 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                 <select
                   value={ticket.status}
                   onChange={e => onStatusChange(ticket.id, e.target.value as TicketStatus)}
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer"
                 >
                   <option value="todo">1. Por Iniciar</option>
                   <option value="in_progress">2. En Progreso</option>
@@ -131,13 +131,13 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
               </div>
 
               <div>
-                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                   Sprint Asignado
                 </label>
                 <select
                   value={ticket.sprintId || 'backlog'}
                   onChange={e => onSprintChange(ticket.id, e.target.value === 'backlog' ? null : e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer"
                 >
                   <option value="backlog">📂 En Backlog</option>
                   {sprints.map(sp => (
@@ -152,12 +152,12 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
 
           {/* Description */}
           <div className="space-y-1.5">
-            <h4 className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+            <h4 className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Descripción & Alcance
             </h4>
             <div
               className={`p-4 rounded-2xl border text-xs leading-relaxed whitespace-pre-wrap ${
-                darkMode ? 'bg-slate-900/40 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                darkMode ? 'bg-slate-900/60 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-900 font-medium'
               }`}
             >
               {ticket.description || 'Sin descripción detallada.'}
@@ -176,37 +176,37 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
 
               <div
                 className={`p-4 rounded-2xl border space-y-3 ${
-                  darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                  darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-50 border-slate-200'
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h5 className="text-sm font-bold">{ticket.crm.clientName}</h5>
-                    <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Building size={12} className="text-slate-400" />
+                    <h5 className="text-sm font-bold text-slate-950 dark:text-white">{ticket.crm.clientName}</h5>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1 mt-0.5 font-medium">
+                      <Building size={12} className="text-slate-500 dark:text-slate-400" />
                       <span>{ticket.crm.company}</span>
                     </p>
                   </div>
 
                   {ticket.crm.budget && (
-                    <div className="flex items-center space-x-1 font-mono text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                    <div className="flex items-center space-x-1 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
                       <DollarSign size={12} />
                       <span>{ticket.crm.budget}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-600 dark:text-slate-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-700 dark:text-slate-200">
                   {ticket.crm.email && (
                     <div className="flex items-center gap-1.5 truncate">
                       <Mail size={12} className="text-orange-500 shrink-0" />
-                      <span className="truncate">{ticket.crm.email}</span>
+                      <span className="truncate font-semibold">{ticket.crm.email}</span>
                     </div>
                   )}
                   {ticket.crm.phone && (
                     <div className="flex items-center gap-1.5">
                       <Phone size={12} className="text-purple-600 shrink-0" />
-                      <span>{ticket.crm.phone}</span>
+                      <span className="font-semibold">{ticket.crm.phone}</span>
                     </div>
                   )}
                 </div>
@@ -226,14 +226,14 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 text-xs text-slate-400 font-mono text-center">
+            <div className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 font-mono text-center">
               Tarea interna (Sin vinculación CRM activa)
             </div>
           )}
 
           {/* Comments & Activity Feed */}
           <div className="space-y-3 pt-2">
-            <h4 className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <h4 className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
               <span>Hilo de Comentarios & Bitácora</span>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-600">
                 {ticket.comments.length} notas
@@ -243,7 +243,7 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
             {/* List of comments */}
             <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
               {ticket.comments.length === 0 ? (
-                <p className="text-xs text-slate-400 italic font-mono py-2">
+                <p className="text-xs text-slate-500 dark:text-slate-400 italic font-mono py-2">
                   No hay comentarios registrados. Escribe uno abajo para actualizar la tarjeta.
                 </p>
               ) : (
@@ -257,13 +257,13 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                     <div className="flex items-center justify-between text-[11px]">
                       <div className="flex items-center space-x-2">
                         {/* Typographic Monogram */}
-                        <div className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-mono font-bold text-[9px]">
+                        <div className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-mono font-bold text-[9px] text-slate-800 dark:text-slate-200">
                           {c.authorInitials}
                         </div>
-                        <span className="font-bold">{c.authorName}</span>
-                        <span className="text-[9px] font-mono text-slate-400">({c.authorRole})</span>
+                        <span className="font-bold text-slate-950 dark:text-white">{c.authorName}</span>
+                        <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400">({c.authorRole})</span>
                       </div>
-                      <span className="text-[9px] font-mono text-slate-400">
+                      <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400">
                         {new Date(c.timestamp).toLocaleString(undefined, {
                           month: 'short',
                           day: 'numeric',
@@ -272,7 +272,7 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                         })}
                       </span>
                     </div>
-                    <p className="text-slate-600 dark:text-slate-300 font-medium pl-7">{c.text}</p>
+                    <p className="text-slate-800 dark:text-slate-200 font-medium pl-7 leading-relaxed">{c.text}</p>
                   </div>
                 ))
               )}
@@ -287,8 +287,8 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                 placeholder="Escribe un comentario o actualización..."
                 className={`flex-1 px-3.5 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-orange-500 ${
                   darkMode
-                    ? 'bg-slate-900 border-slate-800 text-white'
-                    : 'bg-slate-50 border-slate-300 text-slate-900 font-medium'
+                    ? 'bg-slate-900 border-slate-800 text-white placeholder:text-slate-500'
+                    : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500 font-medium'
                 }`}
               />
               <button
@@ -307,8 +307,8 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
             darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}
         >
-          <div className="text-[10px] font-mono text-slate-400 space-y-0.5">
-            <div>Creado por: <span className="font-bold text-slate-600 dark:text-slate-300">{ticket.createdBy}</span></div>
+          <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 space-y-0.5">
+            <div>Creado por: <span className="font-bold text-slate-800 dark:text-slate-200">{ticket.createdBy}</span></div>
             <div>Última actividad: {new Date(ticket.updatedAt).toLocaleTimeString()}</div>
           </div>
 

@@ -28,15 +28,18 @@ import {
   Building,
   MessageSquare,
   ShieldCheck,
-  Briefcase
+  Briefcase,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 interface AdminPortalPageProps {
   onReturnToSite: () => void;
   darkMode: boolean;
+  onToggleDarkMode?: () => void;
 }
 
-export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode }) => {
+export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode, onToggleDarkMode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser());
 
   // Determine initial project scope based on user role
@@ -55,6 +58,10 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<WorkTicket | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const loadData = useCallback(() => {
     if (!currentUser) return;
@@ -273,6 +280,16 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               </span>
             </div>
 
+            {onToggleDarkMode && (
+              <button
+                onClick={onToggleDarkMode}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                title={darkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
+              >
+                {darkMode ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} className="text-slate-600" />}
+              </button>
+            )}
+
             <button
               onClick={handleLogout}
               className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
@@ -297,8 +314,8 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               {totalTickets}
             </div>
             <div>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Total</span>
-              <h4 className="text-xs font-black">{totalTickets} Tarjetas</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Total</span>
+              <h4 className="text-xs font-black text-slate-950 dark:text-white">{totalTickets} Tarjetas</h4>
             </div>
           </div>
 
@@ -307,12 +324,12 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
             }`}
           >
-            <div className="p-2 rounded-xl bg-slate-500/10 text-slate-400 font-black text-sm">
+            <div className="p-2 rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-300 font-black text-sm">
               {todoCount}
             </div>
             <div>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Por Iniciar</span>
-              <h4 className="text-xs font-black text-slate-400">{todoCount} Pendientes</h4>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Por Iniciar</span>
+              <h4 className="text-xs font-black text-slate-700 dark:text-slate-300">{todoCount} Pendientes</h4>
             </div>
           </div>
 
@@ -325,7 +342,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               {inProgressCount}
             </div>
             <div>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">En Curso</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">En Curso</span>
               <h4 className="text-xs font-black text-purple-600">{inProgressCount} Activas</h4>
             </div>
           </div>
@@ -339,7 +356,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               {reviewCount}
             </div>
             <div>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Revisión QA</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Revisión QA</span>
               <h4 className="text-xs font-black text-cyan-600">{reviewCount} en QA</h4>
             </div>
           </div>
@@ -353,7 +370,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               {doneCount}
             </div>
             <div>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Completado</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Completado</span>
               <h4 className="text-xs font-black text-emerald-600">{doneCount} Hechas</h4>
             </div>
           </div>
@@ -367,7 +384,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               {crmCount}
             </div>
             <div>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Clientes CRM</span>
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Clientes CRM</span>
               <h4 className="text-xs font-black text-orange-600">{crmCount} Leads</h4>
             </div>
           </div>
@@ -454,7 +471,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
                         className="hover:bg-orange-500/5 transition-colors cursor-pointer"
                       >
                         <td className="p-3.5 font-mono">
-                          <div className="font-bold">{t.code}</div>
+                          <div className="font-bold text-slate-950 dark:text-white">{t.code}</div>
                           <span
                             className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full border inline-block mt-0.5 ${project.badgeBg} ${project.badgeText} ${project.border}`}
                           >
@@ -462,22 +479,22 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
                           </span>
                         </td>
                         <td className="p-3.5 font-bold">
-                          <div>{t.crm?.clientName}</div>
-                          <div className="text-[11px] text-slate-400 font-normal flex items-center gap-1">
+                          <div className="text-slate-950 dark:text-white">{t.crm?.clientName}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1 mt-0.5">
                             <Building size={11} className="text-slate-400" />
                             <span>{t.crm?.company}</span>
                           </div>
                         </td>
                         <td className="p-3.5 font-mono text-[11px]">
-                          <div>{t.crm?.email || '—'}</div>
-                          <div className="text-slate-400">{t.crm?.phone || '—'}</div>
+                          <div className="text-slate-900 dark:text-slate-100 font-medium">{t.crm?.email || '—'}</div>
+                          <div className="text-slate-500 dark:text-slate-400">{t.crm?.phone || '—'}</div>
                         </td>
                         <td className="p-3.5">
                           <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-bold text-[10px] inline-block">
                             {t.crm?.service}
                           </span>
                           {t.crm?.budget && (
-                            <div className="text-[10px] font-mono font-bold text-emerald-600 mt-0.5">
+                            <div className="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">
                               {t.crm.budget}
                             </div>
                           )}
@@ -486,7 +503,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
                           <select
                             value={t.status}
                             onChange={e => handleStatusChange(t.id, e.target.value as TicketStatus)}
-                            className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold border-none focus:outline-none cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-700 focus:outline-none cursor-pointer"
                           >
                             <option value="todo">1. Por Iniciar</option>
                             <option value="in_progress">2. En Progreso</option>
@@ -500,7 +517,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
                               href={whatsappUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 border border-emerald-500/30 text-xs font-bold inline-flex items-center space-x-1 transition-colors"
+                              className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold inline-flex items-center space-x-1 transition-colors"
                             >
                               <MessageSquare size={12} />
                               <span>WhatsApp</span>

@@ -128,19 +128,19 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                       {sp.status === 'active' ? '🟢 En Curso' : '⚪ Planificado'}
                     </span>
                   </div>
-                  <h3 className="font-bold text-sm">{sp.name}</h3>
+                  <h3 className="font-bold text-sm text-slate-950 dark:text-white">{sp.name}</h3>
                 </div>
 
-                <span className="font-mono text-xs font-black text-slate-400">
+                <span className="font-mono text-xs font-black text-slate-500 dark:text-slate-400">
                   {sprintTickets.length} tareas
                 </span>
               </div>
 
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{sp.goal}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mb-3">{sp.goal}</p>
 
               {/* Sprint Progress Bar */}
               <div className="space-y-1.5 mb-3">
-                <div className="flex justify-between text-[10px] font-mono font-bold text-slate-400">
+                <div className="flex justify-between text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
                   <span>Progreso: {progressPercent}%</span>
                   <span>{completedCount}/{sprintTickets.length} completadas</span>
                 </div>
@@ -153,7 +153,7 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
               </div>
 
               {/* Sprint Dates */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-mono text-slate-400">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-[10px] font-mono text-slate-500 dark:text-slate-400">
                 <div className="flex items-center gap-1">
                   <Calendar size={12} />
                   <span>{sp.startDate} al {sp.endDate}</span>
@@ -225,14 +225,14 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                       </span>
                     </div>
 
-                    <h4 className="font-bold text-sm leading-snug">{ticket.title}</h4>
+                    <h4 className="font-bold text-sm leading-snug text-slate-950 dark:text-white">{ticket.title}</h4>
 
                     {ticket.crm && (
-                      <p className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
-                        <Building size={12} className="text-slate-400" />
-                        <span>{ticket.crm.clientName} ({ticket.crm.company})</span>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+                        <Building size={12} className="text-slate-500 dark:text-slate-400" />
+                        <span className="text-slate-900 dark:text-slate-200">{ticket.crm.clientName} ({ticket.crm.company})</span>
                         {ticket.crm.budget && (
-                          <span className="text-emerald-600 font-mono font-bold">
+                          <span className="text-emerald-700 dark:text-emerald-400 font-mono font-bold">
                             · {ticket.crm.budget}
                           </span>
                         )}
@@ -252,9 +252,9 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                           handleAssignToSprint(ticket.id, e.target.value);
                         }
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 border-none focus:outline-none cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 focus:outline-none cursor-pointer"
                     >
-                      <option value="" disabled>
+                      <option value="" disabled className="text-slate-500">
                         Mover a Sprint...
                       </option>
                       {projectSprints.map(sp => (
@@ -272,7 +272,7 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                             onRefresh();
                           }
                         }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 transition-colors"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                         title="Eliminar (Solo Admin)"
                       >
                         <Trash2 size={14} />
@@ -295,24 +295,23 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
             }`}
           >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-bold text-base">Crear Ciclo / Sprint</h3>
+              <h3 className="font-bold text-base text-slate-950 dark:text-white">Crear Ciclo / Sprint</h3>
               <button
                 onClick={() => setShowNewSprintModal(false)}
-                className="p-1 text-slate-400 hover:text-slate-600"
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               >
-                <Trash2 size={0} /> {/* Invisible for layout */}
-                <span className="text-lg">&times;</span>
+                <span className="text-xl font-bold">&times;</span>
               </button>
             </div>
 
             <form onSubmit={handleCreateSprintSubmit} className="space-y-4 text-xs font-bold">
               {isAdmin && (
                 <div>
-                  <label className="text-slate-400 block mb-1">Proyecto Asignado</label>
+                  <label className="text-slate-600 dark:text-slate-400 block mb-1">Proyecto Asignado</label>
                   <select
                     value={sprintProject}
                     onChange={e => setSprintProject(e.target.value as ProjectId)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer"
                   >
                     <option value="bariloche">🌲 Proyecto Bariloche</option>
                     <option value="espana">🇪🇸 Proyecto España</option>
@@ -321,45 +320,45 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
               )}
 
               <div>
-                <label className="text-slate-400 block mb-1">Nombre del Sprint *</label>
+                <label className="text-slate-600 dark:text-slate-400 block mb-1">Nombre del Sprint *</label>
                 <input
                   type="text"
                   required
                   value={sprintName}
                   onChange={e => setSprintName(e.target.value)}
                   placeholder="Ej: Sprint 3 · Onboarding & Pagos"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-slate-400 block mb-1">Objetivo del Sprint</label>
+                <label className="text-slate-600 dark:text-slate-400 block mb-1">Objetivo del Sprint</label>
                 <textarea
                   rows={2}
                   value={sprintGoal}
                   onChange={e => setSprintGoal(e.target.value)}
                   placeholder="Meta central del ciclo..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 font-medium"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">Fecha Inicio</label>
+                  <label className="text-slate-600 dark:text-slate-400 block mb-1">Fecha Inicio</label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={e => setStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-mono focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-slate-400 block mb-1">Fecha Cierre</label>
+                  <label className="text-slate-600 dark:text-slate-400 block mb-1">Fecha Cierre</label>
                   <input
                     type="date"
                     value={endDate}
                     onChange={e => setEndDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 font-mono focus:outline-none"
                   />
                 </div>
               </div>

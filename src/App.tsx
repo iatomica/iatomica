@@ -42,6 +42,7 @@ export function App() {
           setCurrentView('site');
         }}
         darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
     );
   }

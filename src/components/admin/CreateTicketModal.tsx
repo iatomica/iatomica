@@ -110,14 +110,14 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
           {/* Project & Sprint Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                 Proyecto / Épica
               </label>
               {isAdmin ? (
                 <select
                   value={projectId}
                   onChange={e => setProjectId(e.target.value as ProjectId)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
                 >
                   <option value="bariloche">🌲 Proyecto Bariloche (José Anaya)</option>
                   <option value="espana">🇪🇸 Proyecto España (Stefi Del Papa)</option>
@@ -133,13 +133,13 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             </div>
 
             <div>
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                 Asignación de Sprint
               </label>
               <select
                 value={sprintId}
                 onChange={e => setSprintId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold focus:outline-none focus:border-orange-500 cursor-pointer"
               >
                 <option value="backlog">📂 En Backlog (Sin Sprint activo)</option>
                 {projectSprints.map(sp => (
@@ -153,7 +153,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
           {/* Title */}
           <div>
-            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
               Título de la Tarea / Requerimiento *
             </label>
             <input
@@ -162,13 +162,13 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="Ej: Implementación de pasarela de pago o Consulta sobre IA..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none focus:border-orange-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold focus:outline-none focus:border-orange-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
               Descripción & Alcance
             </label>
             <textarea
@@ -176,20 +176,20 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Detalla las especificaciones técnicas, objetivos o notas del cliente..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-medium focus:outline-none focus:border-orange-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-medium focus:outline-none focus:border-orange-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
           </div>
 
           {/* Priority & Phase */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                 Prioridad
               </label>
               <select
                 value={priority}
                 onChange={e => setPriority(e.target.value as TicketPriority)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold focus:outline-none cursor-pointer"
               >
                 <option value="baja">🟢 Baja</option>
                 <option value="media">🟡 Media</option>
@@ -199,13 +199,13 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             </div>
 
             <div>
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                 Fase Inicial en Tablero
               </label>
               <select
                 value={status}
                 onChange={e => setStatus(e.target.value as TicketStatus)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold focus:outline-none cursor-pointer"
               >
                 <option value="todo">1. Por Iniciar</option>
                 <option value="in_progress">2. En Progreso</option>
@@ -220,9 +220,9 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Sparkles size={14} className="text-orange-500" />
-                <span className="text-xs font-bold">Vincular Información de Cliente (CRM)</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-white">Vincular Información de Cliente (CRM)</span>
               </div>
-              <label className="flex items-center space-x-2 text-xs text-slate-400 cursor-pointer">
+              <label className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={hasCrm}
@@ -241,7 +241,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[10px] font-mono font-bold text-slate-400 block mb-1">
+                    <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
                       Nombre del Cliente / Contacto
                     </label>
                     <input
@@ -249,12 +249,12 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                       value={clientName}
                       onChange={e => setClientName(e.target.value)}
                       placeholder="Ej: Laura Méndez"
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-medium focus:outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-medium focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-mono font-bold text-slate-400 block mb-1">
+                    <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
                       Empresa / Organización
                     </label>
                     <div className="relative">
@@ -264,7 +264,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                         value={company}
                         onChange={e => setCompany(e.target.value)}
                         placeholder="Ej: Andes Tech SRL"
-                        className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-medium focus:outline-none"
+                        className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-medium focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
@@ -272,7 +272,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="text-[10px] font-mono font-bold text-slate-400 block mb-1">
+                    <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
                       Teléfono / WhatsApp
                     </label>
                     <div className="relative">
@@ -282,13 +282,13 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                         value={phone}
                         onChange={e => setPhone(e.target.value)}
                         placeholder="+54 9 294..."
-                        className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono focus:outline-none"
+                        className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-mono font-bold text-slate-400 block mb-1">
+                    <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
                       Email
                     </label>
                     <div className="relative">
@@ -298,13 +298,13 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         placeholder="cliente@empresa.com"
-                        className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-mono focus:outline-none"
+                        className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-mono font-bold text-slate-400 block mb-1">
+                    <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
                       Presupuesto Estimado
                     </label>
                     <input
@@ -312,19 +312,19 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                       value={budget}
                       onChange={e => setBudget(e.target.value)}
                       placeholder="$3,500 USD o €"
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold text-emerald-600 focus:outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-bold text-emerald-700 dark:text-emerald-400 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-mono font-bold text-slate-400 block mb-1">
+                  <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
                     Servicio Solicitado
                   </label>
                   <select
                     value={service}
                     onChange={e => setService(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none cursor-pointer"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold focus:outline-none cursor-pointer"
                   >
                     <option value="Desarrollo a Medida">Desarrollo a Medida</option>
                     <option value="Herramientas de IA">Herramientas de IA</option>
