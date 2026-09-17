@@ -22,10 +22,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, isLo
   }, []);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled 
-        ? darkMode ? 'bg-slate-900/90 backdrop-blur-md border-b border-slate-800 py-3.5 shadow-sm' : 'bg-white/90 backdrop-blur-md border-b border-slate-200 py-3.5 shadow-sm'
-        : 'bg-transparent py-5'
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3.5 border-b shadow-sm ${
+      darkMode 
+        ? 'bg-slate-900/85 backdrop-blur-xl border-slate-800/80 shadow-black/20' 
+        : 'bg-white/88 backdrop-blur-xl border-slate-200/80 shadow-slate-900/5'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         

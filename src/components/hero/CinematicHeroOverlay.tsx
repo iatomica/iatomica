@@ -60,11 +60,11 @@ export const CinematicHeroOverlay: React.FC<CinematicHeroOverlayProps> = ({
 
   return (
     <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-6 sm:p-12 lg:p-16 select-none">
-      {/* Top spacer / subtle ambient header gradient for contrast */}
-      <div className="w-full h-28 bg-gradient-to-b from-white/80 via-white/30 to-transparent pointer-events-none -mx-6 sm:-mx-12 lg:-mx-16 -mt-6 sm:-mt-12 lg:-mt-16 px-6 sm:px-12 lg:px-16" />
+      {/* Top spacer */}
+      <div className="w-full h-20 pointer-events-none" />
 
       {/* Center Container for Animated Scenes */}
-      <div className="relative w-full max-w-5xl mx-auto my-auto flex items-center justify-center min-h-[280px]">
+      <div className="relative w-full max-w-5xl mx-auto my-auto flex items-center justify-center min-h-[300px]">
         {scenes.map((scene) => {
           const style = getSceneStyle(scene);
           const isCenter = scene.align === 'center' || !scene.align;
@@ -78,32 +78,46 @@ export const CinematicHeroOverlay: React.FC<CinematicHeroOverlayProps> = ({
                 isCenter ? 'items-center text-center' : isLeft ? 'items-start text-left max-w-xl' : 'items-end text-right ml-auto max-w-xl'
               }`}
             >
-              {/* Glassmorphic backdrop pill to guarantee perfect legibility over video frames */}
+              {/* Apple-style Glassmorphism Card with Maximum Contrast */}
               <div
                 style={{ touchAction: 'pan-y' }}
-                className={`p-6 sm:p-8 rounded-3xl backdrop-blur-xl border shadow-2xl transition-colors ${
+                className={`p-7 sm:p-10 rounded-[32px] border backdrop-blur-2xl backdrop-saturate-200 transition-all duration-300 ${
                   darkMode
-                    ? 'bg-slate-950/85 border-slate-800/90 shadow-black/60 text-white'
-                    : 'bg-white/92 border-white/80 shadow-slate-900/10 text-slate-900'
+                    ? 'bg-slate-950/85 border-white/20 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.1)_inset]'
+                    : 'bg-white/94 border-slate-200/90 shadow-[0_24px_60px_-15px_rgba(15,23,42,0.18),0_0_0_1px_rgba(255,255,255,0.9)_inset]'
                 }`}
               >
                 {scene.badge && (
-                  <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase mb-3.5 bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <div
+                    className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-black tracking-wider uppercase mb-4 border backdrop-blur-md shadow-sm ${
+                      darkMode
+                        ? 'bg-orange-500/15 border-orange-500/30 text-orange-400'
+                        : 'bg-orange-50 border-orange-200 text-orange-700'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-orange-500" />
                     <span>{scene.badge}</span>
                   </div>
                 )}
 
-                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] mb-3">
+                <h2
+                  className={`text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] mb-4 ${
+                    darkMode ? 'text-white' : 'text-slate-950'
+                  }`}
+                >
                   {scene.title}
                 </h2>
 
-                <p className="text-sm sm:text-base lg:text-lg max-w-2xl leading-relaxed text-slate-600 dark:text-slate-300 font-medium">
+                <p
+                  className={`text-base sm:text-lg lg:text-xl max-w-2xl leading-relaxed font-semibold ${
+                    darkMode ? 'text-slate-200' : 'text-slate-700'
+                  }`}
+                >
                   {scene.subtitle}
                 </p>
 
                 {scene.actionText && (
-                  <div className="mt-5 flex items-center gap-3">
+                  <div className="mt-6 flex items-center gap-3">
                     <button
                       onClick={() => {
                         if (onOpenBooking) {
@@ -113,7 +127,7 @@ export const CinematicHeroOverlay: React.FC<CinematicHeroOverlayProps> = ({
                           el?.scrollIntoView({ behavior: 'smooth' });
                         }
                       }}
-                      className="px-7 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02] transition-all flex items-center space-x-2 group cursor-pointer pointer-events-auto"
+                      className="px-8 py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white font-bold text-xs shadow-[0_4px_18px_rgba(249,115,22,0.35)] hover:shadow-[0_6px_22px_rgba(249,115,22,0.45)] hover:scale-[1.02] transition-all flex items-center space-x-2.5 group cursor-pointer pointer-events-auto"
                     >
                       <span>{scene.actionText}</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -126,20 +140,20 @@ export const CinematicHeroOverlay: React.FC<CinematicHeroOverlayProps> = ({
         })}
       </div>
 
-      {/* Bottom Floating Scroll Cue */}
+      {/* Bottom Floating Scroll Cue in Apple Capsule Style */}
       <div
         style={{ opacity: promptOpacity, transform: `translateY(${(1 - promptOpacity) * 12}px)` }}
-        className="w-full flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none pb-4"
+        className="w-full flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none pb-5"
       >
         <div
-          className={`px-4 py-2 rounded-full border backdrop-blur-md text-xs font-semibold tracking-wider uppercase flex items-center space-x-2 ${
+          className={`px-5 py-2.5 rounded-full border backdrop-blur-2xl backdrop-saturate-180 text-xs font-bold tracking-wider uppercase flex items-center space-x-2.5 shadow-lg ${
             darkMode
-              ? 'bg-slate-900/80 border-slate-800 text-slate-300'
-              : 'bg-white/80 border-slate-200 text-slate-600 shadow-sm'
+              ? 'bg-slate-900/90 border-slate-700/80 text-slate-100 shadow-black/30'
+              : 'bg-white/95 border-slate-200 text-slate-800 shadow-slate-900/10'
           }`}
         >
           <span className="inline-block w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-          <span>Desliza para explorar</span>
+          <span className="font-extrabold">Desliza para explorar</span>
           <ArrowDown className="w-3.5 h-3.5 text-orange-500 animate-bounce" />
         </div>
       </div>
