@@ -145,7 +145,6 @@ export const ExperimentalHero: React.FC<ExperimentalHeroProps> = ({ onOpenBookin
     STORY_BEATS.length - 1,
     Math.floor(scrollProgress * STORY_BEATS.length)
   );
-  const currentBeat = STORY_BEATS[currentBeatIdx];
 
   // Mobile layout: classic static presentation
   if (!isDesktop) {
@@ -195,6 +194,46 @@ export const ExperimentalHero: React.FC<ExperimentalHeroProps> = ({ onOpenBookin
   }
 
   // Desktop layout: pinned scroll-driven split view
+  // Interpolation helper for scroll-driven text entrance and exit transitions
+  const getBeatStyle = (idx: number, progress: number) => {
+    const ranges = [
+      { enterStart: -0.05, enterEnd: 0.0, exitStart: 0.20, exitEnd: 0.27 },
+      { enterStart: 0.20, enterEnd: 0.27, exitStart: 0.45, exitEnd: 0.52 },
+      { enterStart: 0.45, enterEnd: 0.52, exitStart: 0.70, exitEnd: 0.77 },
+      { enterStart: 0.70, enterEnd: 0.77, exitStart: 1.05, exitEnd: 1.10 },
+    ];
+
+    const r = ranges[idx];
+    let opacity = 0;
+    let translateY = 24;
+
+    if (progress < r.enterStart) {
+      opacity = 0;
+      translateY = 24;
+    } else if (progress < r.enterEnd) {
+      const t = (progress - r.enterStart) / (r.enterEnd - r.enterStart);
+      opacity = Math.max(0, Math.min(1, t));
+      translateY = (1 - opacity) * 24;
+    } else if (progress <= r.exitStart) {
+      opacity = 1;
+      translateY = 0;
+    } else if (progress <= r.exitEnd) {
+      const t = (progress - r.exitStart) / (r.exitEnd - r.exitStart);
+      opacity = Math.max(0, Math.min(1, 1 - t));
+      translateY = -t * 24;
+    } else {
+      opacity = 0;
+      translateY = -24;
+    }
+
+    return {
+      opacity,
+      transform: `translate3d(0, ${translateY.toFixed(2)}px, 0)`,
+      pointerEvents: opacity > 0.5 ? ('auto' as const) : ('none' as const),
+      visibility: opacity > 0.01 ? ('visible' as const) : ('hidden' as const),
+    };
+  };
+
   return (
     <section
       ref={containerRef}
@@ -222,7 +261,7 @@ export const ExperimentalHero: React.FC<ExperimentalHeroProps> = ({ onOpenBookin
       <div className="max-w-7xl w-full mx-auto px-6 lg:px-8 relative z-10 pt-16">
         <div className="grid grid-cols-12 gap-12 items-center">
           
-          {/* Left Column: Dynamic Storytelling Beat */}
+          {/* Left Column: Dynamic Storytelling Beat Stage */}
           <div className="col-span-7 space-y-6 text-left">
             
             {/* Step Indicators Bar */}
@@ -245,50 +284,62 @@ export const ExperimentalHero: React.FC<ExperimentalHeroProps> = ({ onOpenBookin
               </span>
             </div>
 
-            {/* Pill Badge */}
-            <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all duration-300 ${
-              darkMode
-                ? 'bg-slate-900/90 border-slate-800 text-orange-400 shadow-sm'
-                : 'bg-orange-50/90 border-orange-200 text-orange-700 shadow-sm'
-            }`}>
-              {currentBeat.badgeIcon}
-              <span>{currentBeat.badge}</span>
+            {/* Stacked Story Beats with Scroll-Driven Entrance & Exit */}
+            <div className="relative w-full min-h-[350px]">
+              {STORY_BEATS.map((beat, idx) => {
+                const style = getBeatStyle(idx, scrollProgress);
+                return (
+                  <div
+                    key={beat.id}
+                    style={style}
+                    className="absolute inset-x-0 top-0 space-y-5 will-change-transform"
+                  >
+                    {/* Pill Badge */}
+                    <div className={`inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold border ${
+                      darkMode
+                        ? 'bg-slate-900/90 border-slate-800 text-orange-400 shadow-sm'
+                        : 'bg-orange-50/90 border-orange-200 text-orange-700 shadow-sm'
+                    }`}>
+                      {beat.badgeIcon}
+                      <span>{beat.badge}</span>
+                    </div>
+
+                    {/* Main Headline */}
+                    <h1 className="text-4xl lg:text-5xl font-black tracking-tight leading-[1.12]">
+                      {beat.title} <br />
+                      <span className="text-gradient-brand">{beat.titleGradient}</span>
+                    </h1>
+
+                    {/* Subtitle */}
+                    <p className={`text-base lg:text-lg max-w-xl leading-relaxed font-medium ${
+                      darkMode ? 'text-slate-300' : 'text-slate-600'
+                    }`}>
+                      {beat.subtitle}
+                    </p>
+
+                    {/* Dynamic Benefit Pills */}
+                    <div className="grid grid-cols-3 gap-3 pt-1">
+                      {beat.pills.map((pill, pIdx) => (
+                        <div
+                          key={pIdx}
+                          className={`p-3 rounded-xl border flex items-center space-x-2 ${
+                            darkMode
+                              ? 'bg-slate-900/80 border-slate-800/90'
+                              : 'bg-slate-50/90 border-slate-200/80'
+                          }`}
+                        >
+                          {pill.icon}
+                          <span className="text-xs font-bold truncate">{pill.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Main Headline */}
-            <div className="min-h-[140px] flex flex-col justify-center">
-              <h1 className="text-4xl lg:text-5xl font-black tracking-tight leading-[1.1] transition-all duration-300">
-                {currentBeat.title} <br />
-                <span className="text-gradient-brand">{currentBeat.titleGradient}</span>
-              </h1>
-            </div>
-
-            {/* Subtitle */}
-            <p className={`text-base lg:text-lg max-w-xl leading-relaxed min-h-[60px] font-medium transition-colors duration-300 ${
-              darkMode ? 'text-slate-300' : 'text-slate-600'
-            }`}>
-              {currentBeat.subtitle}
-            </p>
-
-            {/* Dynamic Benefit Pills */}
-            <div className="grid grid-cols-3 gap-3 pt-1">
-              {currentBeat.pills.map((pill, pIdx) => (
-                <div
-                  key={pIdx}
-                  className={`p-3 rounded-xl border flex items-center space-x-2 transition-all duration-300 ${
-                    darkMode
-                      ? 'bg-slate-900/80 border-slate-800/90'
-                      : 'bg-slate-50/90 border-slate-200/80'
-                  }`}
-                >
-                  {pill.icon}
-                  <span className="text-xs font-bold truncate">{pill.text}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Call to Action */}
-            <div className="pt-3 flex items-center space-x-4">
+            {/* Call to Action Bar */}
+            <div className="pt-2 flex items-center space-x-4">
               <button
                 onClick={onOpenBooking}
                 className="px-8 py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/25 hover:shadow-orange-500/35 hover:scale-[1.02] transition-all flex items-center space-x-2 cursor-pointer"

@@ -39,7 +39,7 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
 
     if (!iw || !ih || cw === 0 || ch === 0) return;
 
-    const scale = Math.min(cw / iw, ch / ih) * 1.05; // Contained with gentle upscale
+    const scale = Math.max(cw / iw, ch / ih);
     const nw = iw * scale;
     const nh = ih * scale;
     const dx = (cw - nw) / 2;
@@ -187,16 +187,16 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
   }, [progress, renderCurrent]);
 
   return (
-    <div className={`relative w-full aspect-square max-w-[480px] mx-auto rounded-3xl overflow-hidden select-none pointer-events-none transition-all duration-300 ${
+    <div className={`relative w-full aspect-[16/9] max-w-[560px] mx-auto rounded-3xl overflow-hidden select-none pointer-events-none transition-all duration-300 ${
       darkMode
-        ? 'bg-slate-900/40 border border-slate-800/80 shadow-2xl shadow-black/40'
-        : 'bg-slate-50/60 border border-slate-200/60 shadow-xl shadow-slate-900/5'
+        ? 'bg-slate-950 border border-slate-800 shadow-2xl shadow-black/50'
+        : 'bg-white border border-slate-200/80 shadow-2xl shadow-slate-900/10'
     }`}>
       {/* Fallback image */}
       <img
         src={`${BASE_PATH}/frame_000.webp`}
         alt="iAtomica 3D Animation Model"
-        className={`absolute inset-0 w-full h-full object-contain p-4 transition-opacity duration-300 z-0 ${
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-0 ${
           initialFrameLoaded ? 'opacity-0' : 'opacity-100'
         }`}
         loading="eager"
@@ -205,7 +205,7 @@ export const ExperimentalHeroCanvas: React.FC<ExperimentalHeroCanvasProps> = ({
       {/* Canvas */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full z-10 p-2"
+        className="absolute inset-0 w-full h-full z-10"
         style={{
           width: '100%',
           height: '100%',
