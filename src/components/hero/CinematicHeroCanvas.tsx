@@ -49,12 +49,15 @@ export const CinematicHeroCanvas: React.FC<CinematicHeroCanvasProps> = ({
     const nw = iw * scale;
     const nh = ih * scale;
     const dx = (cw - nw) / 2;
-    const dy = (ch - nh) / 2;
+    // Optical offset to account for fixed header so top of 3D subject is not clipped
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const headerOffset = (isMobile ? 20 : 32) * dpr;
+    const dy = (ch - nh) / 2 + headerOffset;
 
     ctx.clearRect(0, 0, cw, ch);
     ctx.drawImage(img, dx, dy, nw, nh);
     currentFrameDrawnRef.current = frameIdx;
-  }, []);
+  }, [isMobile]);
 
   // Attempt to draw target frame or nearest available fallback
   const renderCurrent = useCallback(() => {
@@ -203,6 +206,7 @@ export const CinematicHeroCanvas: React.FC<CinematicHeroCanvasProps> = ({
       <img
         src={isMobile ? '/media/frames/mobile/frame_000.webp' : '/media/frames/desktop/frame_000.webp'}
         alt="iAtomica Hero Visual Intro"
+        style={{ objectPosition: isMobile ? 'center calc(50% + 20px)' : 'center calc(50% + 32px)' }}
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-0 ${
           initialFrameLoaded ? 'opacity-0' : 'opacity-100'
         }`}
