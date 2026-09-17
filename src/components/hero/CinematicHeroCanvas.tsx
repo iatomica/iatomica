@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { HERO_CONFIG } from './heroConfig';
 
 interface CinematicHeroCanvasProps {
   progress: number; // 0.0 to 1.0
   isMobile: boolean;
   onLoaded?: () => void;
+  darkMode?: boolean;
 }
 
-const TOTAL_FRAMES = 151;
+const TOTAL_FRAMES = 181;
 
 export const CinematicHeroCanvas: React.FC<CinematicHeroCanvasProps> = ({
   progress,
   isMobile,
   onLoaded,
+  darkMode = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<(HTMLImageElement | null)[]>(new Array(TOTAL_FRAMES).fill(null));
@@ -197,10 +198,10 @@ export const CinematicHeroCanvas: React.FC<CinematicHeroCanvasProps> = ({
   }, [progress, renderCurrent]);
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none bg-white">
+    <div className={`absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none transition-colors ${darkMode ? 'bg-slate-950' : 'bg-white'}`}>
       {/* High-fidelity Fallback Poster Image */}
       <img
-        src={isMobile ? HERO_CONFIG.mobilePosterSrc : HERO_CONFIG.desktopPosterSrc}
+        src={isMobile ? '/media/frames/mobile/frame_000.webp' : '/media/frames/desktop/frame_000.webp'}
         alt="iAtomica Hero Visual Intro"
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-0 ${
           initialFrameLoaded ? 'opacity-0' : 'opacity-100'
@@ -221,8 +222,14 @@ export const CinematicHeroCanvas: React.FC<CinematicHeroCanvasProps> = ({
         }}
       />
 
-      {/* Clean Bottom White Fade to transition smoothly into the following section */}
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/30 to-transparent z-15 pointer-events-none" />
+      {/* Clean Bottom Gradient to transition smoothly into the following section */}
+      <div
+        className={`absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t z-15 pointer-events-none transition-colors ${
+          darkMode
+            ? 'from-slate-950 via-slate-950/40 to-transparent'
+            : 'from-white via-white/40 to-transparent'
+        }`}
+      />
     </div>
   );
 };

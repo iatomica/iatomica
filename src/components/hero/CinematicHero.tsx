@@ -19,7 +19,7 @@ interface CinematicHeroProps {
   darkMode: boolean;
 }
 
-export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking, darkMode }) => {
+export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking: _onOpenBooking, darkMode }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Synchronous initialization to ensure correct media source from frame 0 on mobile devices
@@ -95,13 +95,11 @@ export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking, dar
   // If user prefers reduced motion, render clean static hero without scroll trap
   if (reducedMotion) {
     return (
-      <section className="relative w-full min-h-screen min-h-[90svh] flex items-center justify-center overflow-hidden bg-white">
-        <CinematicHeroCanvas progress={0} isMobile={isMobile} />
+      <section className={`relative w-full min-h-screen min-h-[90svh] flex items-center justify-center overflow-hidden transition-colors ${darkMode ? 'bg-slate-950' : 'bg-white'}`}>
+        <CinematicHeroCanvas progress={0} isMobile={isMobile} darkMode={darkMode} />
         <CinematicHeroOverlay
           progress={0}
-          scenes={HERO_CONFIG.scenes}
           darkMode={darkMode}
-          onOpenBooking={onOpenBooking}
         />
       </section>
     );
@@ -110,21 +108,20 @@ export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking, dar
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-screen h-[100svh] overflow-hidden bg-white select-none"
+      className={`relative w-full h-screen h-[100svh] overflow-hidden select-none transition-colors ${darkMode ? 'bg-slate-950' : 'bg-white'}`}
       aria-label="Cinematic Hero Introduction"
     >
       {/* Pixel-Perfect HTML5 Canvas WebP Image Sequence Layer */}
       <CinematicHeroCanvas
         progress={scrollProgress}
         isMobile={isMobile}
+        darkMode={darkMode}
       />
 
-      {/* HTML Typography & Brand Overlays */}
+      {/* Discreet Initial Scroll Indicator */}
       <CinematicHeroOverlay
         progress={scrollProgress}
-        scenes={HERO_CONFIG.scenes}
         darkMode={darkMode}
-        onOpenBooking={onOpenBooking}
       />
     </section>
   );

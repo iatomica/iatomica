@@ -27,12 +27,12 @@ export interface CinematicHeroConfig {
 export const HERO_CONFIG: CinematicHeroConfig = {
   desktopVideoSrc: '/media/hero-desktop.mp4',
   mobileVideoSrc: '/media/hero-mobile.mp4',
-  desktopPosterSrc: '/media/hero-poster.webp',
-  mobilePosterSrc: '/media/hero-poster-mobile.webp',
-  scrollLengthDesktop: 450, // 4.5x screen height (~4,500px) for measured, cinematic scrubbing
-  scrollLengthTablet: 350,  // 3.5x screen height
-  scrollLengthMobile: 280,  // 2.8x screen height
-  objectPositionDesktop: 'center 45%',
+  desktopPosterSrc: '/media/frames/desktop/frame_000.webp',
+  mobilePosterSrc: '/media/frames/mobile/frame_000.webp',
+  scrollLengthDesktop: 300, // 3x screen height for responsive, agile scrubbing without text bubbles
+  scrollLengthTablet: 260,
+  scrollLengthMobile: 220,
+  objectPositionDesktop: 'center center',
   objectPositionTablet: 'center center',
   objectPositionMobile: 'center center',
   scenes: [
