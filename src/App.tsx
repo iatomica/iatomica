@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { CinematicHero } from './components/hero/CinematicHero';
 import { Hero } from './components/Hero';
 import { ServicesOverview } from './components/ServicesOverview';
 import { SolutionsShowcase } from './components/SolutionsShowcase';
@@ -58,6 +59,12 @@ export function App() {
       />
 
       <main>
+        {/* Cinematic Scroll-Driven Hero */}
+        <CinematicHero
+          onOpenBooking={scrollToContact}
+          darkMode={darkMode}
+        />
+
         {/* Section 1: Hero */}
         <Hero
           onOpenBooking={scrollToContact}
