@@ -1,12 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentUser, logoutUser } from '../../services/authService';
 import type { User } from '../../services/authService';
-import { fetchLeadsFromDb, updateLeadStatus, assignLeadRole, addLeadNote, deleteLead, subscribeToLeadChanges } from '../../services/leadService';
-import type { Lead, LeadStatus, LeadRole } from '../../services/leadService';
+import { 
+  fetchJiraIssues, 
+  createJiraIssue, 
+  updateJiraIssue, 
+  updateIssueStatus, 
+  deleteJiraIssue, 
+  subscribeToJiraChanges 
+} from '../../services/jiraService';
+import type { JiraIssue, JiraStatus, JiraIssueType } from '../../services/jiraService';
+import { 
+  fetchCompanies, 
+  fetchCompanyDetail, 
+  createCompany, 
+  updateCompany, 
+  deleteCompany, 
+  addCompanyActivity, 
+  subscribeToCrmChanges 
+} from '../../services/crmService';
+import type { CrmCompany, CrmActivity } from '../../services/crmService';
 import { AdminLoginPage } from './AdminLoginPage';
-import { KanbanBoard } from './KanbanBoard';
-import { LeadDetailDrawer } from './LeadDetailDrawer';
-import { Cpu, LayoutGrid, Table, LogOut, Database, ArrowLeft } from 'lucide-react';
+import { JiraBoard } from './JiraBoard';
+import { JiraBacklog } from './JiraBacklog';
+import { CrmDirectory } from './CrmDirectory';
+import { CrmCompanyDrawer } from './CrmCompanyDrawer';
+import { JiraIssueModal } from './JiraIssueModal';
+import { 
+  Cpu, 
+  LayoutGrid, 
+  Inbox, 
+  Building, 
+  LogOut, 
+  ArrowLeft 
+} from 'lucide-react';
 
 interface AdminPortalPageProps {
   onReturnToSite: () => void;
@@ -15,116 +42,172 @@ interface AdminPortalPageProps {
 
 export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser());
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [roleFilter, setRoleFilter] = useState<string>('todos');
+  const [activeTab, setActiveTab] = useState<'board' | 'backlog' | 'directory'>('board');
+  
+  // Data States
+  const [issues, setIssues] = useState<JiraIssue[]>([]);
+  const [companies, setCompanies] = useState<CrmCompany[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<CrmCompany | null>(null);
 
-  const fetchLatestLeads = async () => {
-    const data = await fetchLeadsFromDb();
-    setLeads(data);
-    if (selectedLead) {
-      const refreshed = data.find(l => l.id === selectedLead.id) || null;
-      setSelectedLead(refreshed);
+  // Modal States
+  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
+  const [editingIssue, setEditingIssue] = useState<JiraIssue | null>(null);
+  const [defaultCompanyForIssue, setDefaultCompanyForIssue] = useState<string | null>(null);
+
+  // Initial Data Load
+  const refreshAllData = async () => {
+    const [fetchedIssues, fetchedCompanies] = await Promise.all([
+      fetchJiraIssues(),
+      fetchCompanies()
+    ]);
+    setIssues(fetchedIssues);
+    setCompanies(fetchedCompanies);
+
+    // Refresh selected company drawer if open
+    if (selectedCompany) {
+      const refreshedDetail = await fetchCompanyDetail(selectedCompany.id);
+      if (refreshedDetail) {
+        setSelectedCompany(refreshedDetail);
+      }
     }
   };
 
   useEffect(() => {
-    fetchLatestLeads();
-    // Subscribe to BroadcastChannel real-time live updates
-    const unsubscribe = subscribeToLeadChanges(() => {
-      fetchLatestLeads();
-    });
-    return () => unsubscribe();
+    refreshAllData();
+
+    // Subscribe to Live Sync Channels
+    const unsubJira = subscribeToJiraChanges(() => refreshAllData());
+    const unsubCrm = subscribeToCrmChanges(() => refreshAllData());
+
+    return () => {
+      unsubJira();
+      unsubCrm();
+    };
   }, []);
-
-  const handleLoginSuccess = (user: User) => {
-    setCurrentUser(user);
-    // If logging in as specific role, set filter accordingly
-    if (user.role === 'Atención Público' || user.role === 'Consultoría Técnica') {
-      setRoleFilter(user.role);
-    } else {
-      setRoleFilter('todos');
-    }
-    fetchLatestLeads();
-  };
-
-  const handleLogout = () => {
-    logoutUser();
-    setCurrentUser(null);
-  };
-
-  const handleStatusChange = async (id: string, newStatus: LeadStatus) => {
-    const updated = await updateLeadStatus(id, newStatus);
-    setLeads(updated);
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead(updated.find(l => l.id === id) || null);
-    }
-  };
-
-  const handleAssignRole = async (id: string, role: LeadRole) => {
-    const updated = await assignLeadRole(id, role);
-    setLeads(updated);
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead(updated.find(l => l.id === id) || null);
-    }
-  };
-
-  const handleAddNote = async (id: string, text: string) => {
-    if (!currentUser) return;
-    const authorName = `${currentUser.name} (${currentUser.role})`;
-    const updated = await addLeadNote(id, text, authorName);
-    setLeads(updated);
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead(updated.find(l => l.id === id) || null);
-    }
-  };
-
-  const handleDeleteLead = async (id: string) => {
-    const updated = await deleteLead(id);
-    setLeads(updated);
-    if (selectedLead?.id === id) {
-      setSelectedLead(null);
-    }
-  };
 
   if (!currentUser) {
     return (
       <AdminLoginPage
-        onLoginSuccess={handleLoginSuccess}
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          refreshAllData();
+        }}
         onReturnToSite={onReturnToSite}
         darkMode={darkMode}
       />
     );
   }
 
-  const filteredLeads = leads.filter(l => {
-    if (roleFilter === 'todos') return true;
-    return l.assignedTo === roleFilter;
-  });
+  const handleLogout = () => {
+    logoutUser();
+    setCurrentUser(null);
+  };
 
-  const totalCount = leads.length;
-  const newCount = leads.filter(l => l.status === 'nuevo').length;
-  const contactCount = leads.filter(l => l.status === 'en_contacto').length;
-  const bookedCount = leads.filter(l => l.status === 'cita_agendada').length;
-  const clientCount = leads.filter(l => l.status === 'cliente').length;
+  // Jira Handlers
+  const handleStatusChange = async (id: string, newStatus: JiraStatus) => {
+    // Optimistic UI update
+    setIssues(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
+    await updateIssueStatus(id, newStatus);
+    await refreshAllData();
+  };
+
+  const handleSaveIssue = async (issueData: any) => {
+    if (editingIssue) {
+      await updateJiraIssue(editingIssue.id, issueData);
+    } else {
+      await createJiraIssue(issueData);
+    }
+    await refreshAllData();
+  };
+
+  const handleDeleteIssue = async (id: string) => {
+    if (window.confirm('¿Deseas eliminar esta incidencia de Jira?')) {
+      await deleteJiraIssue(id);
+      await refreshAllData();
+    }
+  };
+
+  const handleQuickCreateBacklog = async (title: string, type: JiraIssueType) => {
+    await createJiraIssue({
+      title,
+      description: '',
+      type,
+      status: 'backlog',
+      priority: 'medium',
+      companyId: null,
+      assignedTo: currentUser.name,
+      storyPoints: 3,
+      value: 0
+    });
+    await refreshAllData();
+  };
+
+  const handleOpenCompanyDrawer = async (companyId: string) => {
+    const detail = await fetchCompanyDetail(companyId);
+    if (detail) {
+      setSelectedCompany(detail);
+    }
+  };
+
+  const handleCreateIssueForCompany = (companyId: string) => {
+    setEditingIssue(null);
+    setDefaultCompanyForIssue(companyId);
+    setIsIssueModalOpen(true);
+  };
+
+  // CRM Handlers
+  const handleCreateCompany = async (companyData: any) => {
+    await createCompany(companyData);
+    await refreshAllData();
+  };
+
+  const handleUpdateCompany = async (id: string, updates: Partial<CrmCompany>) => {
+    await updateCompany(id, updates);
+    const updatedDetail = await fetchCompanyDetail(id);
+    if (updatedDetail) {
+      setSelectedCompany(updatedDetail);
+    }
+    await refreshAllData();
+  };
+
+  const handleDeleteCompany = async (id: string) => {
+    if (window.confirm('¿Deseas eliminar esta cuenta del directorio CRM?')) {
+      await deleteCompany(id);
+      if (selectedCompany?.id === id) {
+        setSelectedCompany(null);
+      }
+      await refreshAllData();
+    }
+  };
+
+  const handleAddActivity = async (companyId: string, activityData: Omit<CrmActivity, 'id' | 'companyId' | 'createdAt'>) => {
+    await addCompanyActivity(companyId, activityData);
+    const updatedDetail = await fetchCompanyDetail(companyId);
+    if (updatedDetail) {
+      setSelectedCompany(updatedDetail);
+    }
+    await refreshAllData();
+  };
+
+  const activeIssuesCount = issues.filter(i => i.status !== 'backlog').length;
+  const backlogIssuesCount = issues.filter(i => i.status === 'backlog').length;
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors ${
       darkMode ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'
     }`}>
       
-      {/* Top Work Management Header */}
-      <header className={`px-6 py-4 border-b flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-md ${
+      {/* Top Main Navigation Header */}
+      <header className={`px-6 py-3.5 border-b flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-md ${
         darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-xs'
       }`}>
         
-        {/* Brand & Workspace Title */}
+        {/* Brand & Platform Identifier */}
         <div className="flex items-center space-x-4">
           <button
             onClick={onReturnToSite}
             className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
-            title="Volver al Sitio Web Público"
+            title="Volver a la Web Pública"
           >
             <ArrowLeft size={18} />
           </button>
@@ -135,49 +218,83 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             </div>
             <div>
               <h1 className="font-heading font-black text-lg leading-none flex items-center gap-2">
-                <span>Herramienta de Gestión de Trabajo</span>
+                <span>Plataforma de Trabajo &amp; CRM</span>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                  🟢 Sincronizado en Vivo
+                  SQLite Live Sync
                 </span>
               </h1>
-              <span className="text-xs text-slate-400 font-medium">iAtomica 2.0 Work Platform</span>
+              <span className="text-xs text-slate-400 font-medium">iAtomica Jira Suite &amp; CRM 360°</span>
             </div>
           </div>
         </div>
 
-        {/* User Identity & Actions */}
-        <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
+        {/* Central Jira / CRM Module Switcher */}
+        <div className="flex items-center p-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">
           
-          {/* View Switcher */}
-          <div className="flex items-center p-1 rounded-xl bg-slate-200 dark:bg-slate-800">
-            <button
-              onClick={() => setViewMode('kanban')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                viewMode === 'kanban'
-                  ? 'gradient-brand text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-              }`}
-            >
-              <LayoutGrid size={14} />
-              <span>Tablero Kanban</span>
-            </button>
+          {/* Tablero Activo */}
+          <button
+            onClick={() => setActiveTab('board')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 ${
+              activeTab === 'board'
+                ? 'gradient-brand text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <LayoutGrid size={15} />
+            <span>Tablero Activo</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+              activeTab === 'board' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+            }`}>
+              {activeIssuesCount}
+            </span>
+          </button>
 
-            <button
-              onClick={() => setViewMode('table')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                viewMode === 'table'
-                  ? 'gradient-brand text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-              }`}
-            >
-              <Table size={14} />
-              <span>Tabla CRM</span>
-            </button>
-          </div>
+          {/* Backlog */}
+          <button
+            onClick={() => setActiveTab('backlog')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 ${
+              activeTab === 'backlog'
+                ? 'gradient-brand text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Inbox size={15} />
+            <span>Backlog</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+              activeTab === 'backlog' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+            }`}>
+              {backlogIssuesCount}
+            </span>
+          </button>
 
-          {/* User Badge Profile */}
+          {/* Directorio CRM */}
+          <button
+            onClick={() => setActiveTab('directory')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 ${
+              activeTab === 'directory'
+                ? 'gradient-brand text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Building size={15} />
+            <span>Directorio CRM</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+              activeTab === 'directory' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+            }`}>
+              {companies.length}
+            </span>
+          </button>
+
+        </div>
+
+        {/* User Profile & Logout */}
+        <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
           <div className="flex items-center space-x-3 pl-3 border-l border-slate-200 dark:border-slate-800">
-            <img src={currentUser.avatar} alt={currentUser.name} className="w-9 h-9 rounded-full object-cover border border-purple-500" />
+            <img 
+              src={currentUser.avatar} 
+              alt={currentUser.name} 
+              className="w-9 h-9 rounded-full object-cover border border-purple-500" 
+            />
             <div className="hidden sm:block text-left">
               <h4 className="text-xs font-bold leading-tight">{currentUser.name}</h4>
               <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold block">
@@ -193,196 +310,98 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               <LogOut size={16} />
             </button>
           </div>
-
         </div>
+
       </header>
 
-      {/* Main Workspace Body */}
-      <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
+      {/* Main Module Content View */}
+      <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
         
-        {/* KPI Header Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-600 font-bold">
-              {totalCount}
-            </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Trabajo</span>
-              <h4 className="text-sm font-black">{totalCount} Tarjetas</h4>
-            </div>
-          </div>
-
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 font-bold">
-              {newCount}
-            </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Nuevos Leads</span>
-              <h4 className="text-sm font-black text-purple-600">{newCount} Nuevos</h4>
-            </div>
-          </div>
-
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 font-bold">
-              {contactCount}
-            </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">En Contacto</span>
-              <h4 className="text-sm font-black text-indigo-600">{contactCount} Activos</h4>
-            </div>
-          </div>
-
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 font-bold">
-              {bookedCount}
-            </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Citas Agendadas</span>
-              <h4 className="text-sm font-black text-blue-600">{bookedCount} Citas</h4>
-            </div>
-          </div>
-
-          <div className={`p-4 rounded-2xl border flex items-center space-x-3 ${
-            darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 font-bold">
-              {clientCount}
-            </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Clientes Ganados</span>
-              <h4 className="text-sm font-black text-emerald-600">{clientCount} Ganados</h4>
-            </div>
-          </div>
-        </div>
-
-        {/* Toolbar Filters */}
-        <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 ${
-          darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-        }`}>
-          <div className="flex items-center space-x-3 w-full sm:w-auto">
-            <span className="text-xs font-bold text-slate-500 font-mono">Filtro por Rol:</span>
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 border-none focus:outline-none cursor-pointer"
-            >
-              <option value="todos">Todos los Equipos</option>
-              <option value="Atención Público">Atención Público</option>
-              <option value="Consultoría Técnica">Consultoría Técnica</option>
-              <option value="Ventas">Ventas</option>
-            </select>
-          </div>
-
-          <div className="flex items-center space-x-2 text-xs font-mono text-slate-500">
-            <Database size={14} className="text-emerald-500" />
-            <span>Sincronización en vivo activa vía BroadcastChannel</span>
-          </div>
-        </div>
-
-        {/* Active View: Kanban vs Table */}
-        {viewMode === 'kanban' ? (
-          <KanbanBoard
-            leads={filteredLeads}
+        {/* Module 1: Jira Board */}
+        {activeTab === 'board' && (
+          <JiraBoard
+            issues={issues}
             onStatusChange={handleStatusChange}
-            onAssignRole={handleAssignRole}
-            onDeleteLead={handleDeleteLead}
-            onSelectLead={setSelectedLead}
+            onDeleteIssue={handleDeleteIssue}
+            onEditIssue={(issue) => {
+              setEditingIssue(issue);
+              setDefaultCompanyForIssue(issue.companyId || null);
+              setIsIssueModalOpen(true);
+            }}
+            onCreateIssue={() => {
+              setEditingIssue(null);
+              setDefaultCompanyForIssue(null);
+              setIsIssueModalOpen(true);
+            }}
+            onOpenCompany={handleOpenCompanyDrawer}
+            darkMode={darkMode}
+            currentUserName={currentUser.name}
+          />
+        )}
+
+        {/* Module 2: Jira Backlog */}
+        {activeTab === 'backlog' && (
+          <JiraBacklog
+            issues={issues}
+            companies={companies}
+            onStatusChange={handleStatusChange}
+            onQuickCreate={handleQuickCreateBacklog}
+            onEditIssue={(issue) => {
+              setEditingIssue(issue);
+              setDefaultCompanyForIssue(issue.companyId || null);
+              setIsIssueModalOpen(true);
+            }}
+            onDeleteIssue={handleDeleteIssue}
+            onOpenCompany={handleOpenCompanyDrawer}
+            onOpenCreateModal={() => {
+              setEditingIssue(null);
+              setDefaultCompanyForIssue(null);
+              setIsIssueModalOpen(true);
+            }}
             darkMode={darkMode}
           />
-        ) : (
-          <div className={`rounded-2xl border overflow-hidden ${
-            darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-          }`}>
-            <table className="w-full text-left text-xs">
-              <thead className={`border-b uppercase font-mono text-[10px] tracking-wider ${
-                darkMode ? 'bg-slate-950 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
-              }`}>
-                <tr>
-                  <th className="p-3.5">Cliente / Empresa</th>
-                  <th className="p-3.5">Contacto</th>
-                  <th className="p-3.5">Servicio Requerido</th>
-                  <th className="p-3.5">Estado CRM</th>
-                  <th className="p-3.5">Rol Asignado</th>
-                  <th className="p-3.5">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-sans">
-                {filteredLeads.map(l => (
-                  <tr
-                    key={l.id}
-                    onClick={() => setSelectedLead(l)}
-                    className="hover:bg-purple-500/5 transition-colors cursor-pointer"
-                  >
-                    <td className="p-3.5 font-bold">
-                      <div>{l.name}</div>
-                      <div className="text-[11px] text-slate-400 font-normal">{l.company || 'Particular'}</div>
-                    </td>
-                    <td className="p-3.5 font-mono text-[11px]">
-                      <div>{l.email}</div>
-                      <div className="text-slate-400">{l.phone}</div>
-                    </td>
-                    <td className="p-3.5">
-                      <span className="px-2.5 py-1 rounded-full bg-orange-500/10 text-orange-600 border border-orange-500/20 font-bold text-[10px]">
-                        {l.service}
-                      </span>
-                    </td>
-                    <td className="p-3.5 font-bold" onClick={e => e.stopPropagation()}>
-                      <select
-                        value={l.status}
-                        onChange={(e) => handleStatusChange(l.id, e.target.value as LeadStatus)}
-                        className="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-none text-[11px] font-bold focus:outline-none cursor-pointer"
-                      >
-                        <option value="nuevo">1. Nuevo Lead</option>
-                        <option value="en_contacto">2. En Contacto</option>
-                        <option value="cita_agendada">3. Cita Agendada</option>
-                        <option value="propuesta">4. Propuesta Enviada</option>
-                        <option value="cliente">5. Cliente Ganado</option>
-                      </select>
-                    </td>
-                    <td className="p-3.5" onClick={e => e.stopPropagation()}>
-                      <select
-                        value={l.assignedTo}
-                        onChange={(e) => handleAssignRole(l.id, e.target.value as LeadRole)}
-                        className="px-2 py-1 rounded bg-purple-500/10 text-purple-600 border border-purple-500/20 text-[11px] font-bold focus:outline-none cursor-pointer"
-                      >
-                        <option value="Atención Público">Atención Público</option>
-                        <option value="Consultoría Técnica">Consultoría Técnica</option>
-                        <option value="Ventas">Ventas</option>
-                        <option value="Sin Asignar">Sin Asignar</option>
-                      </select>
-                    </td>
-                    <td className="p-3.5" onClick={e => e.stopPropagation()}>
-                      <button
-                        onClick={() => handleDeleteLead(l.id)}
-                        className="text-slate-400 hover:text-rose-600 text-xs font-semibold"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        )}
+
+        {/* Module 3: CRM Directory 360° */}
+        {activeTab === 'directory' && (
+          <CrmDirectory
+            companies={companies}
+            onSelectCompany={(company) => handleOpenCompanyDrawer(company.id)}
+            onCreateCompany={handleCreateCompany}
+            onDeleteCompany={handleDeleteCompany}
+            darkMode={darkMode}
+          />
         )}
 
       </main>
 
-      {/* Side Drawer for Lead Inspection & Internal Notes */}
-      <LeadDetailDrawer
-        lead={selectedLead}
-        onClose={() => setSelectedLead(null)}
-        onStatusChange={handleStatusChange}
-        onAssignRole={handleAssignRole}
-        onAddNote={handleAddNote}
+      {/* Slide-over Drawer for Company 360° Inspection & Commercial History */}
+      <CrmCompanyDrawer
+        company={selectedCompany}
+        onClose={() => setSelectedCompany(null)}
+        onUpdateCompany={handleUpdateCompany}
+        onAddActivity={handleAddActivity}
+        onCreateIssueForCompany={handleCreateIssueForCompany}
+        onOpenIssue={(issue) => {
+          setEditingIssue(issue);
+          setIsIssueModalOpen(true);
+        }}
+        darkMode={darkMode}
+        currentUserName={currentUser.name}
+      />
+
+      {/* Modal for Creating / Editing Jira Issues */}
+      <JiraIssueModal
+        isOpen={isIssueModalOpen}
+        onClose={() => {
+          setIsIssueModalOpen(false);
+          setEditingIssue(null);
+          setDefaultCompanyForIssue(null);
+        }}
+        onSave={handleSaveIssue}
+        editingIssue={editingIssue}
+        companies={companies}
+        defaultCompanyId={defaultCompanyForIssue}
         darkMode={darkMode}
       />
 
