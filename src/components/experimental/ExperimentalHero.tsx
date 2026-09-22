@@ -129,7 +129,7 @@ export const ExperimentalHero: React.FC<ExperimentalHeroProps> = ({ onOpenBookin
         scrub: 0.5,
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        onUpdate: (self) => {
+        onUpdate: (self: any) => {
           setScrollProgress(self.progress);
         },
       });

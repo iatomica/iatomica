@@ -81,7 +81,7 @@ export const CinematicHero: React.FC<CinematicHeroProps> = ({ onOpenBooking: _on
         scrub: isMobile ? 0.4 : 0.8, // Snappier scrub response on mobile touch
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        onUpdate: (self) => {
+        onUpdate: (self: any) => {
           setScrollProgress(self.progress);
         },
       });

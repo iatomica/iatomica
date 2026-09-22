@@ -38,6 +38,7 @@ import {
 interface AdminPortalPageProps {
   onReturnToSite: () => void;
   darkMode: boolean;
+  onToggleDarkMode?: () => void;
 }
 
 export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode }) => {
@@ -290,11 +291,9 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
         {/* User Profile & Logout */}
         <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
           <div className="flex items-center space-x-3 pl-3 border-l border-slate-200 dark:border-slate-800">
-            <img 
-              src={currentUser.avatar} 
-              alt={currentUser.name} 
-              className="w-9 h-9 rounded-full object-cover border border-purple-500" 
-            />
+            <div className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-white font-bold text-xs shadow-xs border border-purple-500">
+              {currentUser.initials || currentUser.name.charAt(0)}
+            </div>
             <div className="hidden sm:block text-left">
               <h4 className="text-xs font-bold leading-tight">{currentUser.name}</h4>
               <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold block">
