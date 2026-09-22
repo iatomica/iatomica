@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { loginUser, DEMO_USERS } from '../../services/authService';
+import { loginUser } from '../../services/authService';
 import type { User } from '../../services/authService';
-import { Cpu, Lock, Mail, ArrowRight, ArrowLeft, Users } from 'lucide-react';
+import { Cpu, Lock, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface AdminLoginPageProps {
   onLoginSuccess: (user: User) => void;
@@ -23,10 +23,6 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
     } else {
       setError(res.error || 'Error al iniciar sesión');
     }
-  };
-
-  const handleSelectEmail = (selectedEmail: string) => {
-    setEmail(selectedEmail);
   };
 
   return (
@@ -104,41 +100,6 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
               <ArrowRight size={14} />
             </button>
           </form>
-
-          {/* Directory of Authorized Users */}
-          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 text-left">
-            <div className="flex items-center space-x-1.5 mb-3 justify-center">
-              <Users size={12} className="text-slate-400" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                Directorio de Usuarios Autorizados
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              {DEMO_USERS.map(u => (
-                <div
-                  key={u.id}
-                  onClick={() => handleSelectEmail(u.email)}
-                  className={`p-2.5 rounded-xl border flex items-center space-x-3 transition-all cursor-pointer ${
-                    email === u.email
-                      ? 'border-orange-500/60 bg-orange-500/5'
-                      : darkMode ? 'bg-slate-950 border-slate-800/80 hover:border-slate-700' : 'bg-slate-50/70 border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  <img src={u.avatar} alt={u.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h5 className="text-xs font-bold truncate">{u.name}</h5>
-                      <span className="text-[9px] text-purple-600 dark:text-purple-400 font-mono font-bold">
-                        {u.role}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-mono block truncate">{u.email}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Back to public site */}

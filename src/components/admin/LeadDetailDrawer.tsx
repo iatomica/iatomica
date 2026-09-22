@@ -76,7 +76,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                 <select
                   value={lead.status}
                   onChange={(e) => onStatusChange(lead.id, e.target.value as LeadStatus)}
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold focus:outline-none cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none cursor-pointer"
                 >
                   <option value="nuevo">1. Nuevo Lead</option>
                   <option value="en_contacto">2. En Contacto</option>
@@ -87,7 +87,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                   Rol Asignado
                 </label>
                 <select

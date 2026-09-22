@@ -1,18 +1,38 @@
 import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { CinematicHero } from './components/hero/CinematicHero';
 import { Hero } from './components/Hero';
+import { ExperimentalHero } from './components/experimental/ExperimentalHero';
 import { ServicesOverview } from './components/ServicesOverview';
 import { SolutionsShowcase } from './components/SolutionsShowcase';
 import { Methodology } from './components/Methodology';
 import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AdminPortalPage } from './components/admin/AdminPortalPage';
+import { PruebaPage } from './components/experimental/PruebaPage';
 import { getCurrentUser } from './services/authService';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'site' | 'admin'>('site');
+  const [currentView, setCurrentView] = useState<'site' | 'admin' | 'prueba'>(() => {
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/prueba')) {
+      return 'prueba';
+    }
+    return 'site';
+  });
+  const [isDesktop, setIsDesktop] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
   const [darkMode, setDarkMode] = useState(false);
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (darkMode) {
@@ -22,8 +42,31 @@ export function App() {
     }
   }, [darkMode]);
 
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      if (window.location.pathname.startsWith('/prueba')) {
+        setCurrentView('prueba');
+      } else {
+        setCurrentView('site');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const refreshUser = () => {
     setCurrentUser(getCurrentUser());
+  };
+
+  const navigateTo = (view: 'site' | 'admin' | 'prueba') => {
+    setCurrentView(view);
+    if (view === 'prueba') {
+      window.history.pushState({}, '', '/prueba');
+    } else if (view === 'site') {
+      window.history.pushState({}, '', '/');
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const scrollToContact = () => {
@@ -38,9 +81,22 @@ export function App() {
       <AdminPortalPage
         onReturnToSite={() => {
           refreshUser();
-          setCurrentView('site');
+          navigateTo('site');
         }}
         darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
+      />
+    );
+  }
+
+  if (currentView === 'prueba') {
+    return (
+      <PruebaPage
+        onOpenAdmin={() => setCurrentView('admin')}
+        onReturnToSite={() => navigateTo('site')}
+        isLoggedIn={!!currentUser}
+        darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
     );
   }
@@ -58,11 +114,25 @@ export function App() {
       />
 
       <main>
-        {/* Section 1: Hero */}
-        <Hero
-          onOpenBooking={scrollToContact}
-          darkMode={darkMode}
-        />
+        {isDesktop ? (
+          /* Desktop Split-Layout Scroll-Driven Hero with Synchronized Beats & LED Ambilight Canvas */
+          <ExperimentalHero
+            onOpenBooking={scrollToContact}
+            darkMode={darkMode}
+          />
+        ) : (
+          /* Mobile: Classic Fullscreen Cinematic Hero & Intro */
+          <>
+            <CinematicHero
+              onOpenBooking={scrollToContact}
+              darkMode={darkMode}
+            />
+            <Hero
+              onOpenBooking={scrollToContact}
+              darkMode={darkMode}
+            />
+          </>
+        )}
 
         {/* Section 2: Services Overview */}
         <ServicesOverview
