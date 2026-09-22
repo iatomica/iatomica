@@ -1,14 +1,16 @@
 import React from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 
-import iconConsulting from '../assets/icon_consulting.webp';
-import iconAiTools from '../assets/icon_ai_tools.webp';
-import iconSoftware from '../assets/icon_software.webp';
-import iconQaTesting from '../assets/icon_qa_testing.webp';
-import iconContent from '../assets/icon_content.webp';
+import {
+  FlaticonConsulting,
+  FlaticonAiTools,
+  FlaticonSoftware,
+  FlaticonQaTesting,
+  FlaticonContent
+} from './icons/FlaticonServices';
 
 interface Pillar {
-  icon3d: string;
+  icon: React.ComponentType<{ className?: string; size?: number }>;
   title: string;
   badge: string;
   tagline: string;
@@ -18,7 +20,7 @@ interface Pillar {
 
 const PILLARS: Pillar[] = [
   {
-    icon3d: iconConsulting,
+    icon: FlaticonConsulting,
     title: 'Consultoría Tecnológica & Estrategia',
     badge: 'Diagnóstico & Acompañamiento',
     tagline: 'Te guiamos paso a paso',
@@ -30,7 +32,7 @@ const PILLARS: Pillar[] = [
     ]
   },
   {
-    icon3d: iconAiTools,
+    icon: FlaticonAiTools,
     title: 'Desarrollo de Herramientas de IA',
     badge: 'Agentes & Asistentes',
     tagline: 'IA útil para el día a día',
@@ -42,7 +44,7 @@ const PILLARS: Pillar[] = [
     ]
   },
   {
-    icon3d: iconSoftware,
+    icon: FlaticonSoftware,
     title: 'Software Dedicado & Sistemas a Medida',
     badge: 'Desarrollo Web & App',
     tagline: 'Tus ideas hechas realidad',
@@ -54,7 +56,7 @@ const PILLARS: Pillar[] = [
     ]
   },
   {
-    icon3d: iconQaTesting,
+    icon: FlaticonQaTesting,
     title: 'Mantenimiento & Control de Calidad (QA)',
     badge: 'Soporte & Pruebas',
     tagline: 'Tu tranquilidad garantizada',
@@ -66,7 +68,7 @@ const PILLARS: Pillar[] = [
     ]
   },
   {
-    icon3d: iconContent,
+    icon: FlaticonContent,
     title: 'Desarrollo de Contenido & Marketing',
     badge: 'Imagen & Comunicación',
     tagline: 'Hacé brillar a tu marca',
@@ -119,13 +121,11 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
               className="w-full md:w-[350px] lg:w-[370px] p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-orange-500/40 shadow-xl flex flex-col justify-between group transition-all duration-300 hover:-translate-y-1.5"
             >
               <div>
-                {/* 3D Low-Poly Icon Header (Extra Large, No Frame) */}
-                <div className="flex items-start justify-between mb-2">
-                  <img
-                    src={p.icon3d}
-                    alt={p.title}
-                    className="w-36 h-36 object-contain pointer-events-none -ml-4 -mt-4 filter drop-shadow-xl group-hover:scale-105 transition-transform duration-300"
-                  />
+                {/* Modern Vector Flaticon Header */}
+                <div className="flex items-start justify-between mb-5">
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10 group-hover:border-orange-500/30 group-hover:bg-orange-500/10 transition-all duration-300 shadow-md">
+                    <p.icon size={58} className="group-hover:scale-110 transition-transform duration-300" />
+                  </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
                     {p.badge}
                   </span>

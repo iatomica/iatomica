@@ -4,6 +4,7 @@ import { CinematicHero } from './components/hero/CinematicHero';
 import { Hero } from './components/Hero';
 import { ExperimentalHero } from './components/experimental/ExperimentalHero';
 import { ServicesOverview } from './components/ServicesOverview';
+import { PortfolioSection } from './components/PortfolioSection';
 import { SolutionsShowcase } from './components/SolutionsShowcase';
 import { Methodology } from './components/Methodology';
 import { BookingContact } from './components/BookingContact';
@@ -140,7 +141,12 @@ export function App() {
           darkMode={darkMode}
         />
 
-        {/* Section 3: Solutions Showcase */}
+        {/* Section 3: Portfolio & Client Ecosystem */}
+        <PortfolioSection
+          darkMode={darkMode}
+        />
+
+        {/* Section 4: Solutions Showcase */}
         <SolutionsShowcase
           onOpenBooking={scrollToContact}
           darkMode={darkMode}

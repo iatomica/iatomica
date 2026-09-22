@@ -38,6 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, isLo
         {/* Desktop Nav Links */}
         <nav className={`hidden md:flex items-center space-x-8 text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
           <a href="#servicios" className="hover:text-orange-500 transition-colors">Servicios</a>
+          <a href="#portfolio" className="hover:text-orange-500 transition-colors">Portfolio</a>
           <a href="#soluciones" className="hover:text-orange-500 transition-colors">Soluciones</a>
           <a href="#metodologia" className="hover:text-orange-500 transition-colors">Cómo Trabajamos</a>
           <a href="#contacto" className="hover:text-orange-500 transition-colors">Contacto</a>
@@ -111,6 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenAdmin, isLo
       {mobileMenuOpen && (
         <div className={`md:hidden p-5 mt-3 border-b space-y-4 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
           <a href="#servicios" onClick={() => setMobileMenuOpen(false)} className="block font-semibold text-sm">Servicios</a>
+          <a href="#portfolio" onClick={() => setMobileMenuOpen(false)} className="block font-semibold text-sm">Portfolio</a>
           <a href="#soluciones" onClick={() => setMobileMenuOpen(false)} className="block font-semibold text-sm">Soluciones</a>
           <a href="#metodologia" onClick={() => setMobileMenuOpen(false)} className="block font-semibold text-sm">Cómo Trabajamos</a>
           <a href="#contacto" onClick={() => setMobileMenuOpen(false)} className="block font-semibold text-sm">Contacto</a>
