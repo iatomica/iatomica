@@ -190,8 +190,39 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
     await refreshAllData();
   };
 
-  const activeIssuesCount = issues.filter(i => i.status !== 'backlog').length;
-  const backlogIssuesCount = issues.filter(i => i.status === 'backlog').length;
+  const isAdmin = currentUser.role === 'admin';
+  const [territoryFilter, setTerritoryFilter] = useState<'all' | 'espana' | 'bariloche'>(
+    currentUser.projectId === 'espana' 
+      ? 'espana' 
+      : currentUser.projectId === 'bariloche' 
+        ? 'bariloche' 
+        : 'all'
+  );
+
+  const scopedCompanies = companies.filter(c => {
+    if (!isAdmin) {
+      if (currentUser.projectId === 'espana') return c.territory === 'espana' || c.id.startsWith('vlc-');
+      if (currentUser.projectId === 'bariloche') return c.territory === 'bariloche';
+    }
+    if (territoryFilter === 'all') return true;
+    if (c.territory && c.territory === territoryFilter) return true;
+    if (c.id.startsWith('vlc-') && territoryFilter === 'espana') return true;
+    return false;
+  });
+
+  const scopedIssues = issues.filter(i => {
+    if (!isAdmin) {
+      if (currentUser.projectId === 'espana') return i.territory === 'espana' || (i.companyId && i.companyId.startsWith('vlc-'));
+      if (currentUser.projectId === 'bariloche') return i.territory === 'bariloche';
+    }
+    if (territoryFilter === 'all') return true;
+    if (i.territory && i.territory === territoryFilter) return true;
+    if (i.companyId && i.companyId.startsWith('vlc-') && territoryFilter === 'espana') return true;
+    return false;
+  });
+
+  const activeIssuesCount = scopedIssues.filter(i => i.status !== 'backlog').length;
+  const backlogIssuesCount = scopedIssues.filter(i => i.status === 'backlog').length;
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors ${
@@ -282,10 +313,55 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
               activeTab === 'directory' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
             }`}>
-              {companies.length}
+              {scopedCompanies.length}
             </span>
           </button>
 
+        </div>
+
+        {/* Territory Switcher for Admin OR Fixed Scope Badge for Leads */}
+        <div className="flex items-center space-x-2">
+          {isAdmin ? (
+            <div className="flex items-center p-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">
+              <button
+                onClick={() => setTerritoryFilter('all')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  territoryFilter === 'all'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+                title="Ver todos los territorios"
+              >
+                🌐 Global
+              </button>
+              <button
+                onClick={() => setTerritoryFilter('espana')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  territoryFilter === 'espana'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+                title="Filtrar por territorio España / Valencia"
+              >
+                🇪🇸 Valencia
+              </button>
+              <button
+                onClick={() => setTerritoryFilter('bariloche')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  territoryFilter === 'bariloche'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                }`}
+                title="Filtrar por territorio Bariloche"
+              >
+                🇦🇷 Bariloche
+              </button>
+            </div>
+          ) : (
+            <div className="px-3 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold font-mono flex items-center gap-1.5">
+              <span>{currentUser.projectId === 'espana' ? '🇪🇸 Territorio: España (Valencia)' : '🇦🇷 Territorio: Bariloche'}</span>
+            </div>
+          )}
         </div>
 
         {/* User Profile & Logout */}
@@ -297,7 +373,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             <div className="hidden sm:block text-left">
               <h4 className="text-xs font-bold leading-tight">{currentUser.name}</h4>
               <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold block">
-                {currentUser.role}
+                {currentUser.title || currentUser.role}
               </span>
             </div>
 
@@ -319,7 +395,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
         {/* Module 1: Jira Board */}
         {activeTab === 'board' && (
           <JiraBoard
-            issues={issues}
+            issues={scopedIssues}
             onStatusChange={handleStatusChange}
             onDeleteIssue={handleDeleteIssue}
             onEditIssue={(issue) => {
@@ -335,14 +411,15 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             onOpenCompany={handleOpenCompanyDrawer}
             darkMode={darkMode}
             currentUserName={currentUser.name}
+            isAdmin={isAdmin}
           />
         )}
 
         {/* Module 2: Jira Backlog */}
         {activeTab === 'backlog' && (
           <JiraBacklog
-            issues={issues}
-            companies={companies}
+            issues={scopedIssues}
+            companies={scopedCompanies}
             onStatusChange={handleStatusChange}
             onQuickCreate={handleQuickCreateBacklog}
             onEditIssue={(issue) => {
@@ -358,22 +435,24 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               setIsIssueModalOpen(true);
             }}
             darkMode={darkMode}
+            isAdmin={isAdmin}
           />
         )}
 
         {/* Module 3: CRM Directory 360° */}
         {activeTab === 'directory' && (
           <CrmDirectory
-            companies={companies}
+            companies={scopedCompanies}
             onSelectCompany={(company) => handleOpenCompanyDrawer(company.id)}
             onCreateCompany={handleCreateCompany}
             onDeleteCompany={handleDeleteCompany}
             darkMode={darkMode}
-            issues={issues}
+            issues={scopedIssues}
             onOpenIssue={(issue) => {
               setEditingIssue(issue);
               setIsIssueModalOpen(true);
             }}
+            isAdmin={isAdmin}
           />
         )}
 
@@ -404,9 +483,10 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
         }}
         onSave={handleSaveIssue}
         editingIssue={editingIssue}
-        companies={companies}
+        companies={scopedCompanies}
         defaultCompanyId={defaultCompanyForIssue}
         darkMode={darkMode}
+        currentUser={currentUser}
       />
 
     </div>

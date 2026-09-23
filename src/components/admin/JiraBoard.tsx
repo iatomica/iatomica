@@ -9,9 +9,10 @@ import {
   Building, 
   Plus, 
   Edit3, 
-  Flame, 
-  Layers 
+  Flame
 } from 'lucide-react';
+
+import { TEAM_MEMBERS } from '../../services/authService';
 
 interface JiraBoardProps {
   issues: JiraIssue[];
@@ -22,6 +23,7 @@ interface JiraBoardProps {
   onOpenCompany: (companyId: string) => void;
   darkMode: boolean;
   currentUserName?: string;
+  isAdmin?: boolean;
 }
 
 interface ColumnDef {
@@ -49,7 +51,8 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
   onCreateIssue,
   onOpenCompany,
   darkMode,
-  currentUserName
+  currentUserName,
+  isAdmin = false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [quickFilter, setQuickFilter] = useState<'all' | 'my' | 'leads' | 'high_priority'>('all');
@@ -118,8 +121,6 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
         return <span title="Prioridad Baja" className="text-slate-400 font-bold text-xs">🔽</span>;
     }
   };
-
-  const totalPoints = filteredIssues.reduce((acc, curr) => acc + (curr.storyPoints || 0), 0);
 
   return (
     <div className="space-y-4">
@@ -192,9 +193,9 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
             }`}
           >
             <option value="all">Cualquier Responsable</option>
-            <option value="Atención Público">Atención Público</option>
-            <option value="Consultoría Técnica">Consultoría Técnica</option>
-            <option value="Ventas">Ventas</option>
+            {TEAM_MEMBERS.map(member => (
+              <option key={member} value={member}>👤 {member}</option>
+            ))}
             <option value="Sin Asignar">Sin Asignar</option>
           </select>
 
@@ -202,14 +203,9 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
 
         {/* Right: Metrics & Create Button */}
         <div className="flex items-center space-x-4 w-full lg:w-auto justify-between lg:justify-end">
-          <div className="flex items-center space-x-3 text-xs font-mono">
-            <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-bold" title="Total Story Points">
-              <Layers size={13} />
-              <span>{totalPoints} pts</span>
-            </span>
-            <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="text-slate-500 font-bold">
-              {filteredIssues.length} Incidencias
+          <div className="flex items-center space-x-2 text-xs font-mono">
+            <span className="text-slate-500 font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800">
+              {filteredIssues.length} Incidencias en Flujo
             </span>
           </div>
 
@@ -290,13 +286,15 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
                             >
                               <Edit3 size={12} />
                             </button>
-                            <button
-                              onClick={() => onDeleteIssue(issue.id)}
-                              className="p-1 rounded text-slate-400 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
-                              title="Eliminar Incidencia"
-                            >
-                              <Trash2 size={12} />
-                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={() => onDeleteIssue(issue.id)}
+                                className="p-1 rounded text-slate-400 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                title="Eliminar Incidencia (Solo Admin)"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            )}
                           </div>
                         </div>
 

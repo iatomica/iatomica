@@ -15,6 +15,14 @@ export interface User {
 
 const AUTH_STORAGE_KEY = 'iatomica_auth_user_v3';
 
+export const TEAM_MEMBERS = [
+  'Lic. Mateo Rossi',
+  'Stefi Del Papa',
+  'José Anaya'
+] as const;
+
+export type TeamMember = typeof TEAM_MEMBERS[number];
+
 export const DEMO_USERS: User[] = [
   {
     id: 'usr-admin',

@@ -139,13 +139,34 @@ db.serialize(async () => {
       assignedTo TEXT NOT NULL DEFAULT 'Sin Asignar',
       storyPoints INTEGER DEFAULT 3,
       value REAL DEFAULT 0,
+      territory TEXT DEFAULT 'espana',
       dueDate TEXT,
       tags TEXT,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL,
       FOREIGN KEY (companyId) REFERENCES crm_companies(id) ON DELETE SET NULL
     )
+  `);
+
+  // 5. Ticket Comments & Notes (E2E Collaborative Timeline)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS ticket_comments (
+      id TEXT PRIMARY KEY,
+      ticketId TEXT NOT NULL,
+      authorId TEXT NOT NULL,
+      authorName TEXT NOT NULL,
+      content TEXT NOT NULL,
+      type TEXT NOT NULL DEFAULT 'note',
+      createdAt TEXT NOT NULL,
+      FOREIGN KEY (ticketId) REFERENCES jira_issues(id) ON DELETE CASCADE
+    )
   `, async (err) => {
+    // Migration: add territory column if it didn't exist
+    db.run("ALTER TABLE crm_companies ADD COLUMN territory TEXT DEFAULT 'espana'", () => {});
+    db.run("ALTER TABLE jira_issues ADD COLUMN territory TEXT DEFAULT 'espana'", () => {});
+    db.run("UPDATE crm_companies SET territory = 'espana' WHERE territory IS NULL OR territory = ''");
+    db.run("UPDATE jira_issues SET territory = 'espana' WHERE territory IS NULL OR territory = ''");
+
     if (!err) {
       await seedInitialDataIfEmpty();
     }
@@ -624,6 +645,57 @@ app.delete('/api/jira/issues/:id', async (req, res) => {
   }
 });
 
+// GET comments for a Jira issue
+app.get('/api/jira/issues/:id/comments', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const comments = await allQuery('SELECT * FROM ticket_comments WHERE ticketId = ? ORDER BY createdAt ASC', [id]);
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST new comment / note for a Jira issue
+app.post('/api/jira/issues/:id/comments', async (req, res) => {
+  try {
+    const { id: ticketId } = req.params;
+    const { authorId, authorName, content, type } = req.body;
+
+    if (!content || !authorName) {
+      return res.status(400).json({ error: 'Contenido y autor son obligatorios' });
+    }
+
+    const id = 'com-' + Date.now();
+    const now = new Date().toISOString();
+
+    await runQuery(`
+      INSERT INTO ticket_comments (id, ticketId, authorId, authorName, content, type, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [id, ticketId, authorId || 'usr-admin', authorName, content, type || 'note', now]);
+
+    // Touch issue updatedAt
+    await runQuery('UPDATE jira_issues SET updatedAt = ? WHERE id = ?', [now, ticketId]);
+
+    // Mirror in crm_activities if issue has companyId
+    const issue = await getQuery('SELECT companyId FROM jira_issues WHERE id = ?', [ticketId]);
+    if (issue && issue.companyId) {
+      const actId = 'act-' + Date.now();
+      await runQuery(`
+        INSERT INTO crm_activities (id, companyId, type, summary, details, author, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `, [actId, issue.companyId, type || 'note', content.length > 80 ? content.substring(0, 80) + '...' : content, content, authorName, now]);
+      await runQuery('UPDATE crm_companies SET updatedAt = ? WHERE id = ?', [now, issue.companyId]);
+    }
+
+    const created = await getQuery('SELECT * FROM ticket_comments WHERE id = ?', [id]);
+    res.status(201).json(created);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 // ====================================================
 // 3. LEGACY LEADS ENDPOINTS (With Auto-Sync to CRM & Jira)
@@ -688,7 +760,7 @@ app.post('/api/leads', async (req, res) => {
 
   const id = 'lead-' + Date.now();
   const status = 'nuevo';
-  const assignedTo = 'Atención Público';
+  const assignedTo = 'Lic. Mateo Rossi';
   const createdAt = new Date().toISOString();
 
   try {
@@ -706,8 +778,8 @@ app.post('/api/leads', async (req, res) => {
     if (!companyId) {
       companyId = 'comp-' + Date.now();
       await runQuery(`
-        INSERT INTO crm_companies (id, name, legalName, industry, contactName, contactRole, email, phone, website, status, estimatedValue, assignedTo, techRequirements, notes, createdAt, updatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO crm_companies (id, name, legalName, industry, contactName, contactRole, email, phone, website, status, estimatedValue, territory, assignedTo, techRequirements, notes, createdAt, updatedAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
         companyId,
         companyName,
@@ -719,7 +791,8 @@ app.post('/api/leads', async (req, res) => {
         phone || '',
         '',
         'lead',
-        1500,
+        0,
+        'general',
         assignedTo,
         `Servicio solicitado: ${service}`,
         `Mensaje inicial: "${message || 'Sin mensaje'}"`,
@@ -732,20 +805,21 @@ app.post('/api/leads', async (req, res) => {
     const issueKey = await getNextIssueKey();
     const issueId = 'iss-' + Date.now();
     await runQuery(`
-      INSERT INTO jira_issues (id, issueKey, title, description, type, status, priority, companyId, assignedTo, storyPoints, value, dueDate, tags, createdAt, updatedAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO jira_issues (id, issueKey, title, description, type, status, priority, companyId, assignedTo, storyPoints, value, territory, dueDate, tags, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       issueId,
       issueKey,
       `Consulta Web: ${service} - ${name}`,
       `Mensaje recibido: "${message || 'Sin mensaje adicional'}". Teléfono: ${phone || 'N/A'}, Email: ${email}`,
       'lead',
-      'backlog', // Entra al Backlog para triaje
+      'backlog',
       'high',
       companyId,
       assignedTo,
-      2,
-      1500,
+      1,
+      0,
+      'general',
       new Date(Date.now() + 2 * 86400000).toISOString(),
       JSON.stringify(['Web Lead', service]),
       createdAt,

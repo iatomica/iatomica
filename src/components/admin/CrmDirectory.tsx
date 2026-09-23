@@ -19,6 +19,8 @@ import {
   X
 } from 'lucide-react';
 
+import { TEAM_MEMBERS } from '../../services/authService';
+
 interface CrmDirectoryProps {
   companies: CrmCompany[];
   onSelectCompany: (company: CrmCompany) => void;
@@ -27,6 +29,7 @@ interface CrmDirectoryProps {
   darkMode: boolean;
   issues?: JiraIssue[];
   onOpenIssue?: (issue: JiraIssue) => void;
+  isAdmin?: boolean;
 }
 
 export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
@@ -36,7 +39,8 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
   onDeleteCompany,
   darkMode,
   issues = [],
-  onOpenIssue
+  onOpenIssue,
+  isAdmin = false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -54,7 +58,7 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
   const [newPhone, setNewPhone] = useState('');
   const [newWebsite, setNewWebsite] = useState('');
   const [newStatus, setNewStatus] = useState<CompanyStatus>('lead');
-  const [newAssignedTo, setNewAssignedTo] = useState('Atención Público');
+  const [newAssignedTo, setNewAssignedTo] = useState<string>(TEAM_MEMBERS[0]);
   const [newTech, setNewTech] = useState('');
   const [newNotes, setNewNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -249,10 +253,10 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
               darkMode ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
             }`}
           >
-            <option value="all">Cualquier Vendedor</option>
-            <option value="Atención Público">Atención Público (Sofía)</option>
-            <option value="Consultoría Técnica">Consultoría Técnica (Lucas)</option>
-            <option value="Ventas">Ventas (Mateo)</option>
+            <option value="all">Cualquier Responsable</option>
+            {TEAM_MEMBERS.map(member => (
+              <option key={member} value={member}>👤 {member}</option>
+            ))}
           </select>
         </div>
 
@@ -498,13 +502,15 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
                           >
                             <ExternalLink size={13} />
                           </button>
-                          <button
-                            onClick={() => onDeleteCompany(c.id)}
-                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-900/40 text-slate-400 hover:text-rose-600 transition-colors"
-                            title="Eliminar Cuenta"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          {isAdmin && (
+                            <button
+                              onClick={() => onDeleteCompany(c.id)}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-900/40 text-slate-400 hover:text-rose-600 transition-colors"
+                              title="Eliminar Cuenta (Solo Admin)"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -662,9 +668,9 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
                     onChange={(e) => setNewAssignedTo(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border text-xs font-bold bg-transparent focus:outline-none cursor-pointer"
                   >
-                    <option value="Atención Público">Atención Público (Sofía)</option>
-                    <option value="Consultoría Técnica">Consultoría Técnica (Lucas)</option>
-                    <option value="Ventas">Ventas (Mateo)</option>
+                    {TEAM_MEMBERS.map(member => (
+                      <option key={member} value={member}>👤 {member}</option>
+                    ))}
                   </select>
                 </div>
               </div>

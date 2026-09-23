@@ -18,12 +18,23 @@ export interface JiraIssue {
   companyPhone?: string | null;
   companyEmail?: string | null;
   assignedTo: string;
-  storyPoints: number;
-  value: number;
+  storyPoints?: number;
+  value?: number;
+  territory?: string;
   dueDate?: string | null;
   tags?: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TicketComment {
+  id: string;
+  ticketId: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  type: 'note' | 'whatsapp' | 'call' | 'meeting' | 'status_change';
+  createdAt: string;
 }
 
 const STORAGE_KEY = 'iatomica_jira_issues_cache_v3';
@@ -174,4 +185,36 @@ export const deleteJiraIssue = async (id: string): Promise<boolean> => {
     console.warn('Error deleting issue:', err);
   }
   return false;
+};
+
+export const fetchTicketComments = async (ticketId: string): Promise<TicketComment[]> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/jira/issues/${ticketId}/comments`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Error fetching ticket comments:', err);
+  }
+  return [];
+};
+
+export const addTicketComment = async (
+  ticketId: string,
+  commentData: { authorId: string; authorName: string; content: string; type?: string }
+): Promise<TicketComment | null> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/jira/issues/${ticketId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(commentData)
+    });
+    if (res.ok) {
+      notifyLiveSync();
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Error adding ticket comment:', err);
+  }
+  return null;
 };

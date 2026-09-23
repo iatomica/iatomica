@@ -22,6 +22,7 @@ interface JiraBacklogProps {
   onOpenCompany: (companyId: string) => void;
   onOpenCreateModal: () => void;
   darkMode: boolean;
+  isAdmin?: boolean;
 }
 
 export const JiraBacklog: React.FC<JiraBacklogProps> = ({
@@ -32,7 +33,8 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
   onDeleteIssue,
   onOpenCompany,
   onOpenCreateModal,
-  darkMode
+  darkMode,
+  isAdmin = false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [newTitle, setNewTitle] = useState('');
@@ -213,10 +215,6 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
                       {getPriorityIcon(issue.priority)}
                     </span>
 
-                    <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 font-mono text-[10px] font-bold">
-                      {issue.storyPoints}p
-                    </span>
-
                     <span className="text-[11px] text-slate-500 font-medium hidden lg:inline max-w-[100px] truncate">
                       {issue.assignedTo}
                     </span>
@@ -328,16 +326,6 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
                       {getPriorityIcon(issue.priority)}
                     </span>
 
-                    <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 font-mono text-[10px] font-bold">
-                      {issue.storyPoints}p
-                    </span>
-
-                    {issue.value > 0 && (
-                      <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        ${issue.value}
-                      </span>
-                    )}
-
                     <span className="text-[11px] text-slate-500 font-medium hidden lg:inline max-w-[100px] truncate">
                       {issue.assignedTo}
                     </span>
@@ -350,13 +338,15 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
                       <Edit3 size={13} />
                     </button>
 
-                    <button
-                      onClick={() => onDeleteIssue(issue.id)}
-                      className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
-                      title="Eliminar"
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => onDeleteIssue(issue.id)}
+                        className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                        title="Eliminar (Solo Admin)"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))

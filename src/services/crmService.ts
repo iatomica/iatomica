@@ -28,6 +28,7 @@ export interface CrmCompany {
   website?: string;
   status: CompanyStatus;
   estimatedValue: number;
+  territory?: string;
   assignedTo: string;
   techRequirements?: string;
   notes?: string;
