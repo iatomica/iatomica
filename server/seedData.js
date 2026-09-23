@@ -1169,3 +1169,43 @@ export const initialValenciaActivities = [
     "createdAt": "2026-09-23T03:56:44.414Z"
   }
 ];
+
+export const initialWebInquiries = [
+  {
+    id: "lead-inb-001",
+    name: "Dr. Marcos Benítez",
+    email: "marcos.benitez@clinicasalud.es",
+    company: "Clínica Benítez & Asociados",
+    phone: "+34 611 45 88 90",
+    service: "Desarrollo de Herramientas IA",
+    message: "Hola, vimos su video explicativo de servicios. Nos interesa implementar un asistente de IA para triaje y agendamiento automático de pacientes en WhatsApp integrado con nuestro sistema.",
+    status: "nuevo",
+    assignedTo: "Lic. Mateo Rossi",
+    createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
+  },
+  {
+    id: "lead-inb-002",
+    name: "Valeria Santillán",
+    email: "valeria@innovalogistica.com",
+    company: "Innova Logística Express",
+    phone: "+54 9 11 4820-9912",
+    service: "Software a Medida & Apps",
+    message: "Quisiéramos coordinar una demo para evaluar el desarrollo de una app de seguimiento de despachos y panel de control web para nuestros clientes corporativos.",
+    status: "nuevo",
+    assignedTo: "Lic. Mateo Rossi",
+    createdAt: new Date(Date.now() - 3600000 * 22).toISOString()
+  },
+  {
+    id: "lead-inb-003",
+    name: "Tomás Albarracín",
+    email: "tomas@patagoniaecotours.com.ar",
+    company: "Patagonia Eco Tours",
+    phone: "+54 9 294 456-1122",
+    service: "Consultoría & Asesoramiento",
+    message: "Buscamos una consultoría integral para renovar nuestra plataforma digital y automatizar las reservas de expediciones turísticas en Bariloche.",
+    status: "en_contacto",
+    assignedTo: "José Anaya",
+    createdAt: new Date(Date.now() - 3600000 * 48).toISOString()
+  }
+];
+

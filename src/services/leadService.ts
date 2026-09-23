@@ -1,6 +1,6 @@
-export type LeadStatus = 'nuevo' | 'en_contacto' | 'cita_agendada' | 'propuesta' | 'cliente';
+export type LeadStatus = 'nuevo' | 'en_contacto' | 'cita_agendada' | 'propuesta' | 'cliente' | 'descartado';
 
-export type LeadRole = 'Atención Público' | 'Consultoría Técnica' | 'Ventas' | 'Sin Asignar';
+export type LeadRole = 'Lic. Mateo Rossi' | 'Stefi Del Papa' | 'José Anaya' | 'Sin Asignar' | string;
 
 export interface LeadNote {
   id: string;
@@ -99,7 +99,7 @@ export const createLead = async (newLeadData: Omit<Lead, 'id' | 'status' | 'assi
     ...newLeadData,
     id: tempId,
     status: 'nuevo',
-    assignedTo: 'Atención Público',
+    assignedTo: 'Lic. Mateo Rossi',
     createdAt: new Date().toISOString(),
     notes: []
   };

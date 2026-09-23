@@ -17,21 +17,30 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) return;
+    if (!formData.name || !formData.email || isSubmitting) return;
 
-    // Save lead to CRM Database
-    createLead({
-      name: formData.name,
-      email: formData.email,
-      company: formData.company,
-      phone: formData.phone,
-      service: selectedService,
-      message: formData.message
-    });
-
-    setSubmitted(true);
+    setIsSubmitting(true);
+    try {
+      // Save lead to CRM Database & SQLite
+      await createLead({
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        phone: formData.phone,
+        service: selectedService,
+        message: formData.message
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.warn('Error al registrar consulta en servidor, procediendo con caché:', err);
+      setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const whatsappUrl = "https://wa.me/5491170142641?text=Hola%20iAtomica,%20quiero%20solicitar%20una%20demo%20de%20sus%20servicios%20de%20consultor%C3%ADa%20y%20desarrollo%20de%20IA.";
@@ -229,10 +238,13 @@ export const BookingContact: React.FC<BookingContactProps> = ({ darkMode }) => {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center justify-center space-x-2"
+                  disabled={isSubmitting}
+                  className={`w-full py-3.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center justify-center space-x-2 cursor-pointer ${
+                    isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
                 >
                   <Calendar className="w-4 h-4" />
-                  <span>Agendar Demo</span>
+                  <span>{isSubmitting ? 'Enviando solicitud...' : 'Agendar Demo'}</span>
                 </button>
               </form>
             )}

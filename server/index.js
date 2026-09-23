@@ -4,7 +4,12 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { initialValenciaCompanies, initialValenciaIssues, initialValenciaActivities } from './seedData.js';
+import { 
+  initialValenciaCompanies, 
+  initialValenciaIssues, 
+  initialValenciaActivities,
+  initialWebInquiries 
+} from './seedData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -217,6 +222,19 @@ async function seedInitialDataIfEmpty() {
       console.log('✅ Clean Valencia CRM Directory & Jira Suite seed complete!');
     } else {
       console.log('CRM Database already populated with Valencia dataset. Skipping seed.');
+    }
+
+    // Check leads / web inquiries table
+    const leadCount = await getQuery('SELECT COUNT(*) as count FROM leads');
+    if (leadCount && leadCount.count === 0 && initialWebInquiries && initialWebInquiries.length > 0) {
+      console.log('🌱 Seeding initial inbound web inquiries...');
+      for (const lead of initialWebInquiries) {
+        await runQuery(`
+          INSERT INTO leads (id, name, email, company, phone, service, message, status, assignedTo, createdAt)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [lead.id, lead.name, lead.email, lead.company || '', lead.phone || '', lead.service, lead.message || '', lead.status, lead.assignedTo, lead.createdAt]);
+      }
+      console.log('✅ Initial inbound web inquiries seeded!');
     }
   } catch (err) {
     console.error('Error seeding initial Valencia data:', err);

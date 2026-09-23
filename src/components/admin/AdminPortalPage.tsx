@@ -20,19 +20,30 @@ import {
   subscribeToCrmChanges 
 } from '../../services/crmService';
 import type { CrmCompany, CrmActivity } from '../../services/crmService';
+import {
+  fetchLeadsFromDb,
+  updateLeadStatus,
+  assignLeadRole,
+  addLeadNote,
+  deleteLead,
+  subscribeToLeadChanges,
+} from '../../services/leadService';
+import type { Lead, LeadStatus, LeadRole } from '../../services/leadService';
 import { AdminLoginPage } from './AdminLoginPage';
 import { JiraBoard } from './JiraBoard';
 import { JiraBacklog } from './JiraBacklog';
 import { CrmDirectory } from './CrmDirectory';
 import { CrmCompanyDrawer } from './CrmCompanyDrawer';
 import { JiraIssueModal } from './JiraIssueModal';
+import { WebInquiriesView } from './WebInquiriesView';
 import { 
   Cpu, 
   LayoutGrid, 
   Inbox, 
   Building, 
   LogOut, 
-  ArrowLeft 
+  ArrowLeft,
+  MessageSquareText,
 } from 'lucide-react';
 
 interface AdminPortalPageProps {
@@ -43,12 +54,19 @@ interface AdminPortalPageProps {
 
 export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser());
-  const [activeTab, setActiveTab] = useState<'board' | 'backlog' | 'directory'>('board');
+  const [activeTab, setActiveTab] = useState<'board' | 'backlog' | 'directory' | 'inquiries'>('board');
   
   // Data States
   const [issues, setIssues] = useState<JiraIssue[]>([]);
   const [companies, setCompanies] = useState<CrmCompany[]>([]);
+  const [inquiries, setInquiries] = useState<Lead[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<CrmCompany | null>(null);
+  const [territoryFilter, setTerritoryFilter] = useState<'all' | 'espana' | 'bariloche'>(() => {
+    const user = getCurrentUser();
+    if (user?.projectId === 'espana') return 'espana';
+    if (user?.projectId === 'bariloche') return 'bariloche';
+    return 'all';
+  });
 
   // Modal States
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
@@ -57,12 +75,14 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
 
   // Initial Data Load
   const refreshAllData = async () => {
-    const [fetchedIssues, fetchedCompanies] = await Promise.all([
+    const [fetchedIssues, fetchedCompanies, fetchedLeads] = await Promise.all([
       fetchJiraIssues(),
-      fetchCompanies()
+      fetchCompanies(),
+      fetchLeadsFromDb(),
     ]);
     setIssues(fetchedIssues);
     setCompanies(fetchedCompanies);
+    setInquiries(fetchedLeads);
 
     // Refresh selected company drawer if open
     if (selectedCompany) {
@@ -79,10 +99,12 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
     // Subscribe to Live Sync Channels
     const unsubJira = subscribeToJiraChanges(() => refreshAllData());
     const unsubCrm = subscribeToCrmChanges(() => refreshAllData());
+    const unsubLeads = subscribeToLeadChanges(() => refreshAllData());
 
     return () => {
       unsubJira();
       unsubCrm();
+      unsubLeads();
     };
   }, []);
 
@@ -190,14 +212,32 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
     await refreshAllData();
   };
 
+  // Inbound Web Inquiries Handlers
+  const handleInquiryStatusChange = async (id: string, status: LeadStatus) => {
+    setInquiries(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+    await updateLeadStatus(id, status);
+    await refreshAllData();
+  };
+
+  const handleInquiryAssignChange = async (id: string, assignedTo: LeadRole) => {
+    setInquiries(prev => prev.map(l => l.id === id ? { ...l, assignedTo } : l));
+    await assignLeadRole(id, assignedTo);
+    await refreshAllData();
+  };
+
+  const handleInquiryAddNote = async (id: string, text: string) => {
+    await addLeadNote(id, text, currentUser.name);
+    await refreshAllData();
+  };
+
+  const handleInquiryDelete = async (id: string) => {
+    await deleteLead(id);
+    await refreshAllData();
+  };
+
+  const newInquiriesCount = inquiries.filter(i => i.status === 'nuevo').length;
+
   const isAdmin = currentUser.role === 'admin';
-  const [territoryFilter, setTerritoryFilter] = useState<'all' | 'espana' | 'bariloche'>(
-    currentUser.projectId === 'espana' 
-      ? 'espana' 
-      : currentUser.projectId === 'bariloche' 
-        ? 'bariloche' 
-        : 'all'
-  );
 
   const scopedCompanies = companies.filter(c => {
     if (!isAdmin) {
@@ -302,7 +342,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
           {/* Directorio CRM */}
           <button
             onClick={() => setActiveTab('directory')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 ${
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 cursor-pointer ${
               activeTab === 'directory'
                 ? 'gradient-brand text-white shadow-sm'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -315,6 +355,30 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             }`}>
               {scopedCompanies.length}
             </span>
+          </button>
+
+          {/* Consultas Web / Bandeja de Entrada */}
+          <button
+            onClick={() => setActiveTab('inquiries')}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 cursor-pointer ${
+              activeTab === 'inquiries'
+                ? 'gradient-brand text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <MessageSquareText size={15} />
+            <span>Consultas Web</span>
+            {newInquiriesCount > 0 ? (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-rose-500 text-white animate-pulse">
+                {newInquiriesCount} nuevas
+              </span>
+            ) : (
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                activeTab === 'inquiries' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+              }`}>
+                {inquiries.length}
+              </span>
+            )}
           </button>
 
         </div>
@@ -453,6 +517,20 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
               setIsIssueModalOpen(true);
             }}
             isAdmin={isAdmin}
+          />
+        )}
+
+        {/* Module 4: Consultas Web (Inbound Inquiries) */}
+        {activeTab === 'inquiries' && (
+          <WebInquiriesView
+            inquiries={inquiries}
+            onStatusChange={handleInquiryStatusChange}
+            onAssignChange={handleInquiryAssignChange}
+            onAddNote={handleInquiryAddNote}
+            onDeleteInquiry={handleInquiryDelete}
+            darkMode={darkMode}
+            isAdmin={isAdmin}
+            currentUserName={currentUser.name}
           />
         )}
 
