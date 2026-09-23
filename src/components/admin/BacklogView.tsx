@@ -231,11 +231,6 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                       <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-medium">
                         <Building size={12} className="text-slate-500 dark:text-slate-400" />
                         <span className="text-slate-900 dark:text-slate-200">{ticket.crm.clientName} ({ticket.crm.company})</span>
-                        {ticket.crm.budget && (
-                          <span className="text-emerald-700 dark:text-emerald-400 font-mono font-bold">
-                            · {ticket.crm.budget}
-                          </span>
-                        )}
                       </p>
                     )}
                   </div>

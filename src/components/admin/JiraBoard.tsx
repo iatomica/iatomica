@@ -10,8 +10,7 @@ import {
   Plus, 
   Edit3, 
   Flame, 
-  Layers, 
-  DollarSign 
+  Layers 
 } from 'lucide-react';
 
 interface JiraBoardProps {
@@ -121,7 +120,6 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
   };
 
   const totalPoints = filteredIssues.reduce((acc, curr) => acc + (curr.storyPoints || 0), 0);
-  const totalValue = filteredIssues.reduce((acc, curr) => acc + (curr.value || 0), 0);
 
   return (
     <div className="space-y-4">
@@ -210,9 +208,8 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
               <span>{totalPoints} pts</span>
             </span>
             <span className="text-slate-300 dark:text-slate-700">|</span>
-            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold" title="Valor en Pipeline">
-              <DollarSign size={13} />
-              <span>${totalValue.toLocaleString()} USD</span>
+            <span className="text-slate-500 font-bold">
+              {filteredIssues.length} Incidencias
             </span>
           </div>
 
@@ -351,11 +348,6 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
                           </div>
 
                           <div className="flex items-center space-x-1.5 font-mono">
-                            {issue.value > 0 && (
-                              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                                ${issue.value}
-                              </span>
-                            )}
                             <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 font-bold">
                               {issue.storyPoints}p
                             </span>

@@ -9,8 +9,7 @@ import {
   Phone,
   MessageSquare,
   Send,
-  Trash2,
-  DollarSign
+  Trash2
 } from 'lucide-react';
 
 interface TicketDetailDrawerProps {
@@ -187,13 +186,6 @@ export const TicketDetailDrawer: React.FC<TicketDetailDrawerProps> = ({
                       <span>{ticket.crm.company}</span>
                     </p>
                   </div>
-
-                  {ticket.crm.budget && (
-                    <div className="flex items-center space-x-1 font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                      <DollarSign size={12} />
-                      <span>{ticket.crm.budget}</span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-700 dark:text-slate-200">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { JiraIssue, JiraIssueType, JiraPriority, JiraStatus } from '../../services/jiraService';
 import type { CrmCompany } from '../../services/crmService';
-import { X, CheckSquare, Layers, Calendar, DollarSign, Tag, Building } from 'lucide-react';
+import { X, CheckSquare, Layers, Calendar, Tag, Building } from 'lucide-react';
 
 interface JiraIssueModalProps {
   isOpen: boolean;
@@ -282,22 +282,6 @@ export const JiraIssueModal: React.FC<JiraIssueModalProps> = ({
               />
             </div>
 
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 font-mono flex items-center gap-1">
-                <DollarSign size={12} className="text-emerald-500" />
-                <span>Valor / Deal ($ USD)</span>
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="50"
-                value={value}
-                onChange={(e) => setValue(Number(e.target.value))}
-                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none ${
-                  darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                }`}
-              />
-            </div>
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 font-mono flex items-center gap-1">

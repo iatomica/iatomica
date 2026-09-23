@@ -39,7 +39,6 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [service, setService] = useState('Desarrollo a Medida');
-  const [budget, setBudget] = useState('');
 
   const projectSprints = getSprints(currentUser, projectId);
 
@@ -60,8 +59,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
             company: company.trim() || 'Empresa Particular',
             email: email.trim(),
             phone: phone.trim(),
-            service,
-            budget: budget.trim()
+            service
           }
         : undefined
     });
@@ -270,7 +268,7 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
                       Teléfono / WhatsApp
@@ -301,19 +299,6 @@ export const CreateTicketModal: React.FC<CreateTicketModalProps> = ({
                         className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 block mb-1">
-                      Presupuesto Estimado
-                    </label>
-                    <input
-                      type="text"
-                      value={budget}
-                      onChange={e => setBudget(e.target.value)}
-                      placeholder="$3,500 USD o €"
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-bold text-emerald-700 dark:text-emerald-400 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                    />
                   </div>
                 </div>
 

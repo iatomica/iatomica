@@ -217,11 +217,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           <div className="mt-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 space-y-1">
                             <div className="flex items-center justify-between text-[11px] font-bold">
                               <span className="truncate text-slate-950 dark:text-slate-100">{ticket.crm.clientName}</span>
-                              {ticket.crm.budget && (
-                                <span className="text-emerald-700 dark:text-emerald-400 font-mono text-[10px] font-bold">
-                                  {ticket.crm.budget}
-                                </span>
-                              )}
                             </div>
                             <p className="text-[10px] text-slate-600 dark:text-slate-400 flex items-center gap-1 font-medium truncate">
                               <Building size={10} className="shrink-0 text-slate-400" />

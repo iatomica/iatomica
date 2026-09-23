@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { CrmCompany, CompanyStatus } from '../../services/crmService';
 import { generateWhatsAppLink } from '../../services/crmService';
+import type { JiraIssue } from '../../services/jiraService';
 import { 
   Building, 
   Search, 
@@ -8,7 +9,7 @@ import {
   Phone, 
   Mail, 
   MessageSquare, 
-  DollarSign, 
+  CheckSquare, 
   Users, 
   TrendingUp, 
   ExternalLink, 
@@ -24,6 +25,8 @@ interface CrmDirectoryProps {
   onCreateCompany: (companyData: any) => Promise<void>;
   onDeleteCompany: (id: string) => Promise<void>;
   darkMode: boolean;
+  issues?: JiraIssue[];
+  onOpenIssue?: (issue: JiraIssue) => void;
 }
 
 export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
@@ -31,7 +34,9 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
   onSelectCompany,
   onCreateCompany,
   onDeleteCompany,
-  darkMode
+  darkMode,
+  issues = [],
+  onOpenIssue
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -49,7 +54,6 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
   const [newPhone, setNewPhone] = useState('');
   const [newWebsite, setNewWebsite] = useState('');
   const [newStatus, setNewStatus] = useState<CompanyStatus>('lead');
-  const [newValue, setNewValue] = useState<number>(3000);
   const [newAssignedTo, setNewAssignedTo] = useState('Atención Público');
   const [newTech, setNewTech] = useState('');
   const [newNotes, setNewNotes] = useState('');
@@ -90,7 +94,7 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
       phone: newPhone.trim() || undefined,
       website: newWebsite.trim() || undefined,
       status: newStatus,
-      estimatedValue: Number(newValue),
+      estimatedValue: 0,
       assignedTo: newAssignedTo,
       techRequirements: newTech.trim() || undefined,
       notes: newNotes.trim() || undefined
@@ -113,7 +117,7 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
   const totalCompanies = companies.length;
   const activeClients = companies.filter(c => c.status === 'active_client' || c.status === 'vip').length;
   const inNegotiation = companies.filter(c => c.status === 'negotiation').length;
-  const totalPipelineValue = companies.reduce((acc, curr) => acc + (curr.estimatedValue || 0), 0);
+  const linkedTicketsCount = companies.filter(c => issues.some(i => i.companyId === c.id)).length;
 
   const getStatusBadge = (status: CompanyStatus) => {
     switch (status) {
@@ -189,14 +193,14 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
           darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
         }`}>
           <div className="p-3 rounded-xl bg-purple-500/10 text-purple-600 font-bold">
-            <DollarSign size={20} />
+            <CheckSquare size={20} />
           </div>
           <div>
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
-              Pipeline Estimado
+              Tickets de Prospección
             </span>
             <h4 className="text-base font-black text-purple-600 font-mono">
-              ${totalPipelineValue.toLocaleString()} USD
+              {linkedTicketsCount} / {totalCompanies} (100%)
             </h4>
           </div>
         </div>
@@ -346,16 +350,31 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
                     </div>
                   </div>
 
-                  {/* Metrics Footer: Value, Activities, Jira Tickets */}
+                  {/* Ticket de Prospección & Historial */}
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-mono">
-                    <div className="text-emerald-600 dark:text-emerald-400 font-bold">
-                      ${c.estimatedValue.toLocaleString()} USD
-                    </div>
+                    {(() => {
+                      const associatedIssue = issues.find(i => i.companyId === c.id);
+                      if (associatedIssue) {
+                        return (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onOpenIssue && onOpenIssue(associatedIssue);
+                            }}
+                            className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-bold border border-purple-500/20 transition-colors"
+                            title="Ver ticket de prospección en Jira"
+                          >
+                            <CheckSquare size={11} />
+                            <span>{associatedIssue.issueKey}</span>
+                            <span className="text-[9px] font-normal text-slate-400">({associatedIssue.status === 'todo' ? 'Pendiente' : associatedIssue.status})</span>
+                          </button>
+                        );
+                      }
+                      return <span className="text-slate-400 text-[10px]">Sin ticket</span>;
+                    })()}
 
                     <div className="flex items-center space-x-2 text-slate-400 text-[10px]">
-                      <span>{c.activitiesCount || 0} act</span>
-                      <span>·</span>
-                      <span className="text-purple-500 font-bold">{c.issuesCount || 0} tickets</span>
+                      <span>{c.activitiesCount || 0} bitácoras</span>
                     </div>
                   </div>
 
@@ -402,15 +421,16 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
                   <th className="p-3.5">Contacto Principal</th>
                   <th className="p-3.5">Rubro / Industria</th>
                   <th className="p-3.5">Estado CRM</th>
-                  <th className="p-3.5">Valor Estimado</th>
-                  <th className="p-3.5">Vendedor</th>
-                  <th className="p-3.5">Historial / Jira</th>
+                  <th className="p-3.5">Ticket de Prospección</th>
+                  <th className="p-3.5">Responsable</th>
+                  <th className="p-3.5">Bitácoras</th>
                   <th className="p-3.5">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-sans">
                 {filteredCompanies.map(c => {
                   const waLink = c.phone ? generateWhatsAppLink(c.phone, c.contactName, c.name) : null;
+                  const associatedIssue = issues.find(i => i.companyId === c.id);
 
                   return (
                     <tr
@@ -434,14 +454,29 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
                       <td className="p-3.5">
                         {getStatusBadge(c.status)}
                       </td>
-                      <td className="p-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                        ${c.estimatedValue.toLocaleString()} USD
+                      <td className="p-3.5 font-mono text-xs">
+                        {associatedIssue ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onOpenIssue && onOpenIssue(associatedIssue);
+                            }}
+                            className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 font-bold border border-purple-500/20 transition-colors"
+                            title="Abrir incidencia en Jira"
+                          >
+                            <CheckSquare size={12} />
+                            <span>{associatedIssue.issueKey}</span>
+                            <span className="text-[10px] font-normal opacity-75">({associatedIssue.status === 'todo' ? 'Pendiente' : associatedIssue.status})</span>
+                          </button>
+                        ) : (
+                          <span className="text-slate-400 text-[11px]">Sin ticket</span>
+                        )}
                       </td>
-                      <td className="p-3.5 text-slate-500">
+                      <td className="p-3.5 text-slate-500 font-medium">
                         {c.assignedTo}
                       </td>
                       <td className="p-3.5 font-mono text-[11px] text-slate-400">
-                        {c.activitiesCount || 0} act · <span className="text-purple-600 font-bold">{c.issuesCount || 0} tickets</span>
+                        {c.activitiesCount || 0} registradas
                       </td>
                       <td className="p-3.5" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center space-x-2">
@@ -538,7 +573,7 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-slate-400 font-mono mb-1">Rubro / Industria</label>
                   <select
@@ -568,16 +603,6 @@ export const CrmDirectory: React.FC<CrmDirectoryProps> = ({
                     <option value="active_client">Cliente Activo</option>
                     <option value="vip">Cuenta VIP</option>
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-400 font-mono mb-1">Valor Estimado ($ USD)</label>
-                  <input
-                    type="number"
-                    value={newValue}
-                    onChange={(e) => setNewValue(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border text-xs font-bold bg-transparent focus:outline-none"
-                  />
                 </div>
               </div>
 

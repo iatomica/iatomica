@@ -369,6 +369,11 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             onCreateCompany={handleCreateCompany}
             onDeleteCompany={handleDeleteCompany}
             darkMode={darkMode}
+            issues={issues}
+            onOpenIssue={(issue) => {
+              setEditingIssue(issue);
+              setIsIssueModalOpen(true);
+            }}
           />
         )}
 

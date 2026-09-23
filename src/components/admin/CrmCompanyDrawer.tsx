@@ -15,7 +15,8 @@ import {
   FileText, 
   Send, 
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  CheckSquare
 } from 'lucide-react';
 
 interface CrmCompanyDrawerProps {
@@ -56,7 +57,6 @@ export const CrmCompanyDrawer: React.FC<CrmCompanyDrawerProps> = ({
   const [editRole, setEditRole] = useState('');
   const [editEmail, setEditEmail] = useState('');
   const [editPhone, setEditPhone] = useState('');
-  const [editValue, setEditValue] = useState(0);
   const [editTech, setEditTech] = useState('');
   const [editNotes, setEditNotes] = useState('');
 
@@ -68,7 +68,6 @@ export const CrmCompanyDrawer: React.FC<CrmCompanyDrawerProps> = ({
     setEditRole(company.contactRole || '');
     setEditEmail(company.email);
     setEditPhone(company.phone || '');
-    setEditValue(company.estimatedValue || 0);
     setEditTech(company.techRequirements || '');
     setEditNotes(company.notes || '');
     setIsEditingInfo(true);
@@ -82,7 +81,7 @@ export const CrmCompanyDrawer: React.FC<CrmCompanyDrawerProps> = ({
       contactRole: editRole,
       email: editEmail,
       phone: editPhone,
-      estimatedValue: Number(editValue),
+      estimatedValue: 0,
       techRequirements: editTech,
       notes: editNotes
     });
@@ -209,12 +208,19 @@ export const CrmCompanyDrawer: React.FC<CrmCompanyDrawerProps> = ({
               <span>Email</span>
             </a>
 
-            <div className="ml-auto flex items-center space-x-2 text-xs font-mono">
-              <span className="text-slate-400">Deal:</span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                ${company.estimatedValue.toLocaleString()} USD
-              </span>
-            </div>
+            {company.issues && company.issues.length > 0 && (
+              <div className="ml-auto flex items-center space-x-1.5 text-xs font-mono">
+                <span className="text-slate-400">Ticket:</span>
+                <button
+                  onClick={() => onOpenIssue && onOpenIssue(company.issues![0])}
+                  className="font-bold text-purple-600 dark:text-purple-400 bg-purple-500/10 hover:bg-purple-500/20 px-2 py-0.5 rounded-md border border-purple-500/20 transition-colors inline-flex items-center gap-1"
+                  title="Abrir ticket de prospección"
+                >
+                  <CheckSquare size={11} />
+                  <span>{company.issues[0].issueKey}</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Navigation Tabs */}
@@ -270,6 +276,43 @@ export const CrmCompanyDrawer: React.FC<CrmCompanyDrawerProps> = ({
               
               {!isEditingInfo ? (
                 <>
+                  {/* Linked Prospecting Ticket Banner */}
+                  {company.issues && company.issues.length > 0 ? (
+                    <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                      darkMode ? 'bg-purple-950/20 border-purple-500/30' : 'bg-purple-50/80 border-purple-200'
+                    }`}>
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-mono font-black text-xs text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                            {company.issues[0].issueKey}
+                          </span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
+                            {company.issues[0].status === 'todo' ? 'Pendiente' : company.issues[0].status}
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-400">
+                            ({company.issues[0].priority})
+                          </span>
+                        </div>
+                        <h5 className="font-bold text-xs text-slate-900 dark:text-white">
+                          {company.issues[0].title}
+                        </h5>
+                        <p className="text-[11px] text-slate-500 font-mono">
+                          Responsable asignado: {company.issues[0].assignedTo}
+                        </p>
+                      </div>
+
+                      {onOpenIssue && (
+                        <button
+                          onClick={() => onOpenIssue(company.issues![0])}
+                          className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xs transition-colors shrink-0 flex items-center justify-center space-x-1.5"
+                        >
+                          <CheckSquare size={13} />
+                          <span>Abrir Ticket Jira</span>
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
+
                   {/* Key Contact Card */}
                   <div className={`p-4 rounded-2xl border space-y-2 ${
                     darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
@@ -422,15 +465,6 @@ export const CrmCompanyDrawer: React.FC<CrmCompanyDrawerProps> = ({
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-400 font-mono mb-1">Valor Estimado ($ USD)</label>
-                    <input
-                      type="number"
-                      value={editValue}
-                      onChange={(e) => setEditValue(Number(e.target.value))}
-                      className="w-full px-3 py-2 rounded-xl border text-xs font-bold bg-transparent focus:outline-none"
-                    />
-                  </div>
 
                   <div>
                     <label className="block text-[11px] font-bold text-slate-400 font-mono mb-1">Requerimientos Técnicos</label>
