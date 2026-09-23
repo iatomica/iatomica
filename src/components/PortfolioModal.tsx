@@ -4,7 +4,6 @@ import {
   ExternalLink, 
   CheckCircle2, 
   Sparkles, 
-  Cpu, 
   Globe 
 } from 'lucide-react';
 import type { PortfolioProject } from '../data/portfolioData';
@@ -33,95 +32,89 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({ project, onClose
   if (!project) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+      
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" 
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
       {/* Modal Dialog Card */}
       <div 
-        className={`relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border shadow-2xl transition-all ${
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="portfolio-modal-title"
+        className={`relative w-full max-w-3xl rounded-3xl overflow-hidden border shadow-2xl z-10 my-8 transition-all max-h-[90vh] flex flex-col ${
           darkMode 
-            ? 'bg-slate-900 border-slate-700/80 text-white' 
+            ? 'bg-slate-900 border-slate-800 text-white' 
             : 'bg-white border-slate-200 text-slate-900'
         }`}
-        onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button Floating */}
-        <button
-          onClick={onClose}
-          aria-label="Cerrar ventana de detalle"
-          className={`absolute top-5 right-5 z-20 p-2.5 rounded-full transition-all cursor-pointer ${
-            darkMode 
-              ? 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700' 
-              : 'bg-white/90 hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-200 shadow-md'
-          }`}
-        >
-          <X size={18} />
-        </button>
-
-        {/* Hero Image Showcase */}
-        <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden bg-slate-950">
-          <img 
-            src={project.heroImage} 
-            alt={project.title} 
+        {/* Modal Hero Banner */}
+        <div className="relative h-60 sm:h-72 w-full overflow-hidden shrink-0 bg-slate-950">
+          <img
+            src={project.heroImage}
+            alt={project.title}
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-          
-          {/* Overlay Floating Tags */}
-          <div className="absolute bottom-6 left-6 right-6 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-500 text-white shadow-md">
-                  {project.sectorLabel}
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md text-white border border-white/20">
-                  {project.badge}
-                </span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow-md">
-                {project.title}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-300 font-medium mt-1">
-                {project.clientName}
-              </p>
-            </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
 
-            {/* Live Launch Button Floating */}
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 transition-all"
-            >
-              <span>Visitar sitio en vivo</span>
-              <ExternalLink size={14} />
-            </a>
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            aria-label="Cerrar modal"
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all hover:scale-105 z-10 cursor-pointer"
+          >
+            <X size={18} />
+          </button>
+
+          {/* Sector & Badge Pills */}
+          <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-950/80 backdrop-blur-md text-white border border-white/20">
+              {project.sectorLabel}
+            </span>
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-orange-500 text-white shadow-sm">
+              {project.badge}
+            </span>
+          </div>
+
+          {/* Hero text overlay inside banner */}
+          <div className="absolute bottom-5 left-6 right-6 text-white">
+            <span className="text-xs uppercase tracking-widest text-orange-400 font-semibold block mb-1">
+              {project.clientName}
+            </span>
+            <h3 id="portfolio-modal-title" className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+              {project.title}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 font-medium mt-1 line-clamp-1">
+              {project.tagline}
+            </p>
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="p-6 sm:p-8 space-y-8">
+        {/* Modal Scrollable Body */}
+        <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
           
-          {/* Tagline & Overview */}
+          {/* Executive Overview */}
           <div>
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-500 block mb-2">
-              Propuesta & Solución
-            </span>
-            <h3 className="text-xl sm:text-2xl font-bold mb-3">
-              "{project.tagline}"
-            </h3>
-            <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Sobre el Proyecto
+            </h4>
+            <p className={`text-sm leading-relaxed ${
+              darkMode ? 'text-slate-200' : 'text-slate-700'
+            }`}>
               {project.fullDesc}
             </p>
           </div>
 
-          {/* Key Metrics Grid */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Impact Metrics Bento */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {project.metrics.map((m, idx) => (
               <div 
                 key={idx}
-                className={`p-4 rounded-2xl border text-center ${
+                className={`p-3.5 rounded-2xl border text-center transition-all ${
                   darkMode 
                     ? 'bg-slate-800/50 border-slate-700/60' 
                     : 'bg-slate-50 border-slate-200/80 shadow-xs'
@@ -158,28 +151,6 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({ project, onClose
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                   <span>{feat}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Tech Stack */}
-          <div>
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-              <Cpu size={14} />
-              <span>Stack Tecnológico & Despliegue</span>
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {project.techStack.map((tech, idx) => (
-                <span 
-                  key={idx}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold border ${
-                    darkMode 
-                      ? 'bg-slate-800 text-slate-300 border-slate-700' 
-                      : 'bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  {tech}
-                </span>
               ))}
             </div>
           </div>

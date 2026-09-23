@@ -80,111 +80,74 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ darkMode }) 
           })}
         </div>
 
-        {/* Projects Bento/Card Grid */}
+        {/* Projects Bento/Card Grid - Full Crop Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProjects.map((project) => (
             <div
               key={project.id}
               onClick={() => setActiveProject(project)}
-              className={`group rounded-3xl overflow-hidden border transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between cursor-pointer ${
-                darkMode
-                  ? 'bg-slate-900/80 border-slate-800 hover:border-orange-500/40 hover:shadow-2xl hover:shadow-orange-500/10'
-                  : 'bg-white border-slate-200/90 hover:border-orange-500/40 hover:shadow-xl shadow-sm'
-              }`}
+              className="group relative h-[420px] sm:h-[460px] rounded-3xl overflow-hidden border border-slate-700/60 shadow-xl hover:shadow-2xl hover:shadow-orange-500/15 hover:border-orange-500/50 hover:-translate-y-2 transition-all duration-500 flex flex-col justify-between p-6 sm:p-7 cursor-pointer"
             >
-              <div>
-                
-                {/* Card Hero Image */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-950">
-                  <img
-                    src={project.heroImage}
-                    alt={project.title}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  
-                  {/* Subtle Gradient Shadow */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+              {/* Full Crop Background Image */}
+              <img
+                src={project.heroImage}
+                alt={project.title}
+                className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
+                loading="lazy"
+              />
 
-                  {/* Top Left Badge */}
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-950/80 backdrop-blur-md text-white border border-white/20 shadow-sm">
-                      {project.sectorLabel}
-                    </span>
-                  </div>
+              {/* Gradient overlays for cinematic readability */}
+              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/75 via-transparent to-transparent h-32 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/10 transition-colors duration-500 pointer-events-none" />
 
-                  {/* Top Right Quick Launch Link */}
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={`Abrir sitio de ${project.title}`}
-                    className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-slate-900 flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-110"
-                    title="Visitar sitio directo"
-                  >
-                    <ExternalLink size={15} />
-                  </a>
+              {/* Top Row: Sector Badge & Quick External Link */}
+              <div className="relative z-10 flex items-center justify-between">
+                <span className="px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-950/75 backdrop-blur-md text-white border border-white/20 shadow-md">
+                  {project.sectorLabel}
+                </span>
 
-                  {/* Bottom Image Brand Tag */}
-                  <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white text-xs font-medium">
-                    <span className="truncate drop-shadow-md">{project.clientName}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500 font-bold uppercase">
-                      {project.badge}
-                    </span>
-                  </div>
-
-                </div>
-
-                {/* Card Content Body */}
-                <div className="p-6">
-                  
-                  <h3 className={`text-xl font-bold tracking-tight mb-2 group-hover:text-orange-500 transition-colors ${
-                    darkMode ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {project.title}
-                  </h3>
-
-                  <p className={`text-xs leading-relaxed line-clamp-3 mb-4 ${
-                    darkMode ? 'text-slate-300' : 'text-slate-600'
-                  }`}>
-                    {project.shortDesc}
-                  </p>
-
-                  {/* Tech stack mini tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {project.techStack.slice(0, 3).map((tech, idx) => (
-                      <span
-                        key={idx}
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded-md border ${
-                          darkMode
-                            ? 'bg-slate-800 text-slate-300 border-slate-700/80'
-                            : 'bg-slate-100 text-slate-600 border-slate-200'
-                        }`}
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                    {project.techStack.length > 3 && (
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 text-slate-400">
-                        +{project.techStack.length - 3}
-                      </span>
-                    )}
-                  </div>
-
-                </div>
-
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Abrir sitio de ${project.title}`}
+                  className="w-10 h-10 rounded-full bg-white/90 hover:bg-white text-slate-900 flex items-center justify-center shadow-xl backdrop-blur-md transition-all duration-200 hover:scale-110 hover:shadow-orange-500/40"
+                  title="Visitar sitio directo"
+                >
+                  <ExternalLink size={16} />
+                </a>
               </div>
 
-              {/* Card Interactive Footer Action */}
-              <div className={`p-6 pt-0 border-t mt-4 flex items-center justify-between text-xs font-bold ${
-                darkMode ? 'border-slate-800/80 text-orange-400' : 'border-slate-100 text-orange-600'
-              }`}>
-                <span>Explorar caso de éxito</span>
-                <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Detalles
-                  <ArrowUpRight size={14} />
-                </span>
+              {/* Bottom Content Area: Title, Badge, Description & Action */}
+              <div className="relative z-10 mt-auto space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500 text-white uppercase tracking-wider shadow-sm">
+                    {project.badge}
+                  </span>
+                  <span className="text-xs text-slate-300 font-medium truncate drop-shadow-sm">
+                    {project.clientName}
+                  </span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white group-hover:text-orange-400 transition-colors drop-shadow-md">
+                  {project.title}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-200 line-clamp-2 leading-relaxed font-normal drop-shadow-sm">
+                  {project.shortDesc}
+                </p>
+
+                <div className="pt-2 flex items-center justify-between text-xs font-bold text-orange-400">
+                  <span className="text-slate-300/90 text-xs font-medium group-hover:text-white transition-colors">
+                    Ver detalles de la plataforma
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white group-hover:bg-orange-500 group-hover:border-orange-500 transition-all shadow-sm">
+                    <span>Explorar</span>
+                    <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </span>
+                </div>
               </div>
 
             </div>

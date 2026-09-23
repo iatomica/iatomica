@@ -38,7 +38,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     shortDesc: 'Sistema operativo integral para estudios profesionales, combinando web institucional, portal privado para clientes y ERP interno con gestión de causas, audiencias y facturación.',
     fullDesc: 'Lexios es una solución SaaS de nivel empresarial construida desde cero bajo principios de Taste Skill. Unifica en un solo entorno el sitio público de la firma, el portal seguro donde los clientes consultan el avance de sus trámites y suben documentación protegida, y un sistema interno de gestión con workspace de 9 pestañas por expediente, control de plazos fatales, matriz RBAC de 7 roles y facturación electrónica.',
     url: 'https://lexios.iatomica.com',
-    heroImage: '/images/portfolio/lexios.png',
+    heroImage: '/images/portfolio/lexios.jpg',
     accentColor: 'from-amber-600 to-amber-700',
     features: [
       'Workspace de 9 pestañas por causa judicial o contable',
