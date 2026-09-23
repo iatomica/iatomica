@@ -4,6 +4,7 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { initialValenciaCompanies, initialValenciaIssues, initialValenciaActivities } from './seedData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -151,312 +152,53 @@ db.serialize(async () => {
   });
 });
 
-// Seed data generator for Jira & CRM
+// Seed data generator for Jira & CRM - Valencia 2026 dataset
 async function seedInitialDataIfEmpty() {
   try {
-    const existingCompanies = await allQuery('SELECT COUNT(*) as count FROM crm_companies');
-    if (existingCompanies && existingCompanies[0].count > 0) {
-      console.log('CRM Database already has data. Skipping seed.');
-      return;
-    }
+    const checkMock = await getQuery("SELECT COUNT(*) as count FROM crm_companies WHERE id LIKE 'comp-%'");
+    const checkValencia = await getQuery("SELECT COUNT(*) as count FROM crm_companies WHERE id LIKE 'vlc-%'");
 
-    console.log('🌱 Seeding initial realistic CRM Directory & Jira Suite...');
-    const now = new Date().toISOString();
+    const hasOldMock = checkMock && checkMock.count > 0;
+    const missingValencia = !checkValencia || checkValencia.count === 0;
 
-    const initialCompanies = [
-      {
-        id: 'comp-1',
-        name: 'Grupo Visión Bariloche',
-        legalName: 'Grupo Visión Turismo S.R.L.',
-        industry: 'Turismo & Hospitalidad',
-        contactName: 'Thomas Benítez',
-        contactRole: 'Director de Operaciones Turísticas',
-        email: 'reservas@grupovision.tur.ar',
-        phone: '+5492944558899',
-        website: 'https://grupovision.tur.ar',
-        status: 'active_client',
-        estimatedValue: 4800,
-        assignedTo: 'Consultoría Técnica',
-        techRequirements: 'Plataforma web reactiva con catálogo de expediciones 4x4, panel de autogestión de contenidos (CMS) y bot WhatsApp automatizado.',
-        notes: 'Cliente con alta temporada invernal y estival. Requieren soporte 24/7 y pasarela de cobros segura.',
-        createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'comp-2',
-        name: 'AURA Salud Integral',
-        legalName: 'Centro Médico Privado Aura S.A.',
-        industry: 'Salud & Clínicas',
-        contactName: 'Dra. Valentina Soria',
-        contactRole: 'Directora Médica & Coordinación',
-        email: 'coordinacion@aurasalud.com.ar',
-        phone: '+5491154883322',
-        website: 'https://aurasalud.iatomica.com',
-        status: 'negotiation',
-        estimatedValue: 7500,
-        assignedTo: 'Consultoría Técnica',
-        techRequirements: 'Portal de autogestión de turnos médicos integrados a Google Calendar y agentes IA para triaje de pacientes en WhatsApp.',
-        notes: 'Propuesta enviada la semana pasada. Reunión de cierre de contrato programada con el directorio.',
-        createdAt: new Date(Date.now() - 15 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'comp-3',
-        name: 'Chocolates Tronador',
-        legalName: 'Chocolatería Patagónica Tronador S.A.',
-        industry: 'Retail & Alimentos',
-        contactName: 'Martín Lanusse',
-        contactRole: 'Gerente Comercial',
-        email: 'ventas@chocotronador.com',
-        phone: '+5492944331122',
-        website: 'https://tronador.iatomica.com',
-        status: 'active_client',
-        estimatedValue: 3200,
-        assignedTo: 'Ventas',
-        techRequirements: 'E-commerce omnicanal B2C con gestión de catálogo de productos artesanales y sincronización con punto de venta físico.',
-        notes: 'Expansión de ventas hacia Buenos Aires en curso.',
-        createdAt: new Date(Date.now() - 25 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'comp-4',
-        name: 'Yiwu Direct Import',
-        legalName: 'Logística Transpacífica Yiwu S.R.L.',
-        industry: 'Logística & Comercio Exterior',
-        contactName: 'Federico Chen',
-        contactRole: 'Head of Global Procurement',
-        email: 'contact@yiwudirect.com',
-        phone: '+5491133224455',
-        website: 'https://yiwu.devops.iatomica.com',
-        status: 'qualified',
-        estimatedValue: 9200,
-        assignedTo: 'Consultoría Técnica',
-        techRequirements: 'Plataforma web de cotización en tiempo real de contenedores marítimos y tracking automatizado mediante webhook.',
-        notes: 'Calificado tras demo de arquitectura de agentes.',
-        createdAt: new Date(Date.now() - 8 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'comp-5',
-        name: 'Vetify Veterinaria & Pet Care',
-        legalName: 'Red Veterinaria Vetify S.A.',
-        industry: 'Salud Animal & Retail',
-        contactName: 'Dr. Guillermo Navarro',
-        contactRole: 'Socio Fundador',
-        email: 'info@vetify.com',
-        phone: '+5491166778899',
-        website: 'https://vetify.iatomica.com',
-        status: 'lead',
-        estimatedValue: 2400,
-        assignedTo: 'Atención Público',
-        techRequirements: 'Sistema de recordatorio de vacunación y turnero online para 4 sucursales.',
-        notes: 'Consulta recibida desde formulario web.',
-        createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-        updatedAt: now
+    if (hasOldMock || missingValencia) {
+      console.log('🔄 Old mock data detected or missing Valencia dataset. Purging previous records and applying clean Valencia seed...');
+      await runQuery('DELETE FROM jira_issues');
+      await runQuery('DELETE FROM crm_activities');
+      await runQuery('DELETE FROM crm_companies');
+      await runQuery('DELETE FROM leads');
+      await runQuery('DELETE FROM lead_notes');
+
+      console.log(`🌱 Seeding ${initialValenciaCompanies.length} Valencia companies...`);
+      for (const c of initialValenciaCompanies) {
+        await runQuery(`
+          INSERT INTO crm_companies (id, name, legalName, industry, contactName, contactRole, email, phone, website, status, estimatedValue, assignedTo, techRequirements, notes, createdAt, updatedAt)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [c.id, c.name, c.legalName, c.industry, c.contactName, c.contactRole, c.email, c.phone, c.website, c.status, c.estimatedValue, c.assignedTo, c.techRequirements, c.notes, c.createdAt, c.updatedAt]);
       }
-    ];
 
-    for (const c of initialCompanies) {
-      await runQuery(`
-        INSERT INTO crm_companies (id, name, legalName, industry, contactName, contactRole, email, phone, website, status, estimatedValue, assignedTo, techRequirements, notes, createdAt, updatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [c.id, c.name, c.legalName, c.industry, c.contactName, c.contactRole, c.email, c.phone, c.website, c.status, c.estimatedValue, c.assignedTo, c.techRequirements, c.notes, c.createdAt, c.updatedAt]);
-    }
-
-    // Seed Activities
-    const initialActivities = [
-      {
-        id: 'act-1',
-        companyId: 'comp-1',
-        type: 'meeting',
-        summary: 'Demo de CMS y Aprobación de Versión 2.0',
-        details: 'Se mostró la autogestión de secciones web y biblioteca multimedia WebP. El cliente expresó total conformidad.',
-        author: 'Ing. Lucas Varela',
-        nextAction: 'Entrega de credenciales de operador',
-        nextActionDate: new Date(Date.now() + 2 * 86400000).toISOString(),
-        createdAt: new Date(Date.now() - 4 * 86400000).toISOString()
-      },
-      {
-        id: 'act-2',
-        companyId: 'comp-2',
-        type: 'call',
-        summary: 'Llamada de Revisión de Presupuesto',
-        details: 'Se afinaron los alcances de la integración con Google Calendar y WhatsApp Bot. Están conformes con el valor propuesto.',
-        author: 'Lic. Mateo Rossi',
-        nextAction: 'Enviar borrador de contrato de servicios',
-        nextActionDate: new Date(Date.now() + 1 * 86400000).toISOString(),
-        createdAt: new Date(Date.now() - 2 * 86400000).toISOString()
-      },
-      {
-        id: 'act-3',
-        companyId: 'comp-4',
-        type: 'whatsapp',
-        summary: 'Envío de Ficha Técnica de Integración API',
-        details: 'Federico confirmó recepción de documentación OpenAPI y validación de endpoints.',
-        author: 'Sofía Martínez',
-        nextAction: 'Reunión de kickoff técnico',
-        nextActionDate: new Date(Date.now() + 5 * 86400000).toISOString(),
-        createdAt: new Date(Date.now() - 1 * 86400000).toISOString()
+      console.log(`🌱 Seeding initial prospecting activities...`);
+      for (const a of initialValenciaActivities) {
+        await runQuery(`
+          INSERT INTO crm_activities (id, companyId, type, summary, details, author, nextAction, nextActionDate, createdAt)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [a.id, a.companyId, a.type, a.summary, a.details, a.author, a.nextAction, a.nextActionDate, a.createdAt]);
       }
-    ];
 
-    for (const a of initialActivities) {
-      await runQuery(`
-        INSERT INTO crm_activities (id, companyId, type, summary, details, author, nextAction, nextActionDate, createdAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [a.id, a.companyId, a.type, a.summary, a.details, a.author, a.nextAction, a.nextActionDate, a.createdAt]);
-    }
-
-    // Seed Jira Issues (Board & Backlog)
-    const initialIssues = [
-      {
-        id: 'iss-1',
-        issueKey: 'IAT-101',
-        title: 'Integración de Pasarela de Pagos & Notificaciones WhatsApp',
-        description: 'Conectar checkout con webhooks de WhatsApp para confirmación automática de reservas.',
-        type: 'automation',
-        status: 'in_progress',
-        priority: 'highest',
-        companyId: 'comp-1',
-        assignedTo: 'Consultoría Técnica',
-        storyPoints: 5,
-        value: 1200,
-        dueDate: new Date(Date.now() + 3 * 86400000).toISOString(),
-        tags: JSON.stringify(['WhatsApp Gateway', 'Pagos', 'Q3']),
-        createdAt: new Date(Date.now() - 6 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'iss-2',
-        issueKey: 'IAT-102',
-        title: 'Arquitectura de Triaje de Pacientes con Agente LLM',
-        description: 'Definir flujos conversacionales médicos y salvaguardas éticas para consultas frecuentes.',
-        type: 'consulting',
-        status: 'review',
-        priority: 'high',
-        companyId: 'comp-2',
-        assignedTo: 'Consultoría Técnica',
-        storyPoints: 8,
-        value: 2500,
-        dueDate: new Date(Date.now() + 4 * 86400000).toISOString(),
-        tags: JSON.stringify(['Agentes IA', 'Salud', 'Arquitectura']),
-        createdAt: new Date(Date.now() - 5 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'iss-3',
-        issueKey: 'IAT-103',
-        title: 'Calificación Comercial y Presentación de Propuesta Final',
-        description: 'Coordinar sesión ejecutiva con directores para firma y primer hito de desarrollo.',
-        type: 'lead',
-        status: 'negotiation',
-        priority: 'high',
-        companyId: 'comp-2',
-        assignedTo: 'Ventas',
-        storyPoints: 3,
-        value: 5000,
-        dueDate: new Date(Date.now() + 2 * 86400000).toISOString(),
-        tags: JSON.stringify(['Cierre Comercial', 'Contrato']),
-        createdAt: new Date(Date.now() - 4 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'iss-4',
-        issueKey: 'IAT-104',
-        title: 'Configuración de Dominio SSL y CDN para Catálogo de Productos',
-        description: 'Normalización de caché de imágenes WebP para carga en menos de 0.8s en móviles.',
-        type: 'task',
-        status: 'done',
-        priority: 'medium',
-        companyId: 'comp-3',
-        assignedTo: 'Atención Público',
-        storyPoints: 2,
-        value: 800,
-        dueDate: new Date(Date.now() - 1 * 86400000).toISOString(),
-        tags: JSON.stringify(['DevOps', 'Cloud', 'Performance']),
-        createdAt: new Date(Date.now() - 10 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'iss-5',
-        issueKey: 'IAT-105',
-        title: 'Diseño de Algoritmo de Cotización de Fletes Marítimos',
-        description: 'Mapear tarifas volumétricas desde puerto de Yiwu a Buenos Aires / Valparaíso.',
-        type: 'consulting',
-        status: 'todo',
-        priority: 'high',
-        companyId: 'comp-4',
-        assignedTo: 'Consultoría Técnica',
-        storyPoints: 8,
-        value: 3800,
-        dueDate: new Date(Date.now() + 7 * 86400000).toISOString(),
-        tags: JSON.stringify(['Logística', 'Cotizador']),
-        createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'iss-6',
-        issueKey: 'IAT-106',
-        title: 'Primer Contacto y Diagnóstico Inicial de Requerimientos',
-        description: 'Contactar al Dr. Navarro para relevar volumen de turnos mensuales y software actual.',
-        type: 'lead',
-        status: 'backlog',
-        priority: 'medium',
-        companyId: 'comp-5',
-        assignedTo: 'Atención Público',
-        storyPoints: 2,
-        value: 1200,
-        dueDate: new Date(Date.now() + 5 * 86400000).toISOString(),
-        tags: JSON.stringify(['Prospección', 'Salud Animal']),
-        createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'iss-7',
-        issueKey: 'IAT-107',
-        title: 'Implementar Motor de Búsqueda RAG sobre Base de Conocimiento',
-        description: 'Indexar políticas de garantía y manuales técnicos para el chatbot interno.',
-        type: 'automation',
-        status: 'backlog',
-        priority: 'high',
-        companyId: 'comp-1',
-        assignedTo: 'Consultoría Técnica',
-        storyPoints: 5,
-        value: 1600,
-        dueDate: new Date(Date.now() + 10 * 86400000).toISOString(),
-        tags: JSON.stringify(['RAG', 'Vector Store', 'IA']),
-        createdAt: new Date(Date.now() - 1 * 86400000).toISOString(),
-        updatedAt: now
-      },
-      {
-        id: 'iss-8',
-        issueKey: 'IAT-108',
-        title: 'Auditoría de Seguridad y Resguardo Automático SQLite en Coolify',
-        description: 'Automatizar script de backup nocturno hacia bucket S3 offsite.',
-        type: 'task',
-        status: 'backlog',
-        priority: 'medium',
-        companyId: null,
-        assignedTo: 'Consultoría Técnica',
-        storyPoints: 3,
-        value: 0,
-        dueDate: new Date(Date.now() + 12 * 86400000).toISOString(),
-        tags: JSON.stringify(['Infraestructura', 'Seguridad']),
-        createdAt: now,
-        updatedAt: now
+      console.log(`🌱 Seeding initial Jira issues in backlog/todo...`);
+      for (const iss of initialValenciaIssues) {
+        await runQuery(`
+          INSERT INTO jira_issues (id, issueKey, title, description, type, status, priority, companyId, assignedTo, storyPoints, value, dueDate, tags, createdAt, updatedAt)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [iss.id, iss.issueKey, iss.title, iss.description, iss.type, iss.status, iss.priority, iss.companyId, iss.assignedTo, iss.storyPoints, iss.value, iss.dueDate, iss.tags, iss.createdAt, iss.updatedAt]);
       }
-    ];
 
-    for (const iss of initialIssues) {
-      await runQuery(`
-        INSERT INTO jira_issues (id, issueKey, title, description, type, status, priority, companyId, assignedTo, storyPoints, value, dueDate, tags, createdAt, updatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [iss.id, iss.issueKey, iss.title, iss.description, iss.type, iss.status, iss.priority, iss.companyId, iss.assignedTo, iss.storyPoints, iss.value, iss.dueDate, iss.tags, iss.createdAt, iss.updatedAt]);
+      console.log('✅ Clean Valencia CRM Directory & Jira Suite seed complete!');
+    } else {
+      console.log('CRM Database already populated with Valencia dataset. Skipping seed.');
     }
-
-    console.log('✅ Initial CRM & Jira Seed complete!');
   } catch (err) {
-    console.error('Error seeding initial data:', err);
+    console.error('Error seeding initial Valencia data:', err);
   }
 }
 

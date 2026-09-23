@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, ExternalLink } from 'lucide-react';
 
 import {
   FlaticonConsulting,
@@ -100,9 +100,10 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 shadow-sm">
-            Nuestros Servicios
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 shadow-sm inline-flex items-center space-x-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+            <span>Nuestros Servicios</span>
           </span>
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white mt-4">
             Todo lo que Necesitas para <br />
@@ -111,6 +112,72 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onOpenBookin
           <p className="mt-4 text-base sm:text-lg text-slate-300">
             Combinamos consultoría práctica, desarrollo de software, inteligencia artificial y comunicación para ayudarte a crecer.
           </p>
+        </div>
+
+        {/* Elegant Minimalist Video Player Window */}
+        <div className="max-w-4xl mx-auto mb-20">
+          <div className="relative group">
+            {/* Ambient Backlight Glow */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/20 via-purple-500/20 to-blue-500/20 rounded-3xl blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Window Container */}
+            <div className="relative rounded-2xl md:rounded-3xl bg-slate-900/90 border border-white/10 shadow-2xl overflow-hidden backdrop-blur-xl transition-all duration-300">
+              
+              {/* Window Titlebar */}
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-slate-950/80 border-b border-white/10 select-none">
+                {/* Traffic Lights */}
+                <div className="flex items-center space-x-2">
+                  <span className="w-3 h-3 rounded-full bg-rose-500/80 hover:bg-rose-500 transition-colors inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-amber-500/80 hover:bg-amber-500 transition-colors inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/80 hover:bg-emerald-500 transition-colors inline-block" />
+                </div>
+
+                {/* Window Badge / Title */}
+                <div className="flex items-center space-x-2 text-xs font-mono text-slate-300 font-medium">
+                  <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-orange-400 font-semibold tracking-wide">
+                    iAtomica · Video Explicativo
+                  </span>
+                  <span className="hidden sm:inline text-slate-400">| ¿De qué van nuestros servicios?</span>
+                </div>
+
+                {/* Direct Link to YouTube */}
+                <a
+                  href="https://youtu.be/Va4-8lEYB3s"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-1.5 text-[11px] font-medium text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg border border-white/5"
+                  title="Abrir en YouTube"
+                >
+                  <span className="hidden sm:inline">YouTube</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              {/* Video Responsive Frame */}
+              <div className="relative aspect-video w-full bg-black/90">
+                <iframe
+                  className="w-full h-full border-0"
+                  src="https://www.youtube-nocookie.com/embed/Va4-8lEYB3s?rel=0&modestbranding=1"
+                  title="iAtomica · Explicación de Servicios"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+
+              {/* Window Footer Bar */}
+              <div className="px-4 sm:px-6 py-3 bg-slate-950/60 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-slate-300 font-medium">Conoce nuestro modelo operativo en video</span>
+                </div>
+                <span className="text-[11px] text-slate-400">
+                  Consultoría · Software · Inteligencia Artificial · Mantenimiento & QA
+                </span>
+              </div>
+
+            </div>
+          </div>
         </div>
 
         {/* Centered Cards Alignment Grid (3 Cards on Row 1, 2 Centered on Row 2) */}

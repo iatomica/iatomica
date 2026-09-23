@@ -26,7 +26,7 @@ export interface JiraIssue {
   updatedAt: string;
 }
 
-const STORAGE_KEY = 'iatomica_jira_issues_cache_v1';
+const STORAGE_KEY = 'iatomica_jira_issues_cache_v2';
 const SYNC_CHANNEL_NAME = 'iatomica_jira_live_sync';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 

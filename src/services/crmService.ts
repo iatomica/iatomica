@@ -39,7 +39,7 @@ export interface CrmCompany {
   issues?: JiraIssue[];
 }
 
-const STORAGE_KEY = 'iatomica_crm_companies_cache_v1';
+const STORAGE_KEY = 'iatomica_crm_companies_cache_v2';
 const SYNC_CHANNEL_NAME = 'iatomica_crm_companies_live_sync';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 

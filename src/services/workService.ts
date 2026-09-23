@@ -83,8 +83,8 @@ export interface Sprint {
   endDate: string;
 }
 
-const STORAGE_TICKETS_KEY = 'iatomica_work_tickets_v2';
-const STORAGE_SPRINTS_KEY = 'iatomica_work_sprints_v2';
+const STORAGE_TICKETS_KEY = 'iatomica_work_tickets_v3';
+const STORAGE_SPRINTS_KEY = 'iatomica_work_sprints_v3';
 const WORK_SYNC_CHANNEL = 'iatomica_work_live_sync_v2';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -106,28 +106,10 @@ const notifySync = () => {
 // Seed initial Sprints
 const INITIAL_SPRINTS: Sprint[] = [
   {
-    id: 'sp-bar-1',
-    projectId: 'bariloche',
-    name: 'Sprint 1 · Despliegue Bariloche',
-    goal: 'Lanzamiento de plataforma local, integraciones de pago y onboarding de primeros clientes.',
-    status: 'active',
-    startDate: '2026-09-01',
-    endDate: '2026-09-30'
-  },
-  {
-    id: 'sp-bar-2',
-    projectId: 'bariloche',
-    name: 'Sprint 2 · Automatización & CRM',
-    goal: 'Flujos automatizados de WhatsApp y sincronización de leads.',
-    status: 'planned',
-    startDate: '2026-10-01',
-    endDate: '2026-10-31'
-  },
-  {
     id: 'sp-esp-1',
     projectId: 'espana',
-    name: 'Sprint 1 · Expansión Península',
-    goal: 'Infraestructura cloud para España, cumplimiento GDPR y prospección B2B.',
+    name: 'Sprint 1 · Prospección & Diagnóstico Valencia',
+    goal: 'Relevamiento y diagnóstico inicial de 31 empresas y profesionales en Cabanyal, Marítim y Valencia capital.',
     status: 'active',
     startDate: '2026-09-01',
     endDate: '2026-09-30'
@@ -135,248 +117,165 @@ const INITIAL_SPRINTS: Sprint[] = [
   {
     id: 'sp-esp-2',
     projectId: 'espana',
-    name: 'Sprint 2 · Escala Corporativa Madrid',
-    goal: 'Cierre de contratos corporativos y homologación de servicios enterprise.',
+    name: 'Sprint 2 · Propuestas Comerciales & Onboarding Península',
+    goal: 'Presentación de soluciones de turnero WhatsApp, modernización web y portales seguros a prospectos calificados.',
     status: 'planned',
     startDate: '2026-10-01',
     endDate: '2026-10-31'
   }
 ];
 
-// Seed initial Tickets
+// Seed initial Tickets (All in initial 'todo' phase, based on Valencia prospects)
 const INITIAL_TICKETS: WorkTicket[] = [
-  // --- PROYECTO BARILOCHE (José Anaya) ---
   {
-    id: 't-bar-1',
-    code: 'BAR-101',
-    projectId: 'bariloche',
-    sprintId: 'sp-bar-1',
-    title: 'Integración Pasarela de Pagos Regional Patagonia',
-    description: 'Configuración de checkout optimizado para tarjetas locales y facturación electrónica AFIP.',
-    status: 'in_progress',
+    id: 't-esp-101',
+    code: 'ESP-101',
+    projectId: 'espana',
+    sprintId: 'sp-esp-1',
+    title: 'Auditoría inicial de presencia digital y ficha Google Maps en sector dental Valencia',
+    description: 'Relevamiento de fichas y posicionamiento local para Lainez Dental y clínicas de Serrería / Cabanyal.',
+    status: 'todo',
     priority: 'alta',
     crm: {
-      clientName: 'Martín Lanusse',
-      company: 'Cervecería & Lodge Nahuel',
-      email: 'martin@nahuellodge.com.ar',
-      phone: '+5492944556677',
-      service: 'Desarrollo a Medida',
-      budget: '$4,500 USD'
+      clientName: 'Dra. María Láinez',
+      company: 'Lainez Dental',
+      email: 'contacto@lainezdental.com',
+      phone: '+34 963 22 75 14',
+      service: 'Herramientas de IA & Citas',
+      budget: '€3,200 EUR'
     },
     comments: [
       {
-        id: 'c-1',
-        authorName: 'José Anaya',
-        authorRole: 'Project Lead',
-        authorInitials: 'JA',
-        text: 'Revisamos los requerimientos con el cliente. Priorizan la compatibilidad offline.',
-        timestamp: '2026-09-15T14:20:00Z'
+        id: 'c-101',
+        authorName: 'Stefi Del Papa',
+        authorRole: 'Project Lead · España',
+        authorInitials: 'SD',
+        text: 'Prospecto recopilado en relevamiento territorial. Dispone de web pero sin agenda automatizada de turnos.',
+        timestamp: '2026-09-20T10:00:00Z'
       }
     ],
-    createdBy: 'José Anaya',
-    createdAt: '2026-09-10T10:00:00Z',
-    updatedAt: '2026-09-16T18:30:00Z'
+    createdBy: 'Stefi Del Papa',
+    createdAt: '2026-09-20T09:30:00Z',
+    updatedAt: '2026-09-20T09:30:00Z'
   },
   {
-    id: 't-bar-2',
-    code: 'BAR-102',
-    projectId: 'bariloche',
-    sprintId: 'sp-bar-1',
-    title: 'Consultoría e IA de Atención Turística',
-    description: 'Entrenamiento de agente RAG para responder consultas frecuentes de huéspedes y reservas directas.',
+    id: 't-esp-102',
+    code: 'ESP-102',
+    projectId: 'espana',
+    sprintId: 'sp-esp-1',
+    title: 'Diseño de flujo de turnero WhatsApp y recordatorios automáticos en Centro AIRE',
+    description: 'Estructurar canal conversacional para reservas de consultas de fisioterapia y podología.',
     status: 'todo',
     priority: 'urgente',
     crm: {
-      clientName: 'Valeria Soria',
-      company: 'Chocolates & Cabañas Catedral',
-      email: 'valeria@catedralturismo.com',
-      phone: '+5492944112233',
-      service: 'Herramientas de IA',
-      budget: '$3,200 USD'
+      clientName: 'Dirección Médica AIRE',
+      company: 'Centro AIRE (Fisioterapia y Podología)',
+      email: 'contacto@airevalencia.es',
+      phone: '+34 962 49 04 00',
+      service: 'Automatización & WhatsApp',
+      budget: '€3,200 EUR'
     },
     comments: [
       {
-        id: 'c-2',
+        id: 'c-102',
         authorName: 'Lic. Mateo Rossi',
         authorRole: 'Admin',
         authorInitials: 'MR',
-        text: 'Aprobado el presupuesto inicial. Coordinar demo para el lunes.',
-        timestamp: '2026-09-16T11:00:00Z'
+        text: 'Coordinar con Stefi la maqueta inicial del flujo de reservas por WhatsApp.',
+        timestamp: '2026-09-21T11:00:00Z'
       }
     ],
-    createdBy: 'José Anaya',
-    createdAt: '2026-09-12T09:00:00Z',
-    updatedAt: '2026-09-16T19:10:00Z'
+    createdBy: 'Lic. Mateo Rossi',
+    createdAt: '2026-09-21T10:00:00Z',
+    updatedAt: '2026-09-21T10:00:00Z'
   },
   {
-    id: 't-bar-3',
-    code: 'BAR-103',
-    projectId: 'bariloche',
-    sprintId: null, // Backlog
-    title: 'Migración Cloud & Backup Automático en Frío',
-    description: 'Planificación de snapshots diarios y replicación en data center secundario.',
-    status: 'todo',
-    priority: 'media',
-    crm: {
-      clientName: 'Esteban Bosch',
-      company: 'Bosch Distribuidora Mayorista',
-      email: 'esteban@distribuidorabosch.com.ar',
-      phone: '+5492944889900',
-      service: 'Consultoría Técnica',
-      budget: '$2,800 USD'
-    },
-    comments: [],
-    createdBy: 'José Anaya',
-    createdAt: '2026-09-14T15:00:00Z',
-    updatedAt: '2026-09-14T15:00:00Z'
-  },
-  {
-    id: 't-bar-4',
-    code: 'BAR-104',
-    projectId: 'bariloche',
-    sprintId: 'sp-bar-1',
-    title: 'Control de Calidad (QA) de App Móvil de Reservas',
-    description: 'Testing de compatibilidad iOS/Android en condiciones de conectividad variable de montaña.',
-    status: 'review',
-    priority: 'alta',
-    crm: {
-      clientName: 'Romina Bellagio',
-      company: 'Outdoor Adventures Patagonia',
-      email: 'romina@outdoorpatagonia.com',
-      phone: '+5492944334455',
-      service: 'QA & Testing',
-      budget: '$1,900 USD'
-    },
-    comments: [
-      {
-        id: 'c-3',
-        authorName: 'José Anaya',
-        authorRole: 'Project Lead',
-        authorInitials: 'JA',
-        text: 'Se ejecutaron las pruebas automatizadas de Cypress. Quedan 2 tests de regresión.',
-        timestamp: '2026-09-16T17:45:00Z'
-      }
-    ],
-    createdBy: 'José Anaya',
-    createdAt: '2026-09-11T12:00:00Z',
-    updatedAt: '2026-09-17T01:15:00Z'
-  },
-
-  // --- PROYECTO ESPAÑA (Stefi Del Papa) ---
-  {
-    id: 't-esp-1',
-    code: 'ESP-201',
+    id: 't-esp-103',
+    code: 'ESP-103',
     projectId: 'espana',
     sprintId: 'sp-esp-1',
-    title: 'Auditoría de Cumplimiento GDPR & RGPD en Plataforma SaaS',
-    description: 'Adecuación de políticas de consentimiento, cookies de terceros y portabilidad de datos para la UE.',
-    status: 'in_progress',
-    priority: 'urgente',
-    crm: {
-      clientName: 'Álvaro Herrero',
-      company: 'Iberia Logistic Tech SL',
-      email: 'alvaro.herrero@iberialogistic.es',
-      phone: '+34612345678',
-      service: 'Consultoría Técnica',
-      budget: '€6,800 EUR'
-    },
-    comments: [
-      {
-        id: 'c-4',
-        authorName: 'Stefi Del Papa',
-        authorRole: 'Project Lead',
-        authorInitials: 'SD',
-        text: 'Revisado con el equipo legal de Madrid. Añadimos cláusula de servidores europeos.',
-        timestamp: '2026-09-16T16:00:00Z'
-      }
-    ],
-    createdBy: 'Stefi Del Papa',
-    createdAt: '2026-09-08T10:00:00Z',
-    updatedAt: '2026-09-16T19:40:00Z'
-  },
-  {
-    id: 't-esp-2',
-    code: 'ESP-202',
-    projectId: 'espana',
-    sprintId: 'sp-esp-1',
-    title: 'Pipeline de IA para Scoring Automático de Clientes B2B',
-    description: 'Integración de modelo predictivo para evaluar intención de compra de empresas inmobiliarias en Valencia.',
+    title: 'Propuesta de modernización web y portfolio para OSB Arquitectos y Fandiño',
+    description: 'Diseño de portfolio visual en alta resolución con optimización WebP y cotizador de reformas/obra.',
     status: 'todo',
     priority: 'alta',
     crm: {
-      clientName: 'Beatriz Casado',
-      company: 'Mediterráneo Proptech SL',
-      email: 'b.casado@mediterraneoprop.com',
-      phone: '+34698765432',
-      service: 'Herramientas de IA',
-      budget: '€8,500 EUR'
-    },
-    comments: [
-      {
-        id: 'c-5',
-        authorName: 'Stefi Del Papa',
-        authorRole: 'Project Lead',
-        authorInitials: 'SD',
-        text: 'Recibimos los primeros datasets de prueba anonimizados.',
-        timestamp: '2026-09-15T18:15:00Z'
-      }
-    ],
-    createdBy: 'Stefi Del Papa',
-    createdAt: '2026-09-09T11:00:00Z',
-    updatedAt: '2026-09-15T18:15:00Z'
-  },
-  {
-    id: 't-esp-3',
-    code: 'ESP-203',
-    projectId: 'espana',
-    sprintId: null, // Backlog
-    title: 'Desarrollo de Portal de Proveedores en Barcelona',
-    description: 'Arquitectura frontend en React + Tailwind con autenticación SSO.',
-    status: 'todo',
-    priority: 'media',
-    crm: {
-      clientName: 'Jordi Vila',
-      company: 'Catalunya Retail Connect',
-      email: 'jvila@retailconnect.cat',
-      phone: '+34655443322',
+      clientName: 'Dirección de Estudio OSB',
+      company: 'OSB Arquitectos',
+      email: 'contacto@osbarquitectos.com',
+      phone: '+34 963 20 40 85',
       service: 'Desarrollo a Medida',
-      budget: '€5,200 EUR'
+      budget: '€2,800 EUR'
     },
     comments: [],
     createdBy: 'Stefi Del Papa',
-    createdAt: '2026-09-13T14:00:00Z',
-    updatedAt: '2026-09-13T14:00:00Z'
+    createdAt: '2026-09-21T15:00:00Z',
+    updatedAt: '2026-09-21T15:00:00Z'
   },
   {
-    id: 't-esp-4',
-    code: 'ESP-204',
+    id: 't-esp-104',
+    code: 'ESP-104',
     projectId: 'espana',
-    sprintId: 'sp-esp-1',
-    title: 'Despliegue y Pruebas de Carga en Coolify Frankfurt',
-    description: 'Configuración de cluster con balanceo Traefik y benchmarks de 5,000 req/s.',
-    status: 'done',
+    sprintId: null, // Backlog
+    title: 'Dossier de portal seguro de clientes para Gestoría Cabanyal SLP y Canyamelar Assessors',
+    description: 'Relevar requerimientos para recepción automatizada de facturas y consultas fiscales recurrentes.',
+    status: 'todo',
+    priority: 'media',
+    crm: {
+      clientName: 'Socio Gestor Cabanyal',
+      company: 'Gestoría Cabanyal SLP',
+      email: 'contacto@gestoriacabanyalslp.es',
+      phone: '+34 963 71 14 50',
+      service: 'Consultoría Técnica',
+      budget: '€2,600 EUR'
+    },
+    comments: [],
+    createdBy: 'Stefi Del Papa',
+    createdAt: '2026-09-22T08:00:00Z',
+    updatedAt: '2026-09-22T08:00:00Z'
+  },
+  {
+    id: 't-esp-105',
+    code: 'ESP-105',
+    projectId: 'espana',
+    sprintId: null, // Backlog
+    title: 'Estandarización de dossier de servicios legales digitales para Ángel Toledo Algarra',
+    description: 'Análisis de captación online y reserva de primera consulta jurídica en despacho de Carrer Reina.',
+    status: 'todo',
+    priority: 'media',
+    crm: {
+      clientName: 'Lic. Ángel Toledo Algarra',
+      company: 'Ángel Toledo Algarra Abogados',
+      email: 'contacto@angeltoledo.com',
+      phone: '+34 637 73 65 33',
+      service: 'Consultoría Técnica',
+      budget: '€2,200 EUR'
+    },
+    comments: [],
+    createdBy: 'Stefi Del Papa',
+    createdAt: '2026-09-22T09:30:00Z',
+    updatedAt: '2026-09-22T09:30:00Z'
+  },
+  {
+    id: 't-esp-106',
+    code: 'ESP-106',
+    projectId: 'espana',
+    sprintId: null, // Backlog
+    title: 'Plan de desarrollo web para comercios y profesionales sin sitio web en Valencia',
+    description: 'Estructuración de paquetes llave en mano para 18 prospectos identificados sin presencia online propia.',
+    status: 'todo',
     priority: 'alta',
     crm: {
-      clientName: 'Fernando Morales',
-      company: 'Fintech Iberia Group',
-      email: 'f.morales@fintechiberia.com',
-      phone: '+34677889900',
-      service: 'Consultoría Técnica',
-      budget: '€7,400 EUR'
+      clientName: 'Stefi Del Papa & Mateo Rossi',
+      company: 'Comercios Sin Web Valencia',
+      email: 'stefi.delpapa@iatomica.com',
+      phone: '+34 685 41 27 63',
+      service: 'Desarrollo Web Llave en Mano',
+      budget: '€1,950 EUR'
     },
-    comments: [
-      {
-        id: 'c-6',
-        authorName: 'Lic. Mateo Rossi',
-        authorRole: 'Admin',
-        authorInitials: 'MR',
-        text: 'Excelente resultado de latencia (menos de 28ms en media peninsular).',
-        timestamp: '2026-09-16T12:30:00Z'
-      }
-    ],
-    createdBy: 'Stefi Del Papa',
-    createdAt: '2026-09-07T08:00:00Z',
-    updatedAt: '2026-09-16T12:30:00Z'
+    comments: [],
+    createdBy: 'Lic. Mateo Rossi',
+    createdAt: '2026-09-22T14:00:00Z',
+    updatedAt: '2026-09-22T14:00:00Z'
   }
 ];
 
