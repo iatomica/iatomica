@@ -3,11 +3,12 @@ import { Cpu, MessageSquare, ShieldAlert, LayoutDashboard } from 'lucide-react';
 
 interface FooterProps {
   onOpenAdmin: () => void;
+  onOpenLinktree?: () => void;
   isLoggedIn: boolean;
   darkMode: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, isLoggedIn, darkMode }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, onOpenLinktree, isLoggedIn, darkMode }) => {
   const whatsappUrl = "https://wa.me/5491170142641?text=Hola%20iAtomica,%20quiero%20consultar%20por%20servicios%20de%20consultor%C3%ADa%20y%20desarrollo%20de%20IA%20para%20mi%20empresa.";
 
   return (
@@ -37,6 +38,22 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, isLoggedIn, darkMod
                   <MessageSquare size={13} className="text-emerald-400" />
                   <span>WhatsApp: +54 9 11 7014-2641</span>
                 </a>
+              </li>
+              <li>
+                {onOpenLinktree ? (
+                  <button
+                    onClick={onOpenLinktree}
+                    className="hover:text-white transition-colors flex items-center gap-1.5 font-mono cursor-pointer text-slate-400"
+                  >
+                    <span className="text-orange-400 font-bold">⚡</span>
+                    <span>Linktree iAtomica (/linktree)</span>
+                  </button>
+                ) : (
+                  <a href="/linktree" className="hover:text-white transition-colors flex items-center gap-1.5 font-mono">
+                    <span className="text-orange-400 font-bold">⚡</span>
+                    <span>Linktree iAtomica</span>
+                  </a>
+                )}
               </li>
             </ul>
           </div>

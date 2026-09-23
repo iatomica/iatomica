@@ -11,12 +11,16 @@ import { BookingContact } from './components/BookingContact';
 import { Footer } from './components/Footer';
 import { AdminPortalPage } from './components/admin/AdminPortalPage';
 import { PruebaPage } from './components/experimental/PruebaPage';
+import { LinktreePage } from './components/LinktreePage';
 import { getCurrentUser } from './services/authService';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'site' | 'admin' | 'prueba'>(() => {
-    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/prueba')) {
-      return 'prueba';
+  const [currentView, setCurrentView] = useState<'site' | 'admin' | 'prueba' | 'linktree'>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.startsWith('/prueba')) return 'prueba';
+      if (path.startsWith('/linktree') || hash === '#linktree' || hash === '#/linktree') return 'linktree';
     }
     return 'site';
   });
@@ -46,8 +50,12 @@ export function App() {
   // Handle browser back/forward buttons
   useEffect(() => {
     const handlePopState = () => {
-      if (window.location.pathname.startsWith('/prueba')) {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.startsWith('/prueba')) {
         setCurrentView('prueba');
+      } else if (path.startsWith('/linktree') || hash === '#linktree' || hash === '#/linktree') {
+        setCurrentView('linktree');
       } else {
         setCurrentView('site');
       }
@@ -60,10 +68,12 @@ export function App() {
     setCurrentUser(getCurrentUser());
   };
 
-  const navigateTo = (view: 'site' | 'admin' | 'prueba') => {
+  const navigateTo = (view: 'site' | 'admin' | 'prueba' | 'linktree') => {
     setCurrentView(view);
     if (view === 'prueba') {
       window.history.pushState({}, '', '/prueba');
+    } else if (view === 'linktree') {
+      window.history.pushState({}, '', '/linktree');
     } else if (view === 'site') {
       window.history.pushState({}, '', '/');
     }
@@ -96,6 +106,16 @@ export function App() {
         onOpenAdmin={() => setCurrentView('admin')}
         onReturnToSite={() => navigateTo('site')}
         isLoggedIn={!!currentUser}
+        darkMode={darkMode}
+        onToggleDarkMode={() => setDarkMode(!darkMode)}
+      />
+    );
+  }
+
+  if (currentView === 'linktree') {
+    return (
+      <LinktreePage
+        onReturnToSite={() => navigateTo('site')}
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
       />
@@ -166,6 +186,7 @@ export function App() {
       {/* Footer */}
       <Footer
         onOpenAdmin={() => setCurrentView('admin')}
+        onOpenLinktree={() => navigateTo('linktree')}
         isLoggedIn={!!currentUser}
         darkMode={darkMode}
       />
