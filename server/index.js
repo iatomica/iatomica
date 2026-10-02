@@ -174,6 +174,7 @@ db.serialize(async () => {
 
     if (!err) {
       await seedInitialDataIfEmpty();
+      await applyCrmV2Migration();
     }
   });
 });
@@ -241,6 +242,195 @@ async function seedInitialDataIfEmpty() {
   }
 }
 
+// Migration & Normalization for CRM v2
+async function applyCrmV2Migration() {
+  try {
+    const addCompanyCol = (colDef) => new Promise((resolve) => db.run(`ALTER TABLE crm_companies ADD COLUMN ${colDef}`, () => resolve()));
+    const addActCol = (colDef) => new Promise((resolve) => db.run(`ALTER TABLE crm_activities ADD COLUMN ${colDef}`, () => resolve()));
+
+    await addCompanyCol("city TEXT DEFAULT 'Valencia'");
+    await addCompanyCol("address TEXT");
+    await addCompanyCol("whatsapp TEXT");
+    await addCompanyCol("instagram TEXT");
+    await addCompanyCol("googleRating REAL DEFAULT 0");
+    await addCompanyCol("googleReviewsCount INTEGER DEFAULT 0");
+    await addCompanyCol("potentialService TEXT DEFAULT 'Página web'");
+    await addCompanyCol("lastContactAt TEXT");
+    await addCompanyCol("nextAction TEXT");
+    await addCompanyCol("nextFollowupAt TEXT");
+    await addCompanyCol("legacyData TEXT");
+    await addCompanyCol("isDuplicatePossible INTEGER DEFAULT 0");
+
+    await addActCol("channel TEXT DEFAULT 'WhatsApp'");
+    await addActCol("result TEXT");
+
+    await runQuery(`
+      CREATE TABLE IF NOT EXISTS crm_comments (
+        id TEXT PRIMARY KEY,
+        companyId TEXT NOT NULL,
+        authorId TEXT,
+        authorName TEXT NOT NULL,
+        comment TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
+        FOREIGN KEY (companyId) REFERENCES crm_companies(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Normalization of legacy pipe-separated notes and standard statuses
+    const companies = await allQuery('SELECT * FROM crm_companies');
+    for (const comp of companies) {
+      let needsUpdate = false;
+      let newAddress = comp.address;
+      let newCity = comp.city || 'Valencia';
+      let newWhatsapp = comp.whatsapp;
+      let newInstagram = comp.instagram;
+      let newWebsite = comp.website;
+      let newStatus = comp.status;
+      let newPotentialService = comp.potentialService || 'Página web';
+      let newLegacyData = comp.legacyData || comp.notes || '';
+
+      const statusMap = {
+        'lead': 'A contactar',
+        'nuevo': 'Nuevo',
+        'a_contactar': 'A contactar',
+        'contactado': 'Contactado',
+        'respondió': 'Respondió',
+        'respondio': 'Respondió',
+        'reunión': 'Reunión',
+        'reunion': 'Reunión',
+        'propuesta': 'Propuesta',
+        'negociación': 'Negociación',
+        'negociacion': 'Negociación',
+        'ganado': 'Ganado',
+        'active_client': 'Ganado',
+        'vip': 'Ganado',
+        'perdido': 'Perdido',
+        'descartado': 'Descartado',
+        'churn': 'Perdido'
+      };
+      if (statusMap[comp.status?.toLowerCase()]) {
+        newStatus = statusMap[comp.status.toLowerCase()];
+        needsUpdate = true;
+      }
+
+      if (comp.notes && comp.notes.includes('|')) {
+        const parts = comp.notes.split('|').map(p => p.trim());
+        for (const part of parts) {
+          if (!newAddress && part.startsWith('Dirección:')) {
+            newAddress = part.replace('Dirección:', '').trim();
+            needsUpdate = true;
+          }
+          if (!newWhatsapp && (part.includes('WhatsApp disponible:') || part.includes('WhatsApp:'))) {
+            const match = part.match(/\+?[0-9\s]{8,25}/);
+            if (match) {
+              newWhatsapp = match[0].trim();
+              needsUpdate = true;
+            }
+          }
+          if (!newInstagram && part.startsWith('Instagram:')) {
+            newInstagram = part.replace('Instagram:', '').trim();
+            needsUpdate = true;
+          }
+          if (!newWebsite && part.startsWith('Sitio web existente:')) {
+            newWebsite = part.replace('Sitio web existente:', '').trim();
+            needsUpdate = true;
+          }
+        }
+      }
+
+      if (!comp.potentialService || comp.potentialService === 'Página web') {
+        const combined = ((comp.techRequirements || '') + ' ' + (comp.notes || '')).toLowerCase();
+        if (combined.includes('bot') || combined.includes('whatsapp')) newPotentialService = 'Bot WhatsApp';
+        else if (combined.includes('automatiz')) newPotentialService = 'Automatización';
+        else if (combined.includes('gestión') || combined.includes('erp') || combined.includes('sistema')) newPotentialService = 'Sistema de gestión';
+        else if (combined.includes('diseño') || combined.includes('identidad') || combined.includes('branding')) newPotentialService = 'Diseño gráfico';
+        else if (combined.includes('redes') || combined.includes('contenido')) newPotentialService = 'Redes / contenido';
+        else if (combined.includes('consultoría') || combined.includes('asesoramiento') || combined.includes('estrategia')) newPotentialService = 'Consultoría';
+        else newPotentialService = 'Página web';
+        needsUpdate = true;
+      }
+
+      if (newAddress && (newAddress.includes('València') || newAddress.includes('Valencia'))) {
+        newCity = 'Valencia';
+      }
+
+      if (needsUpdate || !comp.legacyData) {
+        await runQuery(`
+          UPDATE crm_companies SET
+            address = COALESCE(?, address),
+            city = COALESCE(?, city),
+            whatsapp = COALESCE(?, whatsapp),
+            instagram = COALESCE(?, instagram),
+            website = COALESCE(?, website),
+            status = COALESCE(?, status),
+            potentialService = COALESCE(?, potentialService),
+            legacyData = COALESCE(?, legacyData)
+          WHERE id = ?
+        `, [newAddress, newCity, newWhatsapp, newInstagram, newWebsite, newStatus, newPotentialService, newLegacyData, comp.id]);
+      }
+    }
+
+    // Sync lastContactAt from activities
+    await runQuery(`
+      UPDATE crm_companies 
+      SET lastContactAt = (
+        SELECT MAX(createdAt) FROM crm_activities WHERE crm_activities.companyId = crm_companies.id
+      )
+      WHERE lastContactAt IS NULL AND id IN (SELECT DISTINCT companyId FROM crm_activities)
+    `);
+
+    // Detect duplicates
+    const allComps = await allQuery('SELECT id, name, phone, whatsapp, instagram FROM crm_companies');
+    const seenPhone = new Map();
+    const seenInsta = new Map();
+    const seenName = new Map();
+    const duplicateIds = new Set();
+
+    for (const c of allComps) {
+      const cleanPhone = (c.whatsapp || c.phone || '').replace(/[^0-9]/g, '');
+      const cleanInsta = (c.instagram || '').toLowerCase().replace(/[@\s]/g, '');
+      const cleanName = (c.name || '').toLowerCase().trim();
+
+      if (cleanPhone && cleanPhone.length > 7) {
+        if (seenPhone.has(cleanPhone)) {
+          duplicateIds.add(c.id);
+          duplicateIds.add(seenPhone.get(cleanPhone));
+        } else {
+          seenPhone.set(cleanPhone, c.id);
+        }
+      }
+
+      if (cleanInsta && cleanInsta.length > 3) {
+        if (seenInsta.has(cleanInsta)) {
+          duplicateIds.add(c.id);
+          duplicateIds.add(seenInsta.get(cleanInsta));
+        } else {
+          seenInsta.set(cleanInsta, c.id);
+        }
+      }
+
+      if (cleanName && cleanName.length > 4) {
+        if (seenName.has(cleanName)) {
+          duplicateIds.add(c.id);
+          duplicateIds.add(seenName.get(cleanName));
+        } else {
+          seenName.set(cleanName, c.id);
+        }
+      }
+    }
+
+    await runQuery('UPDATE crm_companies SET isDuplicatePossible = 0');
+    for (const dupId of duplicateIds) {
+      await runQuery('UPDATE crm_companies SET isDuplicatePossible = 1 WHERE id = ?', [dupId]);
+    }
+
+    console.log('✅ CRM v2 Schema & Data Normalization applied successfully!');
+  } catch (err) {
+    console.error('Error in applyCrmV2Migration:', err);
+  }
+}
+
 // ----------------------------------------------------
 // REST API Endpoints
 // ----------------------------------------------------
@@ -254,17 +444,19 @@ app.get('/api/health', (req, res) => {
 // 1. CRM DIRECTORY ENDPOINTS (/api/crm/companies)
 // ====================================================
 
-// GET all companies with activity count & active issues count
+// GET all companies with activity count, active issues count & comments count
 app.get('/api/crm/companies', async (req, res) => {
   try {
     const query = `
       SELECT 
         c.*,
         COUNT(DISTINCT a.id) as activitiesCount,
-        COUNT(DISTINCT j.id) as issuesCount
+        COUNT(DISTINCT j.id) as issuesCount,
+        COUNT(DISTINCT cm.id) as commentsCount
       FROM crm_companies c
       LEFT JOIN crm_activities a ON c.id = a.companyId
       LEFT JOIN jira_issues j ON c.id = j.companyId
+      LEFT JOIN crm_comments cm ON c.id = cm.companyId
       GROUP BY c.id
       ORDER BY c.updatedAt DESC
     `;
@@ -275,7 +467,7 @@ app.get('/api/crm/companies', async (req, res) => {
   }
 });
 
-// GET single company with its activities & linked Jira issues
+// GET single company with its activities, comments & linked Jira issues
 app.get('/api/crm/companies/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -285,11 +477,13 @@ app.get('/api/crm/companies/:id', async (req, res) => {
     }
 
     const activities = await allQuery('SELECT * FROM crm_activities WHERE companyId = ? ORDER BY createdAt DESC', [id]);
+    const comments = await allQuery('SELECT * FROM crm_comments WHERE companyId = ? ORDER BY createdAt DESC', [id]);
     const issues = await allQuery('SELECT * FROM jira_issues WHERE companyId = ? ORDER BY createdAt DESC', [id]);
 
     res.json({
       ...company,
       activities,
+      comments,
       issues: issues.map(iss => ({ ...iss, tags: iss.tags ? JSON.parse(iss.tags) : [] }))
     });
   } catch (err) {
@@ -304,43 +498,66 @@ app.post('/api/crm/companies', async (req, res) => {
       name,
       legalName,
       industry,
+      city,
+      address,
       contactName,
       contactRole,
       email,
       phone,
+      whatsapp,
+      instagram,
       website,
+      googleRating,
+      googleReviewsCount,
+      potentialService,
       status,
       estimatedValue,
       assignedTo,
+      nextAction,
+      nextFollowupAt,
       techRequirements,
       notes
     } = req.body;
 
-    if (!name || !email) {
-      return res.status(400).json({ error: 'Nombre de empresa y correo son obligatorios' });
+    if (!name || (!phone && !whatsapp && !email)) {
+      return res.status(400).json({ error: 'El nombre del negocio y al menos una vía de contacto (teléfono/WhatsApp/email) son obligatorios' });
     }
 
     const id = 'comp-' + Date.now();
     const now = new Date().toISOString();
 
     await runQuery(`
-      INSERT INTO crm_companies (id, name, legalName, industry, contactName, contactRole, email, phone, website, status, estimatedValue, assignedTo, techRequirements, notes, createdAt, updatedAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO crm_companies (
+        id, name, legalName, industry, city, address, contactName, contactRole, email, phone, whatsapp, instagram, website,
+        googleRating, googleReviewsCount, potentialService, status, estimatedValue, assignedTo, nextAction, nextFollowupAt,
+        techRequirements, notes, legacyData, createdAt, updatedAt
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       id,
-      name,
-      legalName || '',
+      name.trim(),
+      legalName ? legalName.trim() : '',
       industry || 'Tecnología & Servicios',
-      contactName || name,
-      contactRole || 'Contacto Comercial',
-      email,
-      phone || '',
-      website || '',
-      status || 'lead',
+      city ? city.trim() : 'Valencia',
+      address ? address.trim() : '',
+      contactName ? contactName.trim() : name.trim(),
+      contactRole ? contactRole.trim() : 'Decisor Principal',
+      email ? email.trim() : '',
+      phone ? phone.trim() : '',
+      whatsapp ? whatsapp.trim() : (phone ? phone.trim() : ''),
+      instagram ? instagram.trim() : '',
+      website ? website.trim() : '',
+      Number(googleRating) || 0,
+      Number(googleReviewsCount) || 0,
+      potentialService || 'Página web',
+      status || 'Nuevo',
       Number(estimatedValue) || 0,
-      assignedTo || 'Atención Público',
+      assignedTo || 'Lic. Mateo Rossi',
+      nextAction ? nextAction.trim() : '',
+      nextFollowupAt || null,
       techRequirements || '',
       notes || '',
+      '',
       now,
       now
     ]);
@@ -360,16 +577,28 @@ app.put('/api/crm/companies/:id', async (req, res) => {
       name,
       legalName,
       industry,
+      city,
+      address,
       contactName,
       contactRole,
       email,
       phone,
+      whatsapp,
+      instagram,
       website,
+      googleRating,
+      googleReviewsCount,
+      potentialService,
       status,
       estimatedValue,
       assignedTo,
+      lastContactAt,
+      nextAction,
+      nextFollowupAt,
       techRequirements,
-      notes
+      notes,
+      legacyData,
+      isDuplicatePossible
     } = req.body;
 
     const now = new Date().toISOString();
@@ -379,22 +608,58 @@ app.put('/api/crm/companies/:id', async (req, res) => {
         name = COALESCE(?, name),
         legalName = COALESCE(?, legalName),
         industry = COALESCE(?, industry),
+        city = COALESCE(?, city),
+        address = COALESCE(?, address),
         contactName = COALESCE(?, contactName),
         contactRole = COALESCE(?, contactRole),
         email = COALESCE(?, email),
         phone = COALESCE(?, phone),
+        whatsapp = COALESCE(?, whatsapp),
+        instagram = COALESCE(?, instagram),
         website = COALESCE(?, website),
+        googleRating = COALESCE(?, googleRating),
+        googleReviewsCount = COALESCE(?, googleReviewsCount),
+        potentialService = COALESCE(?, potentialService),
         status = COALESCE(?, status),
         estimatedValue = COALESCE(?, estimatedValue),
         assignedTo = COALESCE(?, assignedTo),
+        lastContactAt = COALESCE(?, lastContactAt),
+        nextAction = COALESCE(?, nextAction),
+        nextFollowupAt = COALESCE(?, nextFollowupAt),
         techRequirements = COALESCE(?, techRequirements),
         notes = COALESCE(?, notes),
+        legacyData = COALESCE(?, legacyData),
+        isDuplicatePossible = COALESCE(?, isDuplicatePossible),
         updatedAt = ?
       WHERE id = ?
     `, [
-      name, legalName, industry, contactName, contactRole, email, phone, website,
-      status, estimatedValue !== undefined ? Number(estimatedValue) : null, assignedTo, techRequirements, notes,
-      now, id
+      name,
+      legalName,
+      industry,
+      city,
+      address,
+      contactName,
+      contactRole,
+      email,
+      phone,
+      whatsapp,
+      instagram,
+      website,
+      googleRating !== undefined ? Number(googleRating) : null,
+      googleReviewsCount !== undefined ? Number(googleReviewsCount) : null,
+      potentialService,
+      status,
+      estimatedValue !== undefined ? Number(estimatedValue) : null,
+      assignedTo,
+      lastContactAt,
+      nextAction,
+      nextFollowupAt,
+      techRequirements,
+      notes,
+      legacyData,
+      isDuplicatePossible !== undefined ? Number(isDuplicatePossible) : null,
+      now,
+      id
     ]);
 
     const updated = await getQuery('SELECT * FROM crm_companies WHERE id = ?', [id]);
@@ -429,7 +694,7 @@ app.get('/api/crm/companies/:id/activities', async (req, res) => {
 app.post('/api/crm/companies/:id/activities', async (req, res) => {
   try {
     const { id: companyId } = req.params;
-    const { type, summary, details, author, nextAction, nextActionDate } = req.body;
+    const { type, channel, result, summary, details, author, nextAction, nextActionDate } = req.body;
 
     if (!summary || !author) {
       return res.status(400).json({ error: 'Resumen y autor son obligatorios' });
@@ -439,15 +704,114 @@ app.post('/api/crm/companies/:id/activities', async (req, res) => {
     const now = new Date().toISOString();
 
     await runQuery(`
-      INSERT INTO crm_activities (id, companyId, type, summary, details, author, nextAction, nextActionDate, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [id, companyId, type || 'note', summary, details || '', author, nextAction || '', nextActionDate || null, now]);
+      INSERT INTO crm_activities (id, companyId, type, channel, result, summary, details, author, nextAction, nextActionDate, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      id,
+      companyId,
+      type || 'WhatsApp',
+      channel || 'WhatsApp',
+      result || '',
+      summary.trim(),
+      details ? details.trim() : '',
+      author.trim(),
+      nextAction ? nextAction.trim() : '',
+      nextActionDate || null,
+      now
+    ]);
+
+    // Touch company: update updatedAt, lastContactAt, and if provided, nextAction & nextFollowupAt
+    await runQuery(`
+      UPDATE crm_companies SET
+        lastContactAt = ?,
+        nextAction = CASE WHEN ? != '' THEN ? ELSE nextAction END,
+        nextFollowupAt = CASE WHEN ? IS NOT NULL THEN ? ELSE nextFollowupAt END,
+        updatedAt = ?
+      WHERE id = ?
+    `, [
+      now,
+      nextAction ? nextAction.trim() : '',
+      nextAction ? nextAction.trim() : '',
+      nextActionDate || null,
+      nextActionDate || null,
+      now,
+      companyId
+    ]);
+
+    const created = await getQuery('SELECT * FROM crm_activities WHERE id = ?', [id]);
+    res.status(201).json(created);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Comments & Internal Notes for a Company
+app.get('/api/crm/companies/:id/comments', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const comments = await allQuery('SELECT * FROM crm_comments WHERE companyId = ? ORDER BY createdAt DESC', [id]);
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/crm/companies/:id/comments', async (req, res) => {
+  try {
+    const { id: companyId } = req.params;
+    const { comment, authorName, authorId } = req.body;
+
+    if (!comment || !comment.trim() || !authorName) {
+      return res.status(400).json({ error: 'Comentario y autor son obligatorios' });
+    }
+
+    const id = 'cmt-' + Date.now();
+    const now = new Date().toISOString();
+
+    await runQuery(`
+      INSERT INTO crm_comments (id, companyId, authorId, authorName, comment, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [
+      id,
+      companyId,
+      authorId || 'admin',
+      authorName.trim(),
+      comment.trim(),
+      now,
+      now
+    ]);
 
     // Touch company updatedAt
     await runQuery('UPDATE crm_companies SET updatedAt = ? WHERE id = ?', [now, companyId]);
 
-    const created = await getQuery('SELECT * FROM crm_activities WHERE id = ?', [id]);
+    const created = await getQuery('SELECT * FROM crm_comments WHERE id = ?', [id]);
     res.status(201).json(created);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/crm/comments/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { comment } = req.body;
+    if (!comment || !comment.trim()) {
+      return res.status(400).json({ error: 'El contenido del comentario es obligatorio' });
+    }
+    const now = new Date().toISOString();
+    await runQuery('UPDATE crm_comments SET comment = ?, updatedAt = ? WHERE id = ?', [comment.trim(), now, id]);
+    const updated = await getQuery('SELECT * FROM crm_comments WHERE id = ?', [id]);
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/crm/comments/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await runQuery('DELETE FROM crm_comments WHERE id = ?', [id]);
+    res.json({ success: true, id });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -796,24 +1160,28 @@ app.post('/api/leads', async (req, res) => {
     if (!companyId) {
       companyId = 'comp-' + Date.now();
       await runQuery(`
-        INSERT INTO crm_companies (id, name, legalName, industry, contactName, contactRole, email, phone, website, status, estimatedValue, territory, assignedTo, techRequirements, notes, createdAt, updatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO crm_companies (id, name, legalName, industry, city, contactName, contactRole, email, phone, whatsapp, website, status, potentialService, estimatedValue, territory, assignedTo, techRequirements, notes, legacyData, createdAt, updatedAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
         companyId,
         companyName,
         companyName,
         'Tecnología & Servicios',
+        'Buenos Aires',
         name,
         'Interesado Web',
         email,
         phone || '',
+        phone || '',
         '',
-        'lead',
+        'Nuevo',
+        service || 'Página web',
         0,
         'general',
         assignedTo,
         `Servicio solicitado: ${service}`,
         `Mensaje inicial: "${message || 'Sin mensaje'}"`,
+        '',
         createdAt,
         createdAt
       ]);

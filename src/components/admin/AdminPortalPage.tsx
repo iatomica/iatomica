@@ -17,6 +17,8 @@ import {
   updateCompany, 
   deleteCompany, 
   addCompanyActivity, 
+  addCompanyComment,
+  deleteCompanyComment,
   subscribeToCrmChanges 
 } from '../../services/crmService';
 import type { CrmCompany, CrmActivity } from '../../services/crmService';
@@ -205,6 +207,29 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
 
   const handleAddActivity = async (companyId: string, activityData: Omit<CrmActivity, 'id' | 'companyId' | 'createdAt'>) => {
     await addCompanyActivity(companyId, activityData);
+    const updatedDetail = await fetchCompanyDetail(companyId);
+    if (updatedDetail) {
+      setSelectedCompany(updatedDetail);
+    }
+    await refreshAllData();
+  };
+
+  const handleAddComment = async (companyId: string, commentText: string) => {
+    if (!currentUser) return;
+    await addCompanyComment(companyId, {
+      comment: commentText,
+      authorName: currentUser.name,
+      authorId: currentUser.id
+    });
+    const updatedDetail = await fetchCompanyDetail(companyId);
+    if (updatedDetail) {
+      setSelectedCompany(updatedDetail);
+    }
+    await refreshAllData();
+  };
+
+  const handleDeleteComment = async (commentId: string, companyId: string) => {
+    await deleteCompanyComment(commentId);
     const updatedDetail = await fetchCompanyDetail(companyId);
     if (updatedDetail) {
       setSelectedCompany(updatedDetail);
@@ -509,6 +534,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             companies={scopedCompanies}
             onSelectCompany={(company) => handleOpenCompanyDrawer(company.id)}
             onCreateCompany={handleCreateCompany}
+            onUpdateCompany={handleUpdateCompany}
             onDeleteCompany={handleDeleteCompany}
             darkMode={darkMode}
             issues={scopedIssues}
@@ -542,6 +568,8 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
         onClose={() => setSelectedCompany(null)}
         onUpdateCompany={handleUpdateCompany}
         onAddActivity={handleAddActivity}
+        onAddComment={handleAddComment}
+        onDeleteComment={handleDeleteComment}
         onCreateIssueForCompany={handleCreateIssueForCompany}
         onOpenIssue={(issue) => {
           setEditingIssue(issue);
