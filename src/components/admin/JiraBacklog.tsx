@@ -75,22 +75,22 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
     setIsCreating(false);
   };
 
-  const getTypeIcon = (type: JiraIssueType) => {
+  const getTypeBadge = (type: JiraIssueType) => {
     switch (type) {
-      case 'lead': return '🟢';
-      case 'task': return '🔵';
-      case 'consulting': return '🟣';
-      case 'automation': return '🟠';
-      case 'bug': return '🔴';
+      case 'lead': return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">Lead</span>;
+      case 'task': return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20">Tarea</span>;
+      case 'consulting': return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-600 border border-purple-500/20">Consultoría</span>;
+      case 'automation': return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20">Bot/IA</span>;
+      case 'bug': return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 border border-rose-500/20">Bug</span>;
     }
   };
 
-  const getPriorityIcon = (priority: JiraPriority) => {
+  const getPriorityLabel = (priority: JiraPriority) => {
     switch (priority) {
-      case 'highest': return '⏫';
-      case 'high': return '🔼';
-      case 'medium': return '🟰';
-      case 'low': return '🔽';
+      case 'highest': return <span className="text-[10px] font-extrabold text-rose-600 uppercase">Muy Alta</span>;
+      case 'high': return <span className="text-[10px] font-bold text-orange-500 uppercase">Alta</span>;
+      case 'medium': return <span className="text-[10px] font-bold text-blue-500 uppercase">Media</span>;
+      case 'low': return <span className="text-[10px] font-bold text-slate-400 uppercase">Baja</span>;
     }
   };
 
@@ -180,8 +180,8 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
                 >
                   {/* Left: Type, Key, Title, Company */}
                   <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <span title={issue.type} className="text-sm shrink-0">
-                      {getTypeIcon(issue.type)}
+                    <span title={issue.type} className="shrink-0">
+                      {getTypeBadge(issue.type)}
                     </span>
                     <span className="font-mono text-xs font-bold text-slate-400 shrink-0">
                       {issue.issueKey}
@@ -211,8 +211,8 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
                       {issue.status}
                     </span>
 
-                    <span title={`Prioridad: ${issue.priority}`} className="text-xs font-bold">
-                      {getPriorityIcon(issue.priority)}
+                    <span title={`Prioridad: ${issue.priority}`}>
+                      {getPriorityLabel(issue.priority)}
                     </span>
 
                     <span className="text-[11px] text-slate-500 font-medium hidden lg:inline max-w-[100px] truncate">
@@ -293,8 +293,8 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
                       <span>Activar</span>
                     </button>
 
-                    <span title={issue.type} className="text-sm shrink-0">
-                      {getTypeIcon(issue.type)}
+                    <span title={issue.type} className="shrink-0">
+                      {getTypeBadge(issue.type)}
                     </span>
 
                     <span className="font-mono text-xs font-bold text-slate-400 shrink-0">
@@ -322,8 +322,8 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
 
                   {/* Right: Priority, Story Points, Value, Assignee, Actions */}
                   <div className="flex items-center space-x-2.5 self-end sm:self-center shrink-0">
-                    <span title={`Prioridad: ${issue.priority}`} className="text-xs font-bold">
-                      {getPriorityIcon(issue.priority)}
+                    <span title={`Prioridad: ${issue.priority}`}>
+                      {getPriorityLabel(issue.priority)}
                     </span>
 
                     <span className="text-[11px] text-slate-500 font-medium hidden lg:inline max-w-[100px] truncate">
@@ -364,11 +364,11 @@ export const JiraBacklog: React.FC<JiraBacklogProps> = ({
                   darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-800'
                 }`}
               >
-                <option value="task">🔵 Tarea</option>
-                <option value="lead">🟢 Lead</option>
-                <option value="consulting">🟣 Consultoría</option>
-                <option value="automation">🟠 Bot/IA</option>
-                <option value="bug">🔴 Bug</option>
+                <option value="task">Tarea</option>
+                <option value="lead">Lead</option>
+                <option value="consulting">Consultoría</option>
+                <option value="automation">Bot/IA</option>
+                <option value="bug">Bug</option>
               </select>
 
               <input

@@ -566,12 +566,12 @@ export const WebInquiriesView: React.FC<WebInquiriesViewProps> = ({
                               : 'bg-white border-slate-200 text-slate-800'
                           }`}
                         >
-                          <option value="nuevo">🔴 Nueva Consulta</option>
-                          <option value="en_contacto">🔵 En Contacto</option>
-                          <option value="cita_agendada">🟣 Cita Agendada</option>
-                          <option value="propuesta">🟡 Propuesta Enviada</option>
-                          <option value="cliente">🟢 Cliente Concretado</option>
-                          <option value="descartado">⚪ Descartado</option>
+                          <option value="nuevo">Nueva Consulta</option>
+                          <option value="en_contacto">En Contacto</option>
+                          <option value="cita_agendada">Cita Agendada</option>
+                          <option value="propuesta">Propuesta Enviada</option>
+                          <option value="cliente">Cliente Concretado</option>
+                          <option value="descartado">Descartado</option>
                         </select>
                       </div>
 

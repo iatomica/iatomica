@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { ExternalLink } from 'lucide-react';
 import type { PortfolioProject } from '../data/portfolioData';
 
 interface PortfolioModalProps {
@@ -399,7 +400,7 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({ project, onClose
                 gap: '6px'
               }}
             >
-              <span>🌐</span>
+              <ExternalLink size={13} />
               <span>{project.url.replace(/^https?:\/\//, '')}</span>
             </div>
 

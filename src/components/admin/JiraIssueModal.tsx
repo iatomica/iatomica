@@ -224,7 +224,7 @@ export const JiraIssueModal: React.FC<JiraIssueModalProps> = ({
                 <option value="">-- Sin Vincular a Empresa --</option>
                 {companies.map(c => (
                   <option key={c.id} value={c.id}>
-                    🏢 {c.name} ({c.contactName})
+                    {c.name} ({c.contactName})
                   </option>
                 ))}
               </select>
@@ -275,12 +275,12 @@ export const JiraIssueModal: React.FC<JiraIssueModalProps> = ({
                     darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
                   }`}
                 >
-                  <option value="backlog">📋 Backlog (Triaje)</option>
-                  <option value="todo">⏳ Por Contactar (To Do)</option>
-                  <option value="in_progress">⚙️ Contactado / En Conversación</option>
-                  <option value="review">🔍 Reunión / Propuesta</option>
-                  <option value="negotiation">🤝 En Negociación</option>
-                  <option value="done">✅ Ganado / Cliente Activo</option>
+                  <option value="backlog">Backlog (Triaje)</option>
+                  <option value="todo">Por Contactar (To Do)</option>
+                  <option value="in_progress">Contactado / En Conversación</option>
+                  <option value="review">Reunión / Propuesta</option>
+                  <option value="negotiation">En Negociación</option>
+                  <option value="done">Ganado / Cliente Activo</option>
                 </select>
               </div>
 
@@ -295,10 +295,10 @@ export const JiraIssueModal: React.FC<JiraIssueModalProps> = ({
                     darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
                   }`}
                 >
-                  <option value="highest">⏫ Muy Alta (Urgente)</option>
-                  <option value="high">🔼 Alta</option>
-                  <option value="medium">➡️ Media (Normal)</option>
-                  <option value="low">🔽 Baja</option>
+                  <option value="highest">Muy Alta (Urgente)</option>
+                  <option value="high">Alta</option>
+                  <option value="medium">Media (Normal)</option>
+                  <option value="low">Baja</option>
                 </select>
               </div>
             </div>
@@ -320,7 +320,7 @@ export const JiraIssueModal: React.FC<JiraIssueModalProps> = ({
                   <option value="Sin Asignar">-- Sin Asignar --</option>
                   {TEAM_MEMBERS.map(member => (
                     <option key={member} value={member}>
-                      👤 {member}
+                      {member}
                     </option>
                   ))}
                 </select>

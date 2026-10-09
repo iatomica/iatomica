@@ -178,7 +178,7 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
                 className="btn-admin-nav"
                 title="Acceso al Panel de Control y CRM"
               >
-                <span>🔒</span> Panel
+                Panel CRM
               </button>
             )}
             <a href="#contacto" className="btn yellow">
@@ -217,7 +217,6 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
               background: '#ffe526',
               color: '#171715',
               border: '2px solid #171715',
@@ -230,7 +229,7 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
               letterSpacing: '0.5px'
             }}
           >
-            <span>🔒</span> Acceso Panel CRM
+            Acceso Panel CRM
           </button>
         )}
         <a href="#contacto" className="btn yellow" onClick={closeMenu}>
@@ -791,7 +790,6 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '6px',
                     background: '#ffe526',
                     color: '#171715',
                     border: '1.5px solid #171715',
@@ -805,7 +803,7 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
                   }}
                   title="Acceso al Panel de Control y CRM"
                 >
-                  <span>🔒</span> Portal Admin
+                  Portal Admin
                 </button>
               )}
             </div>

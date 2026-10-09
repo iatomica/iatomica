@@ -97,28 +97,28 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
   const getTypeBadge = (type: JiraIssueType) => {
     switch (type) {
       case 'lead':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">🟢 Lead</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">Lead</span>;
       case 'task':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">🔵 Tarea</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">Tarea</span>;
       case 'consulting':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-600 border border-purple-500/20">🟣 Consultoría</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-600 border border-purple-500/20">Consultoría</span>;
       case 'automation':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/10 text-orange-600 border border-orange-500/20">🟠 Automatización</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/10 text-orange-600 border border-orange-500/20">Automatización</span>;
       case 'bug':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20">🔴 Incidente</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20">Incidente</span>;
     }
   };
 
   const getPriorityIcon = (priority: JiraPriority) => {
     switch (priority) {
       case 'highest':
-        return <span title="Prioridad Muy Alta" className="text-rose-600 font-bold text-xs">⏫</span>;
+        return <span title="Prioridad Muy Alta" className="text-rose-600 font-extrabold text-[10px] tracking-wider uppercase">Muy Alta</span>;
       case 'high':
-        return <span title="Prioridad Alta" className="text-orange-500 font-bold text-xs">🔼</span>;
+        return <span title="Prioridad Alta" className="text-orange-500 font-bold text-[10px] uppercase">Alta</span>;
       case 'medium':
-        return <span title="Prioridad Media" className="text-blue-500 font-bold text-xs">🟰</span>;
+        return <span title="Prioridad Media" className="text-blue-500 font-bold text-[10px] uppercase">Media</span>;
       case 'low':
-        return <span title="Prioridad Baja" className="text-slate-400 font-bold text-xs">🔽</span>;
+        return <span title="Prioridad Baja" className="text-slate-400 font-bold text-[10px] uppercase">Baja</span>;
     }
   };
 
@@ -194,7 +194,7 @@ export const JiraBoard: React.FC<JiraBoardProps> = ({
           >
             <option value="all">Cualquier Responsable</option>
             {TEAM_MEMBERS.map(member => (
-              <option key={member} value={member}>👤 {member}</option>
+              <option key={member} value={member}>{member}</option>
             ))}
             <option value="Sin Asignar">Sin Asignar</option>
           </select>

@@ -64,12 +64,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
   const [companies, setCompanies] = useState<CrmCompany[]>([]);
   const [inquiries, setInquiries] = useState<Lead[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<CrmCompany | null>(null);
-  const [territoryFilter, setTerritoryFilter] = useState<'all' | 'espana' | 'bariloche'>(() => {
-    const user = getCurrentUser();
-    if (user?.projectId === 'espana') return 'espana';
-    if (user?.projectId === 'bariloche') return 'bariloche';
-    return 'all';
-  });
+  const territoryFilter = 'all';
 
   // Modal States
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
@@ -350,7 +345,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
                 </span>
               </div>
               <span className="text-[10px] text-neutral-400 font-mono block">
-                SQLite Live Sync · Multi-territorio
+                Sistema Operativo · CRM &amp; Proyectos
               </span>
             </div>
           </div>
@@ -461,68 +456,8 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
 
         </div>
 
-        {/* Right: Territory Filter & User Profile */}
+        {/* Right: User Profile & Actions */}
         <div className="flex items-center space-x-2.5 w-full lg:w-auto justify-end">
-          {isAdmin ? (
-            <div className="flex items-center p-0.5 rounded-sm bg-neutral-900 border border-neutral-700 text-xs font-bold">
-              <button
-                onClick={() => setTerritoryFilter('all')}
-                style={{
-                  padding: '4px 8px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  backgroundColor: territoryFilter === 'all' ? '#ffe526' : 'transparent',
-                  color: territoryFilter === 'all' ? '#171715' : '#aaa',
-                  borderRadius: '2px'
-                }}
-                title="Ver todos los territorios"
-              >
-                🌐 Global
-              </button>
-              <button
-                onClick={() => setTerritoryFilter('espana')}
-                style={{
-                  padding: '4px 8px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  backgroundColor: territoryFilter === 'espana' ? '#ffe526' : 'transparent',
-                  color: territoryFilter === 'espana' ? '#171715' : '#aaa',
-                  borderRadius: '2px'
-                }}
-                title="Filtrar por Valencia / España"
-              >
-                🇪🇸 Valencia
-              </button>
-              <button
-                onClick={() => setTerritoryFilter('bariloche')}
-                style={{
-                  padding: '4px 8px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  backgroundColor: territoryFilter === 'bariloche' ? '#ffe526' : 'transparent',
-                  color: territoryFilter === 'bariloche' ? '#171715' : '#aaa',
-                  borderRadius: '2px'
-                }}
-                title="Filtrar por Bariloche"
-              >
-                🇦🇷 Bariloche
-              </button>
-            </div>
-          ) : (
-            <div
-              style={{
-                backgroundColor: '#ffe526',
-                color: '#171715',
-                padding: '4px 9px',
-                fontSize: '10px',
-                fontWeight: 900,
-                borderRadius: '2px'
-              }}
-            >
-              {currentUser.projectId === 'espana' ? '🇪🇸 Valencia' : '🇦🇷 Bariloche'}
-            </div>
-          )}
-
           {/* User Badge */}
           <div
             className="flex items-center gap-2 px-2.5 py-1"
