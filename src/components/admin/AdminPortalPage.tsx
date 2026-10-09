@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentUser, logoutUser } from '../../services/authService';
 import type { User } from '../../services/authService';
+import '../../styles/admin-editorial.css';
 import { 
   fetchJiraIssues, 
   createJiraIssue, 
@@ -39,22 +40,22 @@ import { CrmCompanyDrawer } from './CrmCompanyDrawer';
 import { JiraIssueModal } from './JiraIssueModal';
 import { WebInquiriesView } from './WebInquiriesView';
 import { 
-  Cpu, 
   LayoutGrid, 
   Inbox, 
   Building, 
   LogOut, 
   ArrowLeft,
   MessageSquareText,
+  UserCheck
 } from 'lucide-react';
 
 interface AdminPortalPageProps {
   onReturnToSite: () => void;
-  darkMode: boolean;
+  darkMode?: boolean;
   onToggleDarkMode?: () => void;
 }
 
-export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode }) => {
+export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite, darkMode = false }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(getCurrentUser());
   const [activeTab, setActiveTab] = useState<'board' | 'backlog' | 'directory' | 'inquiries'>('board');
   
@@ -86,7 +87,6 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
     setCompanies(fetchedCompanies);
     setInquiries(fetchedLeads);
 
-    // Refresh selected company drawer if open
     if (selectedCompany) {
       const refreshedDetail = await fetchCompanyDetail(selectedCompany.id);
       if (refreshedDetail) {
@@ -98,7 +98,6 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
   useEffect(() => {
     refreshAllData();
 
-    // Subscribe to Live Sync Channels
     const unsubJira = subscribeToJiraChanges(() => refreshAllData());
     const unsubCrm = subscribeToCrmChanges(() => refreshAllData());
     const unsubLeads = subscribeToLeadChanges(() => refreshAllData());
@@ -118,7 +117,6 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
           refreshAllData();
         }}
         onReturnToSite={onReturnToSite}
-        darkMode={darkMode}
       />
     );
   }
@@ -130,7 +128,6 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
 
   // Jira Handlers
   const handleStatusChange = async (id: string, newStatus: JiraStatus) => {
-    // Optimistic UI update
     setIssues(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
     await updateIssueStatus(id, newStatus);
     await refreshAllData();
@@ -261,7 +258,6 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
   };
 
   const newInquiriesCount = inquiries.filter(i => i.status === 'nuevo').length;
-
   const isAdmin = currentUser.role === 'admin';
 
   const scopedCompanies = companies.filter(c => {
@@ -290,58 +286,96 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
   const backlogIssuesCount = scopedIssues.filter(i => i.status === 'backlog').length;
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors ${
-      darkMode ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'
-    }`}>
+    <div className="admin-editorial min-h-screen flex flex-col">
       
-      {/* Top Main Navigation Header */}
-      <header className={`px-6 py-3.5 border-b flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-md ${
-        darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-xs'
-      }`}>
-        
-        {/* Brand & Platform Identifier */}
-        <div className="flex items-center space-x-4">
+      {/* TOP NEO-BRUTALIST HEADER BAR */}
+      <header
+        className="px-4 sm:px-6 py-3 flex flex-col lg:flex-row items-center justify-between gap-3 sticky top-0 z-40"
+        style={{
+          backgroundColor: '#171715',
+          borderBottom: '3px solid #171715',
+          boxShadow: '0 4px 0 #171715'
+        }}
+      >
+        {/* Left: Brand & Return */}
+        <div className="flex items-center space-x-3 w-full lg:w-auto justify-between lg:justify-start">
           <button
             onClick={onReturnToSite}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black transition-all cursor-pointer"
+            style={{
+              backgroundColor: '#ffffff',
+              color: '#171715',
+              border: '2px solid #171715',
+              boxShadow: '2px 2px 0 #ffe526'
+            }}
             title="Volver a la Web Pública"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={13} />
+            <span>Web Principal</span>
           </button>
 
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl gradient-brand flex items-center justify-center text-white shadow-md">
-              <Cpu size={20} />
-            </div>
+          <div className="flex items-center space-x-2.5">
+            <img
+              src="/landing-assets/iatomica-logo-original.png"
+              alt="Logo"
+              width={34}
+              height={30}
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
             <div>
-              <h1 className="font-heading font-black text-lg leading-none flex items-center gap-2">
-                <span>Plataforma de Trabajo &amp; CRM</span>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                  SQLite Live Sync
+              <div className="flex items-center gap-2">
+                <span
+                  style={{
+                    fontFamily: "Impact, 'Arial Narrow', sans-serif",
+                    fontSize: '18px',
+                    letterSpacing: '-0.5px',
+                    textTransform: 'uppercase',
+                    color: '#ffffff'
+                  }}
+                >
+                  iAtomica
                 </span>
-              </h1>
-              <span className="text-xs text-slate-400 font-medium">iAtomica Jira Suite &amp; CRM 360°</span>
+                <span
+                  style={{
+                    backgroundColor: '#ffe526',
+                    color: '#171715',
+                    fontSize: '9px',
+                    fontWeight: 900,
+                    padding: '1px 6px',
+                    borderRadius: '2px',
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  OPERACIONES &amp; CRM
+                </span>
+              </div>
+              <span className="text-[10px] text-neutral-400 font-mono block">
+                SQLite Live Sync · Multi-territorio
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Central Jira / CRM Module Switcher */}
-        <div className="flex items-center p-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">
+        {/* Center: Module Switcher (Brutalist Tabs) */}
+        <div className="flex items-center gap-1.5 p-1 rounded-sm bg-neutral-900 border border-neutral-700 flex-wrap justify-center">
           
           {/* Tablero Activo */}
           <button
             onClick={() => setActiveTab('board')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 ${
-              activeTab === 'board'
-                ? 'gradient-brand text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
+            className={`admin-tab-btn cursor-pointer ${activeTab === 'board' ? 'active' : 'inactive'}`}
           >
-            <LayoutGrid size={15} />
+            <LayoutGrid size={14} />
             <span>Tablero Activo</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-              activeTab === 'board' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-            }`}>
+            <span
+              style={{
+                backgroundColor: activeTab === 'board' ? '#171715' : '#444',
+                color: activeTab === 'board' ? '#ffe526' : '#fff',
+                padding: '1px 5px',
+                fontSize: '9px',
+                fontWeight: 900,
+                borderRadius: '2px'
+              }}
+            >
               {activeIssuesCount}
             </span>
           </button>
@@ -349,17 +383,20 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
           {/* Backlog */}
           <button
             onClick={() => setActiveTab('backlog')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 ${
-              activeTab === 'backlog'
-                ? 'gradient-brand text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
+            className={`admin-tab-btn cursor-pointer ${activeTab === 'backlog' ? 'active' : 'inactive'}`}
           >
-            <Inbox size={15} />
+            <Inbox size={14} />
             <span>Backlog</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-              activeTab === 'backlog' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-            }`}>
+            <span
+              style={{
+                backgroundColor: activeTab === 'backlog' ? '#171715' : '#444',
+                color: activeTab === 'backlog' ? '#ffe526' : '#fff',
+                padding: '1px 5px',
+                fontSize: '9px',
+                fontWeight: 900,
+                borderRadius: '2px'
+              }}
+            >
               {backlogIssuesCount}
             </span>
           </button>
@@ -367,40 +404,56 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
           {/* Directorio CRM */}
           <button
             onClick={() => setActiveTab('directory')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 cursor-pointer ${
-              activeTab === 'directory'
-                ? 'gradient-brand text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
+            className={`admin-tab-btn cursor-pointer ${activeTab === 'directory' ? 'active' : 'inactive'}`}
           >
-            <Building size={15} />
+            <Building size={14} />
             <span>Directorio CRM</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-              activeTab === 'directory' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-            }`}>
+            <span
+              style={{
+                backgroundColor: activeTab === 'directory' ? '#171715' : '#444',
+                color: activeTab === 'directory' ? '#ffe526' : '#fff',
+                padding: '1px 5px',
+                fontSize: '9px',
+                fontWeight: 900,
+                borderRadius: '2px'
+              }}
+            >
               {scopedCompanies.length}
             </span>
           </button>
 
-          {/* Consultas Web / Bandeja de Entrada */}
+          {/* Consultas Web */}
           <button
             onClick={() => setActiveTab('inquiries')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center space-x-2 cursor-pointer ${
-              activeTab === 'inquiries'
-                ? 'gradient-brand text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
+            className={`admin-tab-btn cursor-pointer ${activeTab === 'inquiries' ? 'active' : 'inactive'}`}
           >
-            <MessageSquareText size={15} />
+            <MessageSquareText size={14} />
             <span>Consultas Web</span>
             {newInquiriesCount > 0 ? (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-rose-500 text-white animate-pulse">
-                {newInquiriesCount} nuevas
+              <span
+                style={{
+                  backgroundColor: '#ff4b83',
+                  color: '#ffffff',
+                  padding: '1px 6px',
+                  fontSize: '9px',
+                  fontWeight: 900,
+                  borderRadius: '2px'
+                }}
+                className="animate-pulse"
+              >
+                {newInquiriesCount} NUEVAS
               </span>
             ) : (
-              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'inquiries' ? 'bg-white/20 text-white' : 'bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-              }`}>
+              <span
+                style={{
+                  backgroundColor: activeTab === 'inquiries' ? '#171715' : '#444',
+                  color: activeTab === 'inquiries' ? '#ffe526' : '#fff',
+                  padding: '1px 5px',
+                  fontSize: '9px',
+                  fontWeight: 900,
+                  borderRadius: '2px'
+                }}
+              >
                 {inquiries.length}
               </span>
             )}
@@ -408,80 +461,111 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
 
         </div>
 
-        {/* Territory Switcher for Admin OR Fixed Scope Badge for Leads */}
-        <div className="flex items-center space-x-2">
+        {/* Right: Territory Filter & User Profile */}
+        <div className="flex items-center space-x-2.5 w-full lg:w-auto justify-end">
           {isAdmin ? (
-            <div className="flex items-center p-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">
+            <div className="flex items-center p-0.5 rounded-sm bg-neutral-900 border border-neutral-700 text-xs font-bold">
               <button
                 onClick={() => setTerritoryFilter('all')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  territoryFilter === 'all'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  backgroundColor: territoryFilter === 'all' ? '#ffe526' : 'transparent',
+                  color: territoryFilter === 'all' ? '#171715' : '#aaa',
+                  borderRadius: '2px'
+                }}
                 title="Ver todos los territorios"
               >
                 🌐 Global
               </button>
               <button
                 onClick={() => setTerritoryFilter('espana')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  territoryFilter === 'espana'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-                title="Filtrar por territorio España / Valencia"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  backgroundColor: territoryFilter === 'espana' ? '#ffe526' : 'transparent',
+                  color: territoryFilter === 'espana' ? '#171715' : '#aaa',
+                  borderRadius: '2px'
+                }}
+                title="Filtrar por Valencia / España"
               >
                 🇪🇸 Valencia
               </button>
               <button
                 onClick={() => setTerritoryFilter('bariloche')}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  territoryFilter === 'bariloche'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-                title="Filtrar por territorio Bariloche"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  backgroundColor: territoryFilter === 'bariloche' ? '#ffe526' : 'transparent',
+                  color: territoryFilter === 'bariloche' ? '#171715' : '#aaa',
+                  borderRadius: '2px'
+                }}
+                title="Filtrar por Bariloche"
               >
                 🇦🇷 Bariloche
               </button>
             </div>
           ) : (
-            <div className="px-3 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold font-mono flex items-center gap-1.5">
-              <span>{currentUser.projectId === 'espana' ? '🇪🇸 Territorio: España (Valencia)' : '🇦🇷 Territorio: Bariloche'}</span>
+            <div
+              style={{
+                backgroundColor: '#ffe526',
+                color: '#171715',
+                padding: '4px 9px',
+                fontSize: '10px',
+                fontWeight: 900,
+                borderRadius: '2px'
+              }}
+            >
+              {currentUser.projectId === 'espana' ? '🇪🇸 Valencia' : '🇦🇷 Bariloche'}
             </div>
           )}
-        </div>
 
-        {/* User Profile & Logout */}
-        <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
-          <div className="flex items-center space-x-3 pl-3 border-l border-slate-200 dark:border-slate-800">
-            <div className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-white font-bold text-xs shadow-xs border border-purple-500">
-              {currentUser.initials || currentUser.name.charAt(0)}
-            </div>
-            <div className="hidden sm:block text-left">
-              <h4 className="text-xs font-bold leading-tight">{currentUser.name}</h4>
-              <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold block">
-                {currentUser.title || currentUser.role}
+          {/* User Badge */}
+          <div
+            className="flex items-center gap-2 px-2.5 py-1"
+            style={{
+              backgroundColor: '#272725',
+              border: '1px solid #444',
+              borderRadius: '2px'
+            }}
+          >
+            <UserCheck size={13} className="text-[#ffe526]" />
+            <div className="text-left hidden sm:block leading-none">
+              <span className="text-[11px] font-black text-white block">
+                {currentUser.name}
+              </span>
+              <span className="text-[9px] text-neutral-400 font-mono">
+                {currentUser.role}
               </span>
             </div>
-
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-rose-600 transition-colors"
-              title="Cerrar Sesión"
-            >
-              <LogOut size={16} />
-            </button>
           </div>
-        </div>
 
+          {/* Logout */}
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: '#ff4b83',
+              color: '#ffffff',
+              border: '1.5px solid #ff4b83',
+              boxShadow: '2px 2px 0 #000',
+              padding: '6px 10px',
+              fontSize: '11px',
+              fontWeight: 900,
+              borderRadius: '2px',
+              cursor: 'pointer'
+            }}
+            title="Cerrar sesión"
+          >
+            <LogOut size={13} />
+          </button>
+        </div>
       </header>
 
-      {/* Main Module Content View */}
-      <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
-        
-        {/* Module 1: Jira Board */}
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 p-4 sm:p-6 max-w-[1600px] w-full mx-auto">
         {activeTab === 'board' && (
           <JiraBoard
             issues={scopedIssues}
@@ -489,7 +573,6 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             onDeleteIssue={handleDeleteIssue}
             onEditIssue={(issue) => {
               setEditingIssue(issue);
-              setDefaultCompanyForIssue(issue.companyId || null);
               setIsIssueModalOpen(true);
             }}
             onCreateIssue={() => {
@@ -504,16 +587,14 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
           />
         )}
 
-        {/* Module 2: Jira Backlog */}
         {activeTab === 'backlog' && (
           <JiraBacklog
             issues={scopedIssues}
-            companies={scopedCompanies}
+            companies={companies}
             onStatusChange={handleStatusChange}
             onQuickCreate={handleQuickCreateBacklog}
             onEditIssue={(issue) => {
               setEditingIssue(issue);
-              setDefaultCompanyForIssue(issue.companyId || null);
               setIsIssueModalOpen(true);
             }}
             onDeleteIssue={handleDeleteIssue}
@@ -528,16 +609,15 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
           />
         )}
 
-        {/* Module 3: CRM Directory 360° */}
         {activeTab === 'directory' && (
           <CrmDirectory
             companies={scopedCompanies}
-            onSelectCompany={(company) => handleOpenCompanyDrawer(company.id)}
+            onSelectCompany={(comp) => setSelectedCompany(comp)}
             onCreateCompany={handleCreateCompany}
             onUpdateCompany={handleUpdateCompany}
             onDeleteCompany={handleDeleteCompany}
             darkMode={darkMode}
-            issues={scopedIssues}
+            issues={issues}
             onOpenIssue={(issue) => {
               setEditingIssue(issue);
               setIsIssueModalOpen(true);
@@ -546,7 +626,6 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
           />
         )}
 
-        {/* Module 4: Consultas Web (Inbound Inquiries) */}
         {activeTab === 'inquiries' && (
           <WebInquiriesView
             inquiries={inquiries}
@@ -559,27 +638,28 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
             currentUserName={currentUser.name}
           />
         )}
-
       </main>
 
-      {/* Slide-over Drawer for Company 360° Inspection & Commercial History */}
-      <CrmCompanyDrawer
-        company={selectedCompany}
-        onClose={() => setSelectedCompany(null)}
-        onUpdateCompany={handleUpdateCompany}
-        onAddActivity={handleAddActivity}
-        onAddComment={handleAddComment}
-        onDeleteComment={handleDeleteComment}
-        onCreateIssueForCompany={handleCreateIssueForCompany}
-        onOpenIssue={(issue) => {
-          setEditingIssue(issue);
-          setIsIssueModalOpen(true);
-        }}
-        darkMode={darkMode}
-        currentUserName={currentUser.name}
-      />
+      {/* DRAWER: DETALLE CRM DE EMPRESA */}
+      {selectedCompany && (
+        <CrmCompanyDrawer
+          company={selectedCompany}
+          onClose={() => setSelectedCompany(null)}
+          onUpdateCompany={(id, updates) => handleUpdateCompany(id, updates)}
+          onAddActivity={(companyId, act) => handleAddActivity(companyId, act)}
+          onAddComment={(companyId, text) => handleAddComment(companyId, text)}
+          onDeleteComment={(commentId, companyId) => handleDeleteComment(commentId, companyId)}
+          onCreateIssueForCompany={(companyId) => handleCreateIssueForCompany(companyId)}
+          onOpenIssue={(issue: JiraIssue) => {
+            setEditingIssue(issue);
+            setIsIssueModalOpen(true);
+          }}
+          darkMode={darkMode}
+          currentUserName={currentUser.name}
+        />
+      )}
 
-      {/* Modal for Creating / Editing Jira Issues */}
+      {/* MODAL: CREAR / EDITAR INCIDENCIA DE JIRA */}
       <JiraIssueModal
         isOpen={isIssueModalOpen}
         onClose={() => {
@@ -589,7 +669,7 @@ export const AdminPortalPage: React.FC<AdminPortalPageProps> = ({ onReturnToSite
         }}
         onSave={handleSaveIssue}
         editingIssue={editingIssue}
-        companies={scopedCompanies}
+        companies={companies}
         defaultCompanyId={defaultCompanyForIssue}
         darkMode={darkMode}
         currentUser={currentUser}

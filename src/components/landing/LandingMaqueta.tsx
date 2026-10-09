@@ -171,6 +171,16 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
             <a href="#proyectos">Proyectos</a>
             <a href="#proceso">Cómo trabajamos</a>
             <a href="#nosotros">Nosotros</a>
+            {onOpenAdmin && (
+              <button
+                type="button"
+                onClick={onOpenAdmin}
+                className="btn-admin-nav"
+                title="Acceso al Panel de Control y CRM"
+              >
+                <span>🔒</span> Panel
+              </button>
+            )}
             <a href="#contacto" className="btn yellow">
               Asesoría gratuita <span className="arrow">→</span>
             </a>
@@ -194,6 +204,35 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
         <a href="#proceso" onClick={closeMenu}>Cómo trabajamos</a>
         <a href="#nosotros" onClick={closeMenu}>Nosotros</a>
         <a href="#faq" onClick={closeMenu}>Preguntas frecuentes</a>
+        {onOpenAdmin && (
+          <button
+            type="button"
+            onClick={() => {
+              closeMenu();
+              onOpenAdmin();
+            }}
+            className="btn"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              background: '#ffe526',
+              color: '#171715',
+              border: '2px solid #171715',
+              boxShadow: '3px 3px 0 #171715',
+              fontWeight: 800,
+              fontSize: '13px',
+              padding: '12px',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}
+          >
+            <span>🔒</span> Acceso Panel CRM
+          </button>
+        )}
         <a href="#contacto" className="btn yellow" onClick={closeMenu}>
           Asesoría gratuita →
         </a>
@@ -750,16 +789,23 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
                 <button
                   onClick={onOpenAdmin}
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#888',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: '#ffe526',
+                    color: '#171715',
+                    border: '1.5px solid #171715',
+                    boxShadow: '2px 2px 0 #ffffff',
                     cursor: 'pointer',
                     fontSize: 12,
-                    fontWeight: 700,
-                    padding: 0
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    padding: '5px 12px',
+                    transition: 'transform 0.15s, box-shadow 0.15s'
                   }}
+                  title="Acceso al Panel de Control y CRM"
                 >
-                  Portal Admin
+                  <span>🔒</span> Portal Admin
                 </button>
               )}
             </div>

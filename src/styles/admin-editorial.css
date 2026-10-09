@@ -1,0 +1,282 @@
+/* ==========================================================================
+   ADMIN EDITORIAL DESIGN SYSTEM - IATOMICA
+   Neo-Brutalist / Pop-Art / Paper & Ink Operational Dashboard
+   ========================================================================== */
+
+:root {
+  --admin-paper: #f2efe5;
+  --admin-paper-card: #ffffff;
+  --admin-ink: #171715;
+  --admin-yellow: #ffe526;
+  --admin-blue: #008ded;
+  --admin-pink: #ff4b83;
+  --admin-green: #32c878;
+  --admin-purple: #9055ff;
+}
+
+.admin-editorial {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--admin-paper);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' opacity='.06' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+  color: var(--admin-ink);
+  min-height: 100vh;
+}
+
+.admin-editorial * {
+  box-sizing: border-box;
+}
+
+/* Headings in Impact */
+.admin-editorial h1,
+.admin-editorial h2,
+.admin-editorial h3,
+.admin-editorial .font-heading {
+  font-family: Impact, 'Arial Narrow', sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+/* Neo-Brutalist Cards */
+.admin-editorial .bg-white,
+.admin-editorial .bg-slate-50,
+.admin-editorial .bg-slate-100 {
+  background-color: #ffffff !important;
+  border: 2px solid var(--admin-ink) !important;
+  box-shadow: 4px 4px 0px var(--admin-ink) !important;
+  border-radius: 2px !important;
+}
+
+/* Override dark mode cards if present */
+.admin-editorial .dark .bg-slate-900,
+.admin-editorial .dark .bg-slate-800,
+.admin-editorial .dark .bg-slate-950 {
+  background-color: #1f1f1d !important;
+  border: 2px solid var(--admin-ink) !important;
+  box-shadow: 4px 4px 0px var(--admin-ink) !important;
+  border-radius: 2px !important;
+}
+
+/* Hard Borders & Sharp Corners */
+.admin-editorial .rounded-3xl,
+.admin-editorial .rounded-2xl,
+.admin-editorial .rounded-xl,
+.admin-editorial .rounded-lg {
+  border-radius: 2px !important;
+}
+
+/* Offset Ink Shadows */
+.admin-editorial .shadow-2xl,
+.admin-editorial .shadow-xl,
+.admin-editorial .shadow-lg,
+.admin-editorial .shadow-md {
+  box-shadow: 6px 6px 0px var(--admin-ink) !important;
+}
+
+.admin-editorial .shadow-sm,
+.admin-editorial .shadow-xs {
+  box-shadow: 3px 3px 0px var(--admin-ink) !important;
+}
+
+/* Override gradient-brand to Pop Yellow */
+.admin-editorial .gradient-brand {
+  background: var(--admin-yellow) !important;
+  color: var(--admin-ink) !important;
+  border: 2px solid var(--admin-ink) !important;
+  box-shadow: 3px 3px 0px var(--admin-ink) !important;
+  font-weight: 900 !important;
+}
+
+.admin-editorial .text-gradient-brand {
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  color: var(--admin-ink) !important;
+  font-weight: 900 !important;
+}
+
+/* Input Fields */
+.admin-editorial input,
+.admin-editorial select,
+.admin-editorial textarea {
+  background-color: #ffffff !important;
+  border: 2px solid var(--admin-ink) !important;
+  border-radius: 2px !important;
+  color: var(--admin-ink) !important;
+  font-weight: 600;
+  box-shadow: 2px 2px 0px var(--admin-ink) !important;
+  outline: none !important;
+}
+
+.admin-editorial input:focus,
+.admin-editorial select:focus,
+.admin-editorial textarea:focus {
+  border-color: var(--admin-ink) !important;
+  box-shadow: 4px 4px 0px var(--admin-ink) !important;
+}
+
+/* Buttons */
+.admin-editorial button {
+  cursor: pointer;
+  border-radius: 2px !important;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.admin-editorial button:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+}
+
+.admin-editorial button:active:not(:disabled) {
+  transform: translate(1px, 1px);
+}
+
+/* Navigation Bar */
+.admin-nav-header {
+  background-color: #171715 !important;
+  border-bottom: 3px solid #171715 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Brutalist Tabs */
+.admin-tab-btn {
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid #171715;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-tab-btn.active {
+  background-color: #ffe526 !important;
+  color: #171715 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
+}
+
+.admin-tab-btn.inactive {
+  background-color: #2b2b29 !important;
+  color: #d1d1cf !important;
+  box-shadow: none !important;
+}
+
+.admin-tab-btn.inactive:hover {
+  background-color: #3b3b38 !important;
+  color: #ffffff !important;
+}
+
+/* Kanban Columns */
+.admin-column {
+  background-color: #eae5d8 !important;
+  border: 2px solid #171715 !important;
+  box-shadow: 4px 4px 0px #171715 !important;
+  border-radius: 2px !important;
+}
+
+.admin-column-header {
+  border-bottom: 2px solid #171715 !important;
+  padding: 10px 14px;
+  font-family: Impact, 'Arial Narrow', sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 15px;
+}
+
+/* Issue Card in Board */
+.admin-issue-card {
+  background-color: #ffffff !important;
+  border: 2px solid #171715 !important;
+  box-shadow: 3px 3px 0px #171715 !important;
+  border-radius: 2px !important;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.admin-issue-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0px #171715 !important;
+}
+
+/* Tables */
+.admin-editorial table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 2px solid #171715 !important;
+  background-color: #ffffff !important;
+  box-shadow: 4px 4px 0px #171715 !important;
+  border-radius: 2px !important;
+}
+
+.admin-editorial thead th {
+  background-color: #171715 !important;
+  color: #ffffff !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  border-bottom: 2px solid #171715 !important;
+  padding: 12px 14px !important;
+}
+
+.admin-editorial tbody tr {
+  border-bottom: 1px solid #17171520 !important;
+  transition: background-color 0.15s;
+}
+
+.admin-editorial tbody tr:hover {
+  background-color: #fff9d6 !important;
+}
+
+.admin-editorial tbody td {
+  padding: 12px 14px !important;
+  font-size: 13px !important;
+  border-bottom: 1px solid #17171525 !important;
+}
+
+/* Badges */
+.admin-editorial .badge-pop-yellow {
+  background-color: #ffe526 !important;
+  color: #171715 !important;
+  border: 1.5px solid #171715 !important;
+  font-weight: 900 !important;
+  font-size: 10px !important;
+  padding: 2px 7px !important;
+  border-radius: 2px !important;
+  text-transform: uppercase;
+}
+
+.admin-editorial .badge-pop-blue {
+  background-color: #008ded !important;
+  color: #ffffff !important;
+  border: 1.5px solid #171715 !important;
+  font-weight: 900 !important;
+  font-size: 10px !important;
+  padding: 2px 7px !important;
+  border-radius: 2px !important;
+  text-transform: uppercase;
+}
+
+.admin-editorial .badge-pop-pink {
+  background-color: #ff4b83 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #171715 !important;
+  font-weight: 900 !important;
+  font-size: 10px !important;
+  padding: 2px 7px !important;
+  border-radius: 2px !important;
+  text-transform: uppercase;
+}
+
+.admin-editorial .badge-pop-green {
+  background-color: #32c878 !important;
+  color: #171715 !important;
+  border: 1.5px solid #171715 !important;
+  font-weight: 900 !important;
+  font-size: 10px !important;
+  padding: 2px 7px !important;
+  border-radius: 2px !important;
+  text-transform: uppercase;
+}

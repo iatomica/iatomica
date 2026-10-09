@@ -126,6 +126,30 @@
   border-color: var(--yellow);
 }
 
+.iatomica-landing .btn-admin-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.iatomica-landing .btn-admin-nav:hover {
+  background: var(--yellow);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
 .iatomica-landing .arrow {
   font-size: 23px;
   line-height: 0.6;
@@ -493,7 +517,7 @@
   box-shadow: 4px 6px 0 var(--ink);
 }
 
-.iatomica-landing .project-image { height: 205px; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--ink); background-color: #171715; } .iatomica-landing .project-image img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.35s ease; display: block; } .iatomica-landing .project:hover .project-image img { transform: scale(1.06); } .iatomica-landing .project-badge { position: absolute; top: 10px; right: 10px; background: var(--ink); color: var(--yellow); padding: 4px 9px; font-size: 9px; font-weight: 900; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; z-index: 2; box-shadow: 2px 2px 0 rgba(0,0,0,0.3); } .iatomica-landing .project-metric-pill { display: inline-block; background: #fff8; border: 1px solid #17171520; padding: 2px 7px; font-size: 10px; font-weight: 700; border-radius: 2px; color: #171715; } .iatomica-landing .project-metric-pill strong { color: #000; font-weight: 900; } .iatomica-landing ._old_pi {
+.iatomica-landing .project-image {
   height: 190px;
   background-size: cover;
   background-position: center;
@@ -917,7 +941,7 @@
   .iatomica-landing .contact {
     gap: 30px;
   }
-  .iatomica-landing .project-image { height: 205px; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--ink); background-color: #171715; } .iatomica-landing .project-image img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.35s ease; display: block; } .iatomica-landing .project:hover .project-image img { transform: scale(1.06); } .iatomica-landing .project-badge { position: absolute; top: 10px; right: 10px; background: var(--ink); color: var(--yellow); padding: 4px 9px; font-size: 9px; font-weight: 900; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; z-index: 2; box-shadow: 2px 2px 0 rgba(0,0,0,0.3); } .iatomica-landing .project-metric-pill { display: inline-block; background: #fff8; border: 1px solid #17171520; padding: 2px 7px; font-size: 10px; font-weight: 700; border-radius: 2px; color: #171715; } .iatomica-landing .project-metric-pill strong { color: #000; font-weight: 900; } .iatomica-landing ._old_pi {
+  .iatomica-landing .project-image {
     height: 140px;
   }
 }
@@ -1058,7 +1082,7 @@
   .iatomica-landing .projects {
     grid-template-columns: 1fr;
   }
-  .iatomica-landing .project-image { height: 205px; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--ink); background-color: #171715; } .iatomica-landing .project-image img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.35s ease; display: block; } .iatomica-landing .project:hover .project-image img { transform: scale(1.06); } .iatomica-landing .project-badge { position: absolute; top: 10px; right: 10px; background: var(--ink); color: var(--yellow); padding: 4px 9px; font-size: 9px; font-weight: 900; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; z-index: 2; box-shadow: 2px 2px 0 rgba(0,0,0,0.3); } .iatomica-landing .project-metric-pill { display: inline-block; background: #fff8; border: 1px solid #17171520; padding: 2px 7px; font-size: 10px; font-weight: 700; border-radius: 2px; color: #171715; } .iatomica-landing .project-metric-pill strong { color: #000; font-weight: 900; } .iatomica-landing ._old_pi {
+  .iatomica-landing .project-image {
     height: 180px;
   }
   .iatomica-landing .process {
