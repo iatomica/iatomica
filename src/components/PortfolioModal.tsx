@@ -1,20 +1,13 @@
 import React, { useEffect } from 'react';
-import { 
-  X, 
-  ExternalLink, 
-  CheckCircle2, 
-  Sparkles, 
-  Globe 
-} from 'lucide-react';
 import type { PortfolioProject } from '../data/portfolioData';
 
 interface PortfolioModalProps {
   project: PortfolioProject | null;
   onClose: () => void;
-  darkMode: boolean;
+  darkMode?: boolean;
 }
 
-export const PortfolioModal: React.FC<PortfolioModalProps> = ({ project, onClose, darkMode }) => {
+export const PortfolioModal: React.FC<PortfolioModalProps> = ({ project, onClose }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -32,146 +25,406 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({ project, onClose
   if (!project) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
-      
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" 
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+      style={{
+        backgroundColor: 'rgba(23, 23, 21, 0.75)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)'
+      }}
+    >
+      {/* Backdrop click handler */}
+      <div
+        className="fixed inset-0"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Modal Dialog Card */}
-      <div 
+      {/* Modal Card - Neo-Brutalist Pop-Art Style */}
+      <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="portfolio-modal-title"
-        className={`relative w-full max-w-3xl rounded-3xl overflow-hidden border shadow-2xl z-10 my-8 transition-all max-h-[90vh] flex flex-col ${
-          darkMode 
-            ? 'bg-slate-900 border-slate-800 text-white' 
-            : 'bg-white border-slate-200 text-slate-900'
-        }`}
+        className="relative w-full max-w-3xl z-10 my-6 flex flex-col max-h-[92vh] overflow-hidden"
+        style={{
+          backgroundColor: '#f2efe5',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' opacity='.06' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E")`,
+          border: '3px solid #171715',
+          boxShadow: '10px 10px 0px #171715',
+          borderRadius: '2px',
+          color: '#171715',
+          fontFamily: 'Arial, Helvetica, sans-serif'
+        }}
       >
-        {/* Modal Hero Banner */}
-        <div className="relative h-60 sm:h-72 w-full overflow-hidden shrink-0 bg-slate-950">
+        {/* MODAL HERO BANNER */}
+        <div
+          className="relative w-full overflow-hidden shrink-0"
+          style={{
+            height: '240px',
+            borderBottom: '3px solid #171715',
+            backgroundColor: '#171715'
+          }}
+        >
           <img
             src={project.heroImage}
             alt={project.title}
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
 
-          {/* Close button */}
+          {/* Grayscale / Dark Gradient for punchy readability */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(23,23,21,0.3) 0%, rgba(23,23,21,0.85) 100%)'
+            }}
+          />
+
+          {/* Close button - Neo-brutalist square */}
           <button
             onClick={onClose}
             aria-label="Cerrar modal"
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all hover:scale-105 z-10 cursor-pointer"
+            className="absolute top-3 right-3 flex items-center justify-center font-black transition-transform cursor-pointer"
+            style={{
+              width: '38px',
+              height: '38px',
+              backgroundColor: '#ffe526',
+              color: '#171715',
+              border: '2px solid #171715',
+              boxShadow: '3px 3px 0 #171715',
+              fontSize: '22px',
+              lineHeight: 1,
+              zIndex: 20
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translate(-2px, -2px)';
+              e.currentTarget.style.boxShadow = '5px 5px 0 #171715';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.boxShadow = '3px 3px 0 #171715';
+            }}
           >
-            <X size={18} />
+            ×
           </button>
 
           {/* Sector & Badge Pills */}
-          <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-950/80 backdrop-blur-md text-white border border-white/20">
+          <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2 z-10">
+            <span
+              style={{
+                backgroundColor: '#171715',
+                color: '#ffffff',
+                border: '1.5px solid #171715',
+                fontSize: '10px',
+                fontWeight: 900,
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                padding: '4px 10px',
+                borderRadius: '2px'
+              }}
+            >
               {project.sectorLabel}
             </span>
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-orange-500 text-white shadow-sm">
+
+            <span
+              style={{
+                backgroundColor: '#ffe526',
+                color: '#171715',
+                border: '1.5px solid #171715',
+                boxShadow: '2px 2px 0 #171715',
+                fontSize: '10px',
+                fontWeight: 900,
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                padding: '4px 10px',
+                transform: 'rotate(-2deg)',
+                borderRadius: '2px'
+              }}
+            >
               {project.badge}
             </span>
           </div>
 
-          {/* Hero text overlay inside banner */}
-          <div className="absolute bottom-5 left-6 right-6 text-white">
-            <span className="text-xs uppercase tracking-widest text-orange-400 font-semibold block mb-1">
+          {/* Title & Client Headline inside Hero */}
+          <div className="absolute bottom-4 left-5 right-5 text-white z-10">
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                color: '#ffe526',
+                marginBottom: '4px'
+              }}
+            >
               {project.clientName}
-            </span>
-            <h3 id="portfolio-modal-title" className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+            </div>
+
+            <h3
+              id="portfolio-modal-title"
+              style={{
+                fontFamily: "Impact, 'Arial Narrow', sans-serif",
+                fontSize: '34px',
+                textTransform: 'uppercase',
+                lineHeight: 1.05,
+                letterSpacing: '-1px',
+                margin: 0,
+                textShadow: '2px 2px 0 #171715'
+              }}
+            >
               {project.title}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 font-medium mt-1 line-clamp-1">
+
+            <p
+              style={{
+                fontSize: '13px',
+                color: '#f2efe5',
+                fontWeight: 600,
+                margin: '4px 0 0',
+                opacity: 0.95
+              }}
+            >
               {project.tagline}
             </p>
           </div>
         </div>
 
-        {/* Modal Scrollable Body */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
-          
+        {/* MODAL SCROLLABLE BODY */}
+        <div
+          className="p-5 sm:p-7 overflow-y-auto space-y-6"
+          style={{
+            maxHeight: 'calc(92vh - 240px)'
+          }}
+        >
           {/* Executive Overview */}
           <div>
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 mb-2">
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 800,
+                letterSpacing: '3px',
+                textTransform: 'uppercase',
+                color: '#171715',
+                marginBottom: '8px'
+              }}
+            >
               Sobre el Proyecto
-            </h4>
-            <p className={`text-sm leading-relaxed ${
-              darkMode ? 'text-slate-200' : 'text-slate-700'
-            }`}>
+            </div>
+            <p
+              style={{
+                fontSize: '14px',
+                lineHeight: 1.65,
+                color: '#222',
+                margin: 0
+              }}
+            >
               {project.fullDesc}
             </p>
           </div>
 
-          {/* Impact Metrics Bento */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {project.metrics.map((m, idx) => (
-              <div 
-                key={idx}
-                className={`p-3.5 rounded-2xl border text-center transition-all ${
-                  darkMode 
-                    ? 'bg-slate-800/50 border-slate-700/60' 
-                    : 'bg-slate-50 border-slate-200/80 shadow-xs'
-                }`}
-              >
-                <span className="text-xl sm:text-2xl font-black text-gradient-brand block">
-                  {m.value}
-                </span>
-                <span className={`text-[11px] font-medium tracking-tight uppercase block mt-1 ${
-                  darkMode ? 'text-slate-400' : 'text-slate-500'
-                }`}>
-                  {m.label}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Key Features Implemented by iAtomica */}
+          {/* Bento Metric Cards (Neo-Brutalist) */}
           <div>
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-orange-500 mb-4 flex items-center gap-2">
-              <Sparkles size={14} />
-              <span>Funcionalidades & Soluciones Implementadas</span>
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {project.features.map((feat, idx) => (
-                <div 
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 800,
+                letterSpacing: '3px',
+                textTransform: 'uppercase',
+                color: '#171715',
+                marginBottom: '10px'
+              }}
+            >
+              Métricas & Impacto
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {project.metrics.map((m, idx) => (
+                <div
                   key={idx}
-                  className={`p-3.5 rounded-xl border flex items-start gap-3 text-xs leading-relaxed ${
-                    darkMode 
-                      ? 'bg-slate-800/30 border-slate-800 text-slate-200' 
-                      : 'bg-slate-50/80 border-slate-200 text-slate-700'
-                  }`}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    border: '2px solid #171715',
+                    boxShadow: '4px 4px 0px #171715',
+                    padding: '12px 14px',
+                    borderRadius: '2px'
+                  }}
                 >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{feat}</span>
+                  <div
+                    style={{
+                      fontFamily: "Impact, 'Arial Narrow', sans-serif",
+                      fontSize: '26px',
+                      lineHeight: 1.1,
+                      textTransform: 'uppercase',
+                      color: '#171715'
+                    }}
+                  >
+                    <span
+                      style={{
+                        backgroundColor: '#ffe526',
+                        padding: '1px 6px'
+                      }}
+                    >
+                      {m.value}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      color: '#555',
+                      marginTop: '6px'
+                    }}
+                  >
+                    {m.label}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Footer Navigation Bar */}
-          <div className={`pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4 ${
-            darkMode ? 'border-slate-800' : 'border-slate-200'
-          }`}>
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-              <Globe size={14} className="text-orange-500" />
+          {/* Key Features Implemented */}
+          <div>
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 800,
+                letterSpacing: '3px',
+                textTransform: 'uppercase',
+                color: '#171715',
+                marginBottom: '10px'
+              }}
+            >
+              Soluciones & Funcionalidades Implementadas
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {project.features.map((feat, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    border: '1.5px solid #171715',
+                    boxShadow: '3px 3px 0px #171715',
+                    padding: '10px 12px',
+                    borderRadius: '2px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '10px'
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '18px',
+                      height: '18px',
+                      backgroundColor: '#171715',
+                      color: '#ffe526',
+                      borderRadius: '50%',
+                      fontSize: '11px',
+                      fontWeight: 900,
+                      flexShrink: 0,
+                      marginTop: '1px'
+                    }}
+                  >
+                    ✓
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      lineHeight: 1.45,
+                      color: '#171715'
+                    }}
+                  >
+                    {feat}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tech Stack Pills */}
+          {project.techStack && project.techStack.length > 0 && (
+            <div>
+              <div
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  letterSpacing: '3px',
+                  textTransform: 'uppercase',
+                  color: '#171715',
+                  marginBottom: '8px'
+                }}
+              >
+                Stack Tecnológico
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {project.techStack.map((tech, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      backgroundColor: '#ffffff',
+                      border: '1.5px solid #171715',
+                      boxShadow: '2px 2px 0px #171715',
+                      padding: '4px 10px',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      borderRadius: '2px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* FOOTER ACTIONS */}
+          <div
+            className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-4"
+            style={{
+              borderTop: '2px solid #171715'
+            }}
+          >
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#555',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <span>🌐</span>
               <span>{project.url.replace(/^https?:\/\//, '')}</span>
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={onClose}
-                className={`flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
-                  darkMode 
-                    ? 'border-slate-700 hover:bg-slate-800 text-slate-300' 
-                    : 'border-slate-300 hover:bg-slate-100 text-slate-700'
-                }`}
+                className="flex-1 sm:flex-none cursor-pointer"
+                style={{
+                  border: '1.5px solid #171715',
+                  backgroundColor: 'transparent',
+                  padding: '10px 18px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  borderRadius: '2px',
+                  boxShadow: '3px 3px 0 #171715',
+                  transition: 'transform 0.15s, box-shadow 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translate(-1px, -1px)';
+                  e.currentTarget.style.boxShadow = '4px 4px 0 #171715';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '3px 3px 0 #171715';
+                }}
               >
                 Cerrar
               </button>
@@ -180,16 +433,36 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({ project, onClose
                 href={project.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl gradient-brand text-white font-bold text-xs shadow-md shadow-orange-500/20 hover:shadow-orange-500/40 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="flex-1 sm:flex-none cursor-pointer inline-flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: '#ffe526',
+                  color: '#171715',
+                  border: '1.5px solid #171715',
+                  padding: '10px 22px',
+                  fontSize: '12px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  borderRadius: '2px',
+                  boxShadow: '4px 4px 0 #171715',
+                  textDecoration: 'none',
+                  transition: 'transform 0.15s, box-shadow 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                  e.currentTarget.style.boxShadow = '6px 6px 0 #171715';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '4px 4px 0 #171715';
+                }}
               >
                 <span>Acceder a {project.title}</span>
-                <ExternalLink size={14} />
+                <span style={{ fontSize: '15px', lineHeight: 1 }}>↗</span>
               </a>
             </div>
           </div>
-
         </div>
-
       </div>
     </div>
   );
