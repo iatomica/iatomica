@@ -171,19 +171,20 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
             <a href="#proyectos">Proyectos</a>
             <a href="#proceso">Cómo trabajamos</a>
             <a href="#nosotros">Nosotros</a>
-            {onOpenAdmin && (
+            {onOpenAdmin ? (
               <button
                 type="button"
                 onClick={onOpenAdmin}
-                className="btn-admin-nav"
-                title="Acceso al Panel de Control y CRM"
+                className="btn yellow"
+                title="Acceso al sistema y Panel de Gestión"
               >
-                Panel CRM
+                Acceso <span className="arrow">→</span>
               </button>
+            ) : (
+              <a href="/admin" className="btn yellow" title="Acceso al sistema y Panel de Gestión">
+                Acceso <span className="arrow">→</span>
+              </a>
             )}
-            <a href="#contacto" className="btn yellow">
-              Asesoría gratuita <span className="arrow">→</span>
-            </a>
           </div>
           <button
             className="menu-btn"
@@ -204,37 +205,39 @@ export const LandingMaqueta: React.FC<LandingMaquetaProps> = ({ onOpenAdmin, onO
         <a href="#proceso" onClick={closeMenu}>Cómo trabajamos</a>
         <a href="#nosotros" onClick={closeMenu}>Nosotros</a>
         <a href="#faq" onClick={closeMenu}>Preguntas frecuentes</a>
-        {onOpenAdmin && (
+        {onOpenAdmin ? (
           <button
             type="button"
             onClick={() => {
               closeMenu();
               onOpenAdmin();
             }}
-            className="btn"
+            className="btn yellow"
             style={{
               width: '100%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: '#ffe526',
-              color: '#171715',
-              border: '2px solid #171715',
-              boxShadow: '3px 3px 0 #171715',
-              fontWeight: 800,
-              fontSize: '13px',
-              padding: '12px',
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
+              cursor: 'pointer'
             }}
           >
-            Acceso Panel CRM
+            Acceso <span className="arrow">→</span>
           </button>
+        ) : (
+          <a
+            href="/admin"
+            className="btn yellow"
+            onClick={closeMenu}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            Acceso <span className="arrow">→</span>
+          </a>
         )}
-        <a href="#contacto" className="btn yellow" onClick={closeMenu}>
-          Asesoría gratuita →
-        </a>
         <p className="eyebrow">
           Tecnología para<br /><br />ideas que avanzan.
         </p>
